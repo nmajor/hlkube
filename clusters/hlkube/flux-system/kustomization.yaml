@@ -3,3 +3,18 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
+patches:
+  # Enable image automation components
+  - patch: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: flux-system
+      spec:
+        components:
+          - image-reflector
+          - image-automation
+    target:
+      kind: Kustomization
+      name: flux-system
+      namespace: flux-system
