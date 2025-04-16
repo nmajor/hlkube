@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: echo
+  namespace: echo
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`echo.hlkube.local`)
+      kind: Rule
+      services:
+        - name: echo
+          port: 80
