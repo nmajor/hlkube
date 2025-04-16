@@ -4,7 +4,7 @@ SealedSecrets allows you to encrypt Kubernetes secrets for safe storage in Git.
 
 ## Installation
 
-The SealedSecrets controller is installed via Flux. The configuration is in the `release.yaml` file.
+The SealedSecrets controller is installed via Flux in the `sealed-secrets` namespace. The configuration is in the `release.yaml` file.
 
 ## Workflow
 
@@ -65,7 +65,7 @@ find . -name "*.secret" | while read secretfile; do
   sealedfile=\${secretfile%.secret}.sealed.yaml
   echo "Sealing \$secretfile to \$sealedfile..."
   kubeseal --format yaml --controller-name=sealed-secrets-controller \
-    --controller-namespace=flux-system < \$secretfile > \$sealedfile
+    --controller-namespace=sealed-secrets < \$secretfile > \$sealedfile
 done
 EOF
 

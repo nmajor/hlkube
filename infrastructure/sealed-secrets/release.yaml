@@ -14,6 +14,7 @@ spec:
         name: sealed-secrets
         namespace: flux-system
   install:
-    createNamespace: true
+    createNamespace: false
+  targetNamespace: sealed-secrets
   values:
     fullnameOverride: sealed-secrets-controller
