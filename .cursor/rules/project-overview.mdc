@@ -1,0 +1,89 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+I'm building a home kubernetes cluster. I live in portugal. I use an macbook pro with an intel CPU. I will only ever be running 3-6 worker nodes for the kubernetes cluster. I will never need to run more than 6 worker nodes, but will keep a minimum of 3 worker nodes.
+
+Worker nodes = 3 x HP EliteDesk 800 G6 mini Intel Core i7-10700T
+Control plane nodes = 3 x HP EliteDesk 800 G3 DM 65W - Intel Core i5-7500T CPU
+
+From researched I've gathered from people who have used and tested these machines, they report they both tend to draw 11-12W at idle.
+
+I'll be running Longhorn for the storage and the 2 tb nvme in each of the nodes will be linked to longhord for their recommended 3 replicas.
+
+All the worker nodes will all have 2.5gbe and will each have a dedicated 2tb nvme drive for storage.
+
+All nodes will be running Talos OS on all nodes. Both the worker nodes and control plane nodes will be running Talos OS.
+
+The cluster we be on its own VLAN in my home network.
+The cluster will be connected to the open internet through a cloudflare tunnel.
+
+The main use for this is to self host some websites and some other things. For example I'm a software engineer and I want to be able to deploy my own apps on this cluster. Primarily elixir phoenix apps, or ruby on rails apps, or node js apps. Each app will have a postgresql db with it.
+
+---
+
+I've created a VLAN on my Unify Express called HLKube which is what I will use to run the cluster in a VLAN on my network. I have a Unify Flex Switch 2.5gbe with 8 ports and I configured each port to the HLKube VLAN.
+
+---
+
+All nodes are online with the controlplane vip as 192.168.10.10
+
+❯ talosctl --talosconfig talosconfig --endpoints 192.168.10.10 --nodes 192.168.10.10 get members
+NODE            NAMESPACE   TYPE     ID    VERSION   HOSTNAME   MACHINE TYPE   OS               ADDRESSES
+192.168.10.10   cluster     Member   cp1   9         cp1        controlplane   Talos (v1.9.5)   ["192.168.10.10","192.168.10.11"]
+192.168.10.10   cluster     Member   cp2   1         cp2        controlplane   Talos (v1.9.5)   ["192.168.10.12"]
+192.168.10.10   cluster     Member   cp3   1         cp3        controlplane   Talos (v1.9.5)   ["192.168.10.13"]
+192.168.10.10   cluster     Member   w1    1         w1         worker         Talos (v1.9.5)   ["192.168.10.51"]
+192.168.10.10   cluster     Member   w2    1         w2         worker         Talos (v1.9.5)   ["192.168.10.52"]
+192.168.10.10   cluster     Member   w3    1         w3         worker         Talos (v1.9.5)   ["192.168.10.53"]
+
+---
+
+This project is the Flux CD repo is hosted on github at nmajor/hlkube.
+All changes to the cluster should be made from making changes to this flux repo.
+NEVER SUGGEST MAKING CHANGES WITH `kubectl` DIRECTLY!! ALL CHANGES TO THE STACK MUST BE MADE THROUGH FLUX BY COMMITTING FILES TO THIS REPO.
+The flux namespace on the cluster is `flux-system`
+
+The flux repo should follow this structure (THIS IS AN EXAMPLE WITH FAKE FILES):
+hlkube-flux/
+├── clusters/
+│   └── hlkube/              # Root Flux watches for this cluster (created by bootstrap)
+│       ├── flux-system/       # Flux components (managed by bootstrap)
+│       │   ├── gotk-components.yaml
+│       │   ├── gotk-sync.yaml
+│       │   └── kustomization.yaml
+│       ├── infrastructure.yaml  # Top-level Kustomization for infra components
+│       ├── apps.yaml          # Top-level Kustomization for applications
+│       └── README.md          # Info about this specific cluster config
+├── infrastructure/          # Cluster-wide infrastructure services (non-app specific)
+│   ├── sources/             # Optional: GitRepository/HelmRepository sources
+│   │   ├── kustomization.yaml
+│   │   └── longhorn.yaml    # Example HelmRepository for Longhorn
+│   │   └── traefik.yaml     # Example HelmRepository for Traefik
+│   ├── cert-manager/        # Example: Cert-Manager manifests/HelmRelease
+│   │   └── kustomization.yaml
+│   ├── longhorn/            # Longhorn manifests/HelmRelease
+│   │   └── kustomization.yaml
+│   ├── traefik/             # Traefik manifests/HelmRelease
+│   │   └── kustomization.yaml
+│   ├── tailscale/           # Tailscale operator/subnet router manifests
+│   │   └── kustomization.yaml
+│   └── kustomization.yaml     # Kustomization linking all infra/* subdirs
+├── apps/                    # Application deployments
+│   ├── sources/             # Optional: App-specific Git/Helm sources
+│   │   └── kustomization.yaml
+│   ├── third-party/         # Apps built by others (e.g., monitoring stack, databases if not per-app)
+│   │   ├── postgres-operator/ # Example
+│   │   │   └── kustomization.yaml
+│   │   └── kustomization.yaml # Kustomization linking all third-party/* subdirs
+│   ├── custom/              # Apps you have built
+│   │   ├── my-phoenix-app/  # Configs for your Phoenix app (Deployment, Service, IngressRoute, DB claim/instance etc.)
+│   │   │   └── kustomization.yaml
+│   │   ├── my-rails-app/    # Configs for your Rails app
+│   │   │   └── kustomization.yaml
+│   │   └── kustomization.yaml # Kustomization linking all custom/* subdirs
+│   └── kustomization.yaml     # Kustomization linking third-party/ and custom/
+└── README.md                # Overall repository README
+
+

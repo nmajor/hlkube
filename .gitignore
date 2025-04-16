@@ -1,2 +1,5 @@
 kubeconfig
 talos-cluster
+# Ignore raw secret files
+*.secret
+*.secret.yaml
