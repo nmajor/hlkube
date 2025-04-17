@@ -6,3 +6,4 @@ resources:
   - traefik
   - sealed-secrets
   - cloudflared
+  - metrics-server

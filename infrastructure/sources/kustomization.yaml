@@ -4,3 +4,4 @@ resources:
   - cert-manager.yaml
   - traefik.yaml
   - sealed-secrets.yaml
+  - metrics-server.yaml
