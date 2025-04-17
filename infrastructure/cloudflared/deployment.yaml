@@ -23,11 +23,11 @@ spec:
           args:
             - tunnel
             - --no-autoupdate
-            - run
-            - --credentials-file
-            - /etc/cloudflared/tunnel-credentials.json
             - --config
             - /etc/cloudflared/config.yaml
+            - --credentials-file
+            - /etc/cloudflared/tunnel-credentials.json
+            - run
             - $(TUNNEL_ID)
           env:
             - name: TUNNEL_ID

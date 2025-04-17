@@ -3,3 +3,6 @@ talos-cluster
 # Ignore raw secret files
 *.secret
 *.secret.yaml
+
+# Ignore tmp files
+tmp
