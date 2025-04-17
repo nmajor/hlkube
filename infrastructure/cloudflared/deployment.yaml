@@ -20,11 +20,15 @@ spec:
       containers:
         - name: cloudflared
           image: cloudflare/cloudflared:2025.4.0
-          command:
-            - /bin/sh
-            - -c
           args:
-            - cloudflared tunnel --no-autoupdate run --credentials-file /etc/cloudflared/tunnel-credentials.json --config /etc/cloudflared/config.yaml $TUNNEL_ID
+            - tunnel
+            - --no-autoupdate
+            - run
+            - --credentials-file
+            - /etc/cloudflared/tunnel-credentials.json
+            - --config
+            - /etc/cloudflared/config.yaml
+            - $(TUNNEL_ID)
           env:
             - name: TUNNEL_ID
               valueFrom:
