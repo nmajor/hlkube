@@ -46,7 +46,7 @@ spec:
     # Set node selector for deployment on worker nodes only (not control plane)
     defaultSettings:
       # Only schedule workloads on worker nodes
-      systemManagedComponentsNodeSelector: 'node-type: worker'
+      # systemManagedComponentsNodeSelector: "node-type: worker"
       # Allow Longhorn to run on nodes with worker role
       createDefaultDiskLabeledNodes: true
       # Disk space management
