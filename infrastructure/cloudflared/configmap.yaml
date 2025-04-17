@@ -9,10 +9,7 @@ data:
     metrics: 0.0.0.0:2000
     # This YAML section maps traffic from hostnames to local services
     ingress:
-      - hostname: echo.nmajor.net
-        service: https://traefik.traefik.svc.cluster.local:443
+      # Catch-all rule to forward all traffic to Traefik
+      - service: https://traefik.traefik.svc.cluster.local:443
         originRequest:
           noTLSVerify: true
-      # Catch-all rule, which just responds with 404 if traffic doesn't match any of
-      # the earlier rules
-      - service: http_status:404

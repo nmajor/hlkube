@@ -43,6 +43,7 @@ spec:
     additionalArguments:
       - "--api.dashboard=true"
       - "--log.level=INFO"
+      - "--serverstransport.insecureskipverify=true"
     ports:
       web:
         redirections:
@@ -53,6 +54,11 @@ spec:
       websecure:
         tls:
           enabled: true
+          options: "default"
     service:
       enabled: true
       type: ClusterIP
+    tlsOptions:
+      default:
+        sniStrict: false
+        minVersion: VersionTLS12

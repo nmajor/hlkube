@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: HostRegexp(`{any:.+}`)
+    - match: Host(`echo.hlkube.local`)
       kind: Rule
       services:
         - name: echo
