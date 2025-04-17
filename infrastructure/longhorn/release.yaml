@@ -1,0 +1,57 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: longhorn
+      version: "1.8.1"
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: flux-system
+      interval: 1m
+  # Configure Longhorn for a small home cluster
+  values:
+    persistence:
+      defaultClassReplicaCount: 3
+      # Using the same storage path on each node for the Longhorn volumes
+      defaultDataPath: "/var/lib/longhorn"
+    csi:
+      kubeletRootDir: /var/lib/kubelet
+    # Configure resources for Longhorn components to be friendly to your cluster size
+    resources:
+      manager:
+        limits:
+          cpu: 500m
+          memory: 500Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      instance-manager:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+
+    # Enable monitoring
+    monitoring:
+      enabled: true
+
+    # Set node selector for deployment on worker nodes only (not control plane)
+    defaultSettings:
+      # Only schedule workloads on worker nodes
+      systemManagedComponentsNodeSelector: 'node-type: worker'
+      # Allow Longhorn to run on nodes with worker role
+      createDefaultDiskLabeledNodes: true
+      # Disk space management
+      guaranteedEngineManagerCPU: 120m
+      guaranteedReplicaManagerCPU: 120m
+      # Backup settings (can adjust if you set up backups)
+      backupTarget: ""
+      backupTargetCredentialSecret: ""
