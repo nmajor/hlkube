@@ -12,7 +12,6 @@ data:
       - hostname: echo.nmajor.net
         service: https://traefik.traefik.svc.cluster.local:443
         originRequest:
-          originServerName: echo.hlkube.local
           noTLSVerify: true
       # Catch-all rule, which just responds with 404 if traffic doesn't match any of
       # the earlier rules
