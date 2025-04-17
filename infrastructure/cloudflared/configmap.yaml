@@ -13,3 +13,4 @@ data:
       - service: https://traefik.traefik.svc.cluster.local:443
         originRequest:
           noTLSVerify: true
+          disableChunkedEncoding: true
