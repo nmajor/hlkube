@@ -4,4 +4,5 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - configmap.yaml
+  - cloudflared-credentials.sealed.yaml
   # The sealed secret will be added once it's created
