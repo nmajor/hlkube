@@ -10,9 +10,10 @@ data:
     # This YAML section maps traffic from hostnames to local services
     ingress:
       - hostname: echo.nmajor.net
-        service: http://traefik.traefik.svc.cluster.local:80
+        service: https://traefik.traefik.svc.cluster.local:443
         originRequest:
           originServerName: echo.hlkube.local
+          noTLSVerify: true
       # Catch-all rule, which just responds with 404 if traffic doesn't match any of
       # the earlier rules
       - service: http_status:404
