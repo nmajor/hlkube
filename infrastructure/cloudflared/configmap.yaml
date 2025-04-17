@@ -14,3 +14,8 @@ data:
         originRequest:
           noTLSVerify: true
           disableChunkedEncoding: true
+          connectTimeout: 10s
+          keepAliveConnections: 10
+          keepAliveTimeout: 2m
+          httpHostHeader: traefik.traefik.svc.cluster.local
+          proxyConnectionTimeout: 30s
