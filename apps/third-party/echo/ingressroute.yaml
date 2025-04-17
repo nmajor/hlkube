@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`echo.hlkube.local`)
+    - match: Host(`echo.hlkube.local`) || Host(`echo.nmajor.net`)
       kind: Rule
       services:
         - name: echo
