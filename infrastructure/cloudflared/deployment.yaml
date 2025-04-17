@@ -19,12 +19,12 @@ spec:
     spec:
       containers:
         - name: cloudflared
-          image: cloudflare/cloudflared:2023.10.0
+          image: cloudflare/cloudflared:2025.4.0
           args:
             - tunnel
             - --no-autoupdate
             - run
-            - --token-file
+            - --credentials-file
             - /etc/cloudflared/tunnel-credentials.json
           resources:
             requests:
