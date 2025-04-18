@@ -32,6 +32,6 @@ metadata:
   namespace: longhorn-system
 type: Opaque
 data:
-  # Generated with: htpasswd -nb admin password | openssl base64
+  # Generated with: htpasswd -nb admin 'mypasswordhere' | tr -d '\n' | openssl base64
   # Default credentials: admin/password - CHANGE THIS IN PRODUCTION
-  users: YWRtaW46JGFwcjEkMUQ5V2hNRW4kTDlMZ0JhTWpQaC5teHdiWVJJUll6MQoK
+  users: YWRtaW46JGFwcjEkRGovZmZTM08kZE9tVDc4RGptZ2tuT25HLzFzZjVyMA==
