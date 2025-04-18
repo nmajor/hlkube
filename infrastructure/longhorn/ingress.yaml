@@ -34,4 +34,4 @@ type: Opaque
 data:
   # Generated with: htpasswd -nb admin password | openssl base64
   # Default credentials: admin/password - CHANGE THIS IN PRODUCTION
-  users: YWRtaW46JGFwcjEkSVJyVlMzLk0kVGwzWEJpUU5CYjB3b2JQbExDQXExLgoK
+  users: YWRtaW46JGFwcjEkMUQ5V2hNRW4kTDlMZ0JhTWpQaC5teHdiWVJJUll6MQoK

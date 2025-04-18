@@ -42,3 +42,10 @@ hlkube-flux/
 │   └── kustomization.yaml     # Kustomization linking third-party/ and custom/
 └── README.md                # Overall repository README
 ```
+
+---
+❯ kubectl logs -n longhorn-system longhorn-manager-b7tsc -c longhorn-manager | cat
+time="2025-04-17T21:50:39Z" level=fatal msg="Error starting manager: failed to check environment, please make sure you have iscsiadm/open-iscsi installed on the host: failed to execute: /usr/bin/nsenter [nsenter --mount=/host/proc/79679/ns/mnt --net=/host/proc/79679/ns/net iscsiadm --version], output , stderr nsenter: failed to execute iscsiadm: No such file or directory\n: exit status 127" func=main.main.DaemonCmd.func3 file="daemon.go:105"
+
+https://www.talos.dev/v1.9/kubernetes-guides/configuration/storage/
+https://www.reddit.com/r/kubernetes/comments/1hwietr/problem_with_adding_extensions_to_talos/
