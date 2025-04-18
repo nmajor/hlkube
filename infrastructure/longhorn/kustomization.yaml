@@ -3,5 +3,9 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - release.yaml
-  - storageclass.yaml
+
+  # StorageClass parameters are immutable once created. Applying this manifest causes K8s errors.
+  # Commented out after initial creation to prevent Flux reconciliation failures.
+  # - storageclass.yaml
+
   - ingress.yaml
