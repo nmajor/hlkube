@@ -7,4 +7,3 @@ resources:
   - sealed-secrets
   - cloudflared
   - metrics-server
-  - longhorn

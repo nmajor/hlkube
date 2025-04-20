@@ -5,4 +5,3 @@ resources:
   - traefik.yaml
   - sealed-secrets.yaml
   - metrics-server.yaml
-  - longhorn.yaml
