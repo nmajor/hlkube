@@ -18,9 +18,11 @@ spec:
       - "CF-IPCountry"
       - "User-Agent"
       - "Accept"
+      - "Cookie"
     authResponseHeaders:
       - X-Auth-Request-Access-Token
       - Authorization
       - X-Auth-Request-User
       - X-Auth-Request-Email
       - Location
+      - Set-Cookie

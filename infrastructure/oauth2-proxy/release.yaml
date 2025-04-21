@@ -50,6 +50,11 @@ spec:
       auth-logging: "true"
       request-logging: "true"
       silence-ping-logging: "true"
+      cookie-csrf-per-request: "true"
+      set-xauthrequest: "true"
+      session-cookie-minimal: "true"
+      cookie-refresh: "0"
+      cookie-expire: "24h"
 
     service:
       port: 80
