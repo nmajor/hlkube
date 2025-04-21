@@ -1,0 +1,9 @@
+apiVersion: openebs.io/v1beta1
+kind: DiskPool
+metadata:
+  name: w1-pool
+  namespace: openebs
+spec:
+  node: w1
+  disks:
+    - /dev/disk/by-id/nvme-WD_Blue_SN580_2TB_245105803152
