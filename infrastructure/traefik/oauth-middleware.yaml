@@ -5,13 +5,19 @@ metadata:
   namespace: traefik
 spec:
   forwardAuth:
-    address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth
+    address: https://auth.nmajor.net/oauth2/
     trustForwardHeader: true
     authRequestHeaders:
       - "X-Forwarded-Host"
       - "X-Forwarded-Proto"
       - "X-Forwarded-Uri"
       - "X-Forwarded-For"
+      - "CF-Connecting-IP"
+      - "CF-Ray"
+      - "CF-Visitor"
+      - "CF-IPCountry"
+      - "User-Agent"
+      - "Accept"
     authResponseHeaders:
       - X-Auth-Request-Access-Token
       - Authorization
