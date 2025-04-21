@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: oauth2-proxy
-      version: "6.17.1"
+      version: "7.12.x"
       sourceRef:
         kind: HelmRepository
         name: oauth2-proxy
@@ -21,9 +21,13 @@ spec:
       retries: 3
   values:
     replicaCount: 1
+
     config:
       existingSecret: github-oauth
+      cookieName: "_oauth2_proxy"
+
     configExistingSecret: github-oauth
+
     extraArgs:
       provider: github
       email-domain: "*"
@@ -31,13 +35,23 @@ spec:
       cookie-domain: .nmajor.net
       whitelist-domain: .nmajor.net
       cookie-refresh: "60m"
-      pass-access-token: true
-      set-authorization-header: true
-      skip-provider-button: true
-      upstream: http://kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local
+      cookie-secure: "true"
+      cookie-httponly: "true"
+      cookie-samesite: "lax"
+      pass-access-token: "true"
+      set-authorization-header: "true"
+      skip-provider-button: "true"
+      upstream: "http://kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local"
+      reverse-proxy: "true"
+
+    proxyVarsAsSecrets: true
+
+    sessionStorage:
+      type: cookie
+
     ingress:
       enabled: true
-      className: ""
+      className: "traefik"
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
@@ -45,3 +59,24 @@ spec:
       pathType: Prefix
       hosts:
         - auth.nmajor.net
+
+    metrics:
+      enabled: true
+
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 0
+      timeoutSeconds: 1
+
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 0
+      timeoutSeconds: 5
+
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
