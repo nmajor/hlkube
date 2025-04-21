@@ -4,7 +4,54 @@ This directory contains the setup for OAuth2 Proxy using GitHub authentication.
 
 ## Overview
 
-OAuth2 Proxy authenticates users against GitHub and provides authentication for Traefik routes, replacing basic auth with GitHub account-based authentication.
+OAuth2 Proxy is configured as a generic authentication service that can be used with any application via Traefik's ForwardAuth middleware.
+
+## How to Protect a Service with GitHub OAuth
+
+To protect any service with GitHub OAuth authentication (limited to user "nmajor"), add the `oauth2-auth` middleware to your IngressRoute:
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: your-service-route
+  namespace: your-namespace
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`your-domain.nmajor.net`)
+      kind: Rule
+      services:
+        - name: your-service
+          port: 80
+      middlewares:
+        - name: oauth2-auth
+          namespace: traefik
+  tls: {}
+```
+
+That's it! The middleware will authenticate users against GitHub and only allow access if the GitHub username is "nmajor".
+
+## Adding More Authorized Users
+
+To add more GitHub users that can authenticate:
+
+1. Edit the `infrastructure/oauth2-proxy/release.yaml` file
+2. Update the `github-user` parameter in `extraArgs` to include multiple users, separated by commas
+   ```yaml
+   extraArgs:
+     github-user: "nmajor,anotheruser,thirduser"
+   ```
+3. Commit and push the changes to apply the configuration through Flux
+
+## How It Works
+
+- OAuth2 Proxy is deployed as a standalone service
+- The Traefik ForwardAuth middleware forwards authentication requests to OAuth2 Proxy
+- OAuth2 Proxy authenticates users against GitHub
+- Only authorized GitHub users can access protected services
+- The authentication session is maintained via cookies
 
 ## Configuration
 
