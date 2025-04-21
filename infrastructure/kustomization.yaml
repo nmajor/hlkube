@@ -8,4 +8,3 @@ resources:
   - cloudflared
   - metrics-server
   - openebs
-  - openebs-diskpools
