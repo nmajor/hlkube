@@ -36,6 +36,7 @@ spec:
         mayastor:
           enabled: true
           io_engines:
+            additionalArgs: ["--iova-mode=pa"]
             resources:
               limits:
                 hugepages-2Mi: 1024Mi
