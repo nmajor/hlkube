@@ -50,6 +50,10 @@ spec:
       auth-logging: "true"
       request-logging: "true"
 
+    service:
+      port: 80
+      targetPort: 4180
+
     proxyVarsAsSecrets: true
 
     sessionStorage:
