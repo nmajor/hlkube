@@ -49,6 +49,7 @@ spec:
       standard-logging: "true"
       auth-logging: "true"
       request-logging: "true"
+      silence-ping-logging: "true"
 
     service:
       port: 80

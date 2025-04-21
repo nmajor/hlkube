@@ -23,3 +23,4 @@ spec:
       - Authorization
       - X-Auth-Request-User
       - X-Auth-Request-Email
+      - Location
