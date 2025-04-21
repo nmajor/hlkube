@@ -7,3 +7,4 @@ resources:
   - sealed-secrets
   - cloudflared
   - metrics-server
+  - openebs
