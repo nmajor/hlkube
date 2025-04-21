@@ -34,7 +34,6 @@ spec:
       github-user: "nmajor"
       cookie-domain: .nmajor.net
       whitelist-domain: .nmajor.net
-      cookie-refresh: "60m"
       cookie-secure: "true"
       cookie-httponly: "true"
       cookie-samesite: "lax"
@@ -55,6 +54,10 @@ spec:
       session-cookie-minimal: "true"
       cookie-refresh: "0"
       cookie-expire: "24h"
+      logging-level: "debug"
+      show-debug-on-error: "true"
+      insecure-oidc-allow-unverified-email: "true"
+      insecure-oidc-skip-issuer-verification: "true"
 
     service:
       port: 80

@@ -19,6 +19,8 @@ spec:
       - "User-Agent"
       - "Accept"
       - "Cookie"
+      - "Referer"
+      - "Origin"
     authResponseHeaders:
       - X-Auth-Request-Access-Token
       - Authorization
@@ -26,3 +28,4 @@ spec:
       - X-Auth-Request-Email
       - Location
       - Set-Cookie
+      - Cookie
