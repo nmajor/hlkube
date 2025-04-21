@@ -44,6 +44,7 @@ spec:
       - "--api.dashboard=true"
       - "--log.level=INFO"
       - "--serverstransport.insecureskipverify=true"
+      - "--providers.kubernetescrd.allowCrossNamespace=true"
     ports:
       web:
         redirections:
