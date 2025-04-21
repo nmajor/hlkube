@@ -42,6 +42,13 @@ spec:
       set-authorization-header: "true"
       skip-provider-button: "true"
       upstream: "file:///dev/null"
+      redirect-url: "https://auth.nmajor.net/oauth2/callback"
+      oidc-issuer-url: ""
+      skip-jwt-bearer-tokens: "true"
+      skip-auth-route: "/oauth2/callback"
+      standard-logging: "true"
+      auth-logging: "true"
+      request-logging: "true"
 
     proxyVarsAsSecrets: true
 
