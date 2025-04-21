@@ -8,3 +8,4 @@ resources:
   - cloudflared
   - metrics-server
   - longhorn
+  - oauth2-proxy

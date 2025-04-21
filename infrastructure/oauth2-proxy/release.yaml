@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: oauth2-proxy
+      version: "6.17.1"
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    replicaCount: 1
+    config:
+      existingSecret: github-oauth
+    configExistingSecret: github-oauth
+    extraArgs:
+      provider: github
+      email-domain: "*"
+      github-user: "nmajor"
+      cookie-domain: .nmajor.net
+      whitelist-domain: .nmajor.net
+      cookie-refresh: "60m"
+      pass-access-token: true
+      set-authorization-header: true
+      skip-provider-button: true
+    ingress:
+      enabled: true
+      className: ""
+      hosts:
+        - host: auth.nmajor.net
+          paths:
+            - path: /
+              pathType: Prefix
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"

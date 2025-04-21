@@ -6,3 +6,4 @@ resources:
   - sealed-secrets.yaml
   - metrics-server.yaml
   - longhorn.yaml
+  - oauth2-proxy.yaml
