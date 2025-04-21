@@ -1,0 +1,37 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: longhorn-ui
+  namespace: longhorn-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`longhorn.nmajor.net`)
+      kind: Rule
+      services:
+        - name: longhorn-frontend
+          port: 80
+      middlewares:
+        - name: longhorn-auth
+  tls: {}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: longhorn-auth
+  namespace: longhorn-system
+spec:
+  basicAuth:
+    secret: longhorn-basic-auth
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: longhorn-basic-auth
+  namespace: longhorn-system
+type: Opaque
+data:
+  # Generated with: htpasswd -nb admin 'mypasswordhere' | tr -d '\n' | openssl base64
+  # Default credentials: admin/password - CHANGE THIS IN PRODUCTION
+  users: YWRtaW46JGFwcjEkRGovZmZTM08kZE9tVDc4RGptZ2tuT25HLzFzZjVyMA==
