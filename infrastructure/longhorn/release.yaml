@@ -52,6 +52,8 @@ spec:
       # Disk space management
       guaranteedEngineManagerCPU: 120m
       guaranteedReplicaManagerCPU: 120m
+      # Set stale replica timeout to 48 hours (in minutes)
+      staleReplicaTimeout: 2880
       # Backup settings (can adjust if you set up backups)
       backupTarget: ""
       backupTargetCredentialSecret: ""
