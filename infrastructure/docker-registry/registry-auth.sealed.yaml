@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: registry-auth
+  namespace: docker-registry
+spec:
+  encryptedData:
+    htpasswd: AgBPOmBMIgwXbdlmwaox21RoraBLHb/p9ofLlo8VWoZtQrx2vO9XjhXL8IQjo7Begy4zxpdwFD7hZGl9SBehdw0I4s26BiUWbGO1AZ8miJBj1g3yfuAr9c5HmUHKhRvBQTiNOqqpGwb1ygxd8qOpbnnlMJCdUOrWwhvhSKUCbSSHW/GPJ3LXUTuOv4Qv33tveIAOsbRunxSOVQN2RzdCaEX3hMIFoEVDPRDIY1FBijZkpmthlA4rm0SKSmmbBEmJ9r2gnFv2zbkzXiuQxnMUEASajLSjihRw7l/2uj5TEH0RBmDKoZt2HKWzzJqel5tXWFwcqvVodWjuBG5z20KXJrW+K4ha4/YjYCKnXRmheI+KbtBplr8/HQBzToFvSqvoC2+1XrRLDRfJjE2uuOzB36kMDYKhF2uyl22AdcbZNumDPOE7rn0I/CoHrejXrOW9sPNDvbyd9Y1Be9iCib2G7hfreLRS7YxT5G4RjQOOYTBAcLlOGp5RIN3IB+Wqf5B0pumI4APg4vIcVpSvACu2EYsbUnuguowmVeT6Pb9/zfk32bDxNlSsfKPcMa3XP/8U21Sd9iLW9+jyNAThSvrnL00dJx8wAm5lwOuDvJaaByTQhcDXTyEHoRlYfAPwobL0jNssdaP1g8gb2tRYEp+vnMlO17/7DBt9J8++zjAp/ArhTTO/r01AamqCIU3OkSAe/VejGmVvwO/I+UESr5UEf75/1GrrDewR2EZfZ4XV0UAfWrwAo98RFkrxjYQQP6Q=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: registry-auth
+      namespace: docker-registry
+    type: Opaque

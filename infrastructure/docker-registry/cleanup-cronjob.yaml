@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: registry-cleanup
+  namespace: docker-registry
+spec:
+  schedule: "0 1 * * 0" # Weekly at 1:00 AM on Sunday
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: registry-cleaner
+              image: registry:2
+              command:
+                - /bin/sh
+                - /scripts/cleanup.sh
+              volumeMounts:
+                - name: registry-data
+                  mountPath: /var/lib/registry
+                - name: registry-config
+                  mountPath: /etc/docker/registry/config.yml
+                  subPath: config.yml
+                - name: cleanup-script
+                  mountPath: /scripts
+          volumes:
+            - name: registry-data
+              persistentVolumeClaim:
+                claimName: registry-data
+            - name: registry-config
+              configMap:
+                name: registry-config
+            - name: cleanup-script
+              configMap:
+                name: registry-config
+                items:
+                  - key: cleanup.sh
+                    path: cleanup.sh
+                    mode: 0755
+          restartPolicy: OnFailure

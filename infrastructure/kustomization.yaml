@@ -12,3 +12,4 @@ resources:
   - monitoring
   - cloudnativepg
   - actions-runner-controller
+  - docker-registry

@@ -1,0 +1,18 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: private-repo-autoscaler
+  namespace: actions-runner-system
+spec:
+  scaleTargetRef:
+    name: private-repo-runners
+  minReplicas: 1
+  maxReplicas: 5
+  scaleDownDelaySecondsAfterScaleOut: 300
+  # Scale based on queued workflow runs
+  metrics:
+    - type: PercentageRunnersBusy
+      scaleUpThreshold: "0.75" # Scale up when 75% of runners are busy
+      scaleDownThreshold: "0.25" # Scale down when only 25% of runners are busy
+      scaleUpFactor: "2" # Double the number when scaling up
+      scaleDownFactor: "0.5" # Cut in half when scaling down

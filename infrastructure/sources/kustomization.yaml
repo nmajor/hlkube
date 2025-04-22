@@ -9,3 +9,4 @@ resources:
   - oauth2-proxy.yaml
   - prometheus.yaml
   - cloudnativepg.yaml
+  - actions-runner-controller.yaml
