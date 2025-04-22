@@ -63,6 +63,9 @@ spec:
           - name: "null"
 
     grafana:
+      enabled: true
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: browser
       adminPassword: admin
       service:
         type: ClusterIP
@@ -72,20 +75,23 @@ spec:
         runAsUser: 472
         runAsGroup: 472
         fsGroup: 472
-      # Disable Grafana's built-in login screen since we're using OAuth
-      grafana.ini:
+      ini:
         auth:
-          disable_login_form: true
-          disable_signout_menu: true
-        auth.basic:
-          enabled: false
+          oauth_auto_login: true
+          signout_redirect_url: "https://oauth2-proxy.nmajor.net/oauth2/sign_out"
         auth.proxy:
           enabled: true
-          header_name: X-Auth-Request-Email
-          header_property: username
-          auto_sign_up: true
+          header_name: X-Email
+          header_property: email
+          headers: Name:X-User
+          enable_login_token: false
         users:
+          allow_sign_up: false
+          auto_assign_org: true
           auto_assign_org_role: Admin
+        server:
+          root_url: "https://grafana.nmajor.net"
+          domain: "grafana.nmajor.net"
 
     kubeStateMetrics:
       enabled: true
