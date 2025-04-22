@@ -7,8 +7,8 @@ spec:
   cluster:
     name: postgres-sample
 
-  # Use PgBouncer implementation
-  type: pgbouncer
+  # Use read-only pooler type
+  type: ro
 
   # Create 2 replicas for high availability
   instances: 2
@@ -17,8 +17,6 @@ spec:
   monitoring:
     enablePodMonitor: true
 
-  # Read-only connection pooler (connects to replicas)
-  role: readonly
   pgbouncer:
     poolMode: session
     parameters:

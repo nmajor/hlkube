@@ -7,8 +7,8 @@ spec:
   cluster:
     name: postgres-sample
 
-  # Use PgBouncer implementation
-  type: pgbouncer
+  # Use read-write pooler type
+  type: rw
 
   # Create 2 replicas for high availability
   instances: 2
