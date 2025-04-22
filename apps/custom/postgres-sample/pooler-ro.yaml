@@ -13,19 +13,14 @@ spec:
   # Create 2 replicas for high availability
   instances: 2
 
-  # Set up monitoring
+  # Setup monitoring
   monitoring:
     enablePodMonitor: true
 
-  # Connect to replicas only (for read-only operations)
-  mode: session
-  role: read
-
-  # Configure PgBouncer parameters
+  # Read-only connection pooler (connects to replicas)
+  role: readonly
   pgbouncer:
+    poolMode: session
     parameters:
-      # Maximum client connections per pooler instance
       default_pool_size: "30"
       max_client_conn: "150"
-      # Use TLS for client connections
-      client_tls_sslmode: prefer
