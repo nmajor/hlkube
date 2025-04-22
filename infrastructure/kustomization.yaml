@@ -11,3 +11,4 @@ resources:
   - oauth2-proxy
   - monitoring
   - cloudnativepg
+  - actions-runner-controller
