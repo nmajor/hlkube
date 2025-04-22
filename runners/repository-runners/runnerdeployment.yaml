@@ -20,5 +20,9 @@ spec:
         requests:
           cpu: "0.5"
           memory: "1Gi"
-      # Enable Docker for container jobs
-      dockerEnabled: true
+      # Use dockerd in the same container instead of a privileged sidecar container
+      dockerdWithinRunnerContainer: true
+      # Disable privileged Docker sidecar
+      dockerEnabled: false
+      # Use dind image
+      image: summerwind/actions-runner-dind
