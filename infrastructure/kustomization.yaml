@@ -10,3 +10,4 @@ resources:
   - longhorn
   - oauth2-proxy
   - monitoring
+  - cloudnativepg

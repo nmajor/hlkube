@@ -8,3 +8,4 @@ resources:
   - longhorn.yaml
   - oauth2-proxy.yaml
   - prometheus.yaml
+  - cloudnativepg.yaml

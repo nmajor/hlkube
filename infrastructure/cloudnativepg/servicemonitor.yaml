@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cloudnativepg-controller-manager
+  namespace: cloudnativepg-system
+  labels:
+    app.kubernetes.io/name: cloudnativepg
+    app.kubernetes.io/part-of: cloudnativepg
+spec:
+  endpoints:
+    - bearerTokenSecret:
+        key: token
+        name: ""
+      interval: 30s
+      port: metrics
+      scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudnative-pg
