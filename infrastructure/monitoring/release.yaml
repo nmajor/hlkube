@@ -76,11 +76,20 @@ spec:
         runAsGroup: 472
         fsGroup: 472
       env:
-        GF_AUTH_ANONYMOUS_ENABLED: "true"
-        GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
-        GF_AUTH_BASIC_ENABLED: "false"
+        GF_AUTH_PROXY_ENABLED: "true"
+        GF_AUTH_PROXY_HEADER_NAME: "X-Auth-Request-Email"
+        GF_AUTH_PROXY_HEADER_PROPERTY: "email"
+        GF_AUTH_PROXY_HEADERS: "Name:X-Auth-Request-User"
+        GF_AUTH_PROXY_AUTO_SIGN_UP: "true"
+        GF_AUTH_PROXY_ENABLE_LOGIN_TOKEN: "false"
+        GF_AUTH_PROXY_SYNC_TTL: "60"
         GF_AUTH_DISABLE_LOGIN_FORM: "true"
         GF_AUTH_DISABLE_SIGNOUT_MENU: "true"
+        GF_AUTH_OAUTH_AUTO_LOGIN: "true"
+        GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.nmajor.net/oauth2/sign_out"
+        GF_USERS_AUTO_ASSIGN_ORG: "true"
+        GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Admin"
+        GF_USERS_ALLOW_SIGN_UP: "false"
         GF_SECURITY_ALLOW_EMBEDDING: "true"
         GF_SERVER_ROOT_URL: "https://grafana.nmajor.net"
         GF_SERVER_DOMAIN: "grafana.nmajor.net"
