@@ -14,5 +14,5 @@ spec:
       - longhorn-system
   endpoints:
     - port: manager
-      path: /metrics
+      interval: 30s
   jobLabel: longhorn-metrics
