@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`prometheus.nmajor.net`)
+      kind: Rule
+      services:
+        - name: kube-prometheus-stack-prometheus
+          port: 9090
+      middlewares:
+        - name: oauth2-auth
+          namespace: traefik
+  tls: {}
