@@ -26,6 +26,3 @@ spec:
   replicationSlots:
     highAvailability:
       enabled: true
-  connectionPooler:
-    instances: 2
-    maxClientConnections: 100
