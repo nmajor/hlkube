@@ -104,6 +104,32 @@ spec:
 
     nodeExporter:
       enabled: true
+      serviceMonitor:
+        enabled: true
+        jobLabel: jobLabel
+        selector:
+          matchLabels:
+            app: prometheus-node-exporter
+            release: kube-prometheus-stack
+        relabelings:
+          - action: replace
+            regex: (.*)
+            replacement: $1
+            sourceLabels:
+              - __meta_kubernetes_pod_node_name
+            targetLabel: kubernetes_node
+      resources:
+        limits:
+          cpu: 200m
+          memory: 200Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+      updateStrategy:
+        type: RollingUpdate
 
     prometheusOperator:
       enabled: true
