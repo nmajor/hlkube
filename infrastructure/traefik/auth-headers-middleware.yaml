@@ -6,5 +6,5 @@ metadata:
 spec:
   headers:
     customRequestHeaders:
-      X-User: "{{ .Request.Headers.X-Auth-Request-User }}"
-      X-Email: "{{ .Request.Headers.X-Auth-Request-Email }}"
+      X-User: "%%X-Auth-Request-User%%"
+      X-Email: "%%X-Auth-Request-Email%%"

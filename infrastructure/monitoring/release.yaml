@@ -79,6 +79,8 @@ spec:
         auth:
           oauth_auto_login: true
           signout_redirect_url: "https://auth.nmajor.net/oauth2/sign_out"
+          disable_login_form: true
+          disable_signout_menu: true
         auth.proxy:
           enabled: true
           header_name: X-Email
