@@ -4,3 +4,4 @@ resources:
   - namespace.yaml
   - release.yaml
   - oauth-middleware.yaml
+  - auth-headers-middleware.yaml
