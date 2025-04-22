@@ -20,20 +20,10 @@ spec:
   # Connect to the primary (for read-write operations)
   mode: session
 
-  # Set resource limits
-  resources:
-    limits:
-      cpu: 500m
-      memory: 256Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-
-  # Configure PgBouncer parameters
   pgbouncer:
     parameters:
       # Maximum client connections per pooler instance
-      default_pool_size: 20
-      max_client_conn: 100
+      default_pool_size: "20"
+      max_client_conn: "100"
       # Use TLS for client connections
       client_tls_sslmode: prefer
