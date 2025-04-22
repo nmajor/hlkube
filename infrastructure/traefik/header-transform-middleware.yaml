@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: header-transform
+  namespace: traefik
+spec:
+  plugin:
+    htransformation:
+      rules:
+        - name: "Set X-User header from auth request"
+          type: "Set"
+          header: "X-User"
+          headerPrefix: "^"
+          value: "^X-Auth-Request-User"
+        - name: "Set X-Email header from auth request"
+          type: "Set"
+          header: "X-Email"
+          headerPrefix: "^"
+          value: "^X-Auth-Request-Email"

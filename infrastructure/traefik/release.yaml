@@ -63,3 +63,8 @@ spec:
       default:
         sniStrict: false
         minVersion: VersionTLS12
+    experimental:
+      plugins:
+        htransformation:
+          moduleName: "github.com/tomMoulard/htransformation"
+          version: "v0.3.3"

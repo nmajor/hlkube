@@ -15,6 +15,6 @@ spec:
       middlewares:
         - name: oauth2-auth
           namespace: traefik
-        - name: auth-headers
+        - name: header-transform
           namespace: traefik
   tls: {}
