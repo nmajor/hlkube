@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres-sample
-  namespace: cloudnativepg-system
+  namespace: postgres-sample
 spec:
   instances: 3
   primaryUpdateStrategy: unsupervised
