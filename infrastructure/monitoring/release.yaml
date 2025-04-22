@@ -75,23 +75,15 @@ spec:
         runAsUser: 472
         runAsGroup: 472
         fsGroup: 472
-      ini:
-        auth:
-          oauth_auto_login: true
-          signout_redirect_url: "https://oauth2-proxy.nmajor.net/oauth2/sign_out"
-        auth.proxy:
-          enabled: true
-          header_name: X-Email
-          header_property: email
-          headers: Name:X-User
-          enable_login_token: false
-        users:
-          allow_sign_up: false
-          auto_assign_org: true
-          auto_assign_org_role: Admin
-        server:
-          root_url: "https://grafana.nmajor.net"
-          domain: "grafana.nmajor.net"
+      env:
+        GF_AUTH_ANONYMOUS_ENABLED: "true"
+        GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+        GF_AUTH_BASIC_ENABLED: "false"
+        GF_AUTH_DISABLE_LOGIN_FORM: "true"
+        GF_AUTH_DISABLE_SIGNOUT_MENU: "true"
+        GF_SECURITY_ALLOW_EMBEDDING: "true"
+        GF_SERVER_ROOT_URL: "https://grafana.nmajor.net"
+        GF_SERVER_DOMAIN: "grafana.nmajor.net"
 
     kubeStateMetrics:
       enabled: true
