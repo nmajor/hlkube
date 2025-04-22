@@ -29,6 +29,3 @@ spec:
   connectionPooler:
     instances: 2
     maxClientConnections: 100
-  recovery:
-    database: postgres
-    owner: postgres
