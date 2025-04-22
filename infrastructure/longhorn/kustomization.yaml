@@ -9,3 +9,4 @@ resources:
   # - storageclass.yaml
 
   - ingress.yaml
+  - servicemonitor.yaml
