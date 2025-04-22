@@ -4,7 +4,7 @@ metadata:
   name: postgres-sample
   namespace: postgres-sample
 spec:
-  instances: 3
+  instances: 2
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi

@@ -1,0 +1,40 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: postgres-sample-pooler-ro
+  namespace: postgres-sample
+spec:
+  cluster:
+    name: postgres-sample
+
+  # Use PgBouncer implementation
+  type: pgbouncer
+
+  # Create 2 replicas for high availability
+  instances: 2
+
+  # Set up monitoring
+  monitoring:
+    enablePodMonitor: true
+
+  # Connect to replicas only (for read-only operations)
+  mode: session
+  role: read
+
+  # Set resource limits
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Configure PgBouncer parameters
+  pgbouncer:
+    parameters:
+      # Maximum client connections per pooler instance
+      default_pool_size: 30
+      max_client_conn: 150
+      # Use TLS for client connections
+      client_tls_sslmode: prefer
