@@ -76,6 +76,13 @@ spec:
         runAsUser: 472
         runAsGroup: 472
         fsGroup: 472
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        size: 10Gi
       grafana.ini:
         auth:
           oauth_auto_login: true
