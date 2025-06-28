@@ -52,14 +52,13 @@ spec:
         size: 20Gi
         storageClass: longhorn-single-replica
 
-    # Enable scaling mode for queue management and webhooks
+    # Enable scaling mode for queue management (without webhooks for now)
     scaling:
       enabled: true
       worker:
         replicaCount: 2
       webhook:
-        enabled: true
-        replicaCount: 1
+        enabled: false # Temporarily disabled until Valkey is confirmed working
 
     # Worker configuration for distributed job processing
     worker:
@@ -94,9 +93,9 @@ spec:
         size: 10Gi
         storageClass: longhorn-single-replica
 
-    # Webhook configuration with proper scaling dependency
+    # Webhook configuration - disabled temporarily
     webhook:
-      enabled: true
+      enabled: false # Will enable once Valkey is confirmed working
       replicaCount: 1
       resources:
         requests:
