@@ -10,7 +10,7 @@ spec:
     name: n8n
     namespace: flux-system
   values:
-    # More robust configuration for production
+    # Main n8n instances configuration
     main:
       replicaCount: 2
       config:
@@ -52,7 +52,7 @@ spec:
         size: 20Gi
         storageClass: longhorn-single-replica
 
-    # Worker instances for distributed job processing
+    # Worker configuration for distributed job processing
     worker:
       enabled: true
       replicaCount: 2
@@ -85,25 +85,10 @@ spec:
         size: 10Gi
         storageClass: longhorn-single-replica
 
-    # Webhook instances for better webhook handling
+    # Webhook configuration with proper Valkey dependency
     webhook:
       enabled: true
       replicaCount: 1
-
-      # Reference sealed secrets via extraEnv
-      extraEnv:
-        N8N_ENCRYPTION_KEY:
-          valueFrom:
-            secretKeyRef:
-              name: n8n-secrets
-              key: encryption_key
-        DB_POSTGRESDB_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: n8n-postgres-credentials
-              key: password
-
-      # Resources for webhook instances
       resources:
         requests:
           cpu: 100m
@@ -112,12 +97,14 @@ spec:
           cpu: 250m
           memory: 512Mi
 
-    # Valkey/Redis for queue management and coordination
+    # Valkey/Redis configuration for queue management and webhooks
     valkey:
       enabled: true
       architecture: standalone
+      auth:
+        enabled: false # Simplify auth for internal use
       primary:
         persistence:
           enabled: true
           size: 2Gi
-          storageClass: longhorn
+          storageClass: longhorn-single-replica
