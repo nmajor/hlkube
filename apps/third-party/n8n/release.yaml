@@ -1,18 +1,14 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: n8n
   namespace: n8n
 spec:
   interval: 15m
-  chart:
-    spec:
-      chart: n8n
-      version: "1.0.10"
-      sourceRef:
-        kind: OCIRepository
-        name: n8n
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: n8n
+    namespace: flux-system
   values:
     # More robust configuration for production
     main:
@@ -41,56 +37,82 @@ spec:
               name: n8n-postgres-credentials
               key: password
 
-      # Enhanced resource allocation
+      # Resources for main instances
       resources:
         requests:
-          memory: "1Gi"
-          cpu: "500m"
+          cpu: 500m
+          memory: 1Gi
         limits:
-          memory: "2Gi"
-          cpu: "1000m"
+          cpu: 1000m
+          memory: 2Gi
 
-      # Enable persistence with more storage
+      # Persistent storage
       persistence:
         enabled: true
         size: 20Gi
-        storageClass: longhorn
-        accessModes:
-          - ReadWriteOnce
+        storageClass: longhorn-single-replica
 
-      service:
-        type: ClusterIP
-        port: 80
-
-    # Enable workers for distributed processing
+    # Worker instances for distributed job processing
     worker:
       enabled: true
       replicaCount: 2
+
+      # Reference sealed secrets via extraEnv
+      extraEnv:
+        N8N_ENCRYPTION_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: encryption_key
+        DB_POSTGRESDB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-postgres-credentials
+              key: password
+
+      # Resources for worker instances
       resources:
         requests:
-          memory: "512Mi"
-          cpu: "250m"
+          cpu: 250m
+          memory: 512Mi
         limits:
-          memory: "1Gi"
-          cpu: "500m"
+          cpu: 500m
+          memory: 1Gi
+
+      # Worker persistence
       persistence:
         enabled: true
         size: 10Gi
-        storageClass: longhorn
+        storageClass: longhorn-single-replica
 
-    # Enable webhooks for better performance
+    # Webhook instances for better webhook handling
     webhook:
       enabled: true
       replicaCount: 1
+
+      # Reference sealed secrets via extraEnv
+      extraEnv:
+        N8N_ENCRYPTION_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: encryption_key
+        DB_POSTGRESDB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-postgres-credentials
+              key: password
+
+      # Resources for webhook instances
       resources:
         requests:
-          memory: "256Mi"
-          cpu: "100m"
+          cpu: 100m
+          memory: 256Mi
         limits:
-          memory: "512Mi"
-          cpu: "250m"
+          cpu: 250m
+          memory: 512Mi
 
-    # Enable Redis/Valkey for queue management
+    # Valkey/Redis for queue management and coordination
     valkey:
       enabled: true
       architecture: standalone
