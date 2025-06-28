@@ -16,6 +16,7 @@ spec:
       config:
         n8n:
           hide_usage_page: true
+        executions_mode: queue
         db:
           type: postgresdb
           postgresdb:
@@ -23,10 +24,11 @@ spec:
             port: 5432
             database: n8n
             user: n8n
-        # Redis/Valkey configuration for queue management and webhooks
-        redis:
-          host: n8n-valkey-primary
-          port: 6379
+        queue:
+          bull:
+            redis:
+              host: n8n-valkey-primary
+              port: 6379
 
       # Reference sealed secrets via extraEnv
       extraEnv:
@@ -65,18 +67,6 @@ spec:
     worker:
       enabled: true
       replicaCount: 2
-      config:
-        db:
-          type: postgresdb
-          postgresdb:
-            host: n8n-postgres-pooler.n8n.svc.cluster.local
-            port: 5432
-            database: n8n
-            user: n8n
-        # Redis/Valkey configuration for queue management
-        redis:
-          host: n8n-valkey-primary
-          port: 6379
 
       # Reference sealed secrets via extraEnv
       extraEnv:
@@ -106,36 +96,10 @@ spec:
         size: 10Gi
         storageClass: longhorn-single-replica
 
-    # Webhook configuration - re-enabled with proper Redis backend
+    # Webhook configuration - webhooks rely on the main queue system
     webhook:
       enabled: true
       replicaCount: 1
-      config:
-        db:
-          type: postgresdb
-          postgresdb:
-            host: n8n-postgres-pooler.n8n.svc.cluster.local
-            port: 5432
-            database: n8n
-            user: n8n
-        # Redis/Valkey configuration required for webhooks
-        redis:
-          host: n8n-valkey-primary
-          port: 6379
-
-      # Reference sealed secrets via extraEnv
-      extraEnv:
-        N8N_ENCRYPTION_KEY:
-          valueFrom:
-            secretKeyRef:
-              name: n8n-secrets
-              key: encryption_key
-        DB_POSTGRESDB_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: n8n-postgres-credentials
-              key: password
-
       resources:
         requests:
           cpu: 100m
