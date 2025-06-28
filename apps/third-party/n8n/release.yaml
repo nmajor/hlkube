@@ -23,6 +23,10 @@ spec:
             port: 5432
             database: n8n
             user: n8n
+        # Redis/Valkey configuration for queue management and webhooks
+        redis:
+          host: n8n-valkey-master
+          port: 6379
 
       # Reference sealed secrets via extraEnv
       extraEnv:
@@ -52,13 +56,10 @@ spec:
         size: 20Gi
         storageClass: longhorn-single-replica
 
-    # Enable scaling mode for queue management (without webhooks for now)
-    scaling:
-      enabled: true
-      worker:
-        replicaCount: 2
-      webhook:
-        enabled: false # Temporarily disabled until Valkey is confirmed working
+      # Service configuration
+      service:
+        type: ClusterIP
+        port: 80
 
     # Worker configuration for distributed job processing
     worker:
@@ -93,9 +94,9 @@ spec:
         size: 10Gi
         storageClass: longhorn-single-replica
 
-    # Webhook configuration - disabled temporarily
+    # Webhook configuration - re-enabled with proper Redis backend
     webhook:
-      enabled: false # Will enable once Valkey is confirmed working
+      enabled: true
       replicaCount: 1
       resources:
         requests:
