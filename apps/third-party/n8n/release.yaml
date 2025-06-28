@@ -19,7 +19,7 @@ spec:
         db:
           type: postgresdb
           postgresdb:
-            host: n8n-postgres-pooler-rw.n8n.svc.cluster.local
+            host: n8n-postgres-pooler.n8n.svc.cluster.local
             port: 5432
             database: n8n
             user: n8n
