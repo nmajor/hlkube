@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - postgres-credentials.sealed.yaml
+  - n8n-secrets.sealed.yaml
+  - postgres-cluster.yaml
+  - postgres-pooler.yaml
+  - release.yaml
+  - ingress.yaml

@@ -10,3 +10,4 @@ resources:
   - prometheus.yaml
   - cloudnativepg.yaml
   - actions-runner-controller.yaml
+  - n8n.yaml

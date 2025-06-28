@@ -1,0 +1,101 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: n8n
+      version: "1.0.10"
+      sourceRef:
+        kind: OCIRepository
+        name: n8n
+        namespace: flux-system
+  values:
+    # More robust configuration for production
+    main:
+      replicaCount: 2
+      config:
+        n8n:
+          hide_usage_page: true
+        db:
+          type: postgresdb
+          postgresdb:
+            host: n8n-postgres-pooler-rw.n8n.svc.cluster.local
+            port: 5432
+            database: n8n
+            user: n8n
+
+      # Reference sealed secrets via extraEnv
+      extraEnv:
+        N8N_ENCRYPTION_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: encryption_key
+        DB_POSTGRESDB_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-postgres-credentials
+              key: password
+
+      # Enhanced resource allocation
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+
+      # Enable persistence with more storage
+      persistence:
+        enabled: true
+        size: 20Gi
+        storageClass: longhorn
+        accessModes:
+          - ReadWriteOnce
+
+      service:
+        type: ClusterIP
+        port: 80
+
+    # Enable workers for distributed processing
+    worker:
+      enabled: true
+      replicaCount: 2
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClass: longhorn
+
+    # Enable webhooks for better performance
+    webhook:
+      enabled: true
+      replicaCount: 1
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "250m"
+
+    # Enable Redis/Valkey for queue management
+    valkey:
+      enabled: true
+      architecture: standalone
+      primary:
+        persistence:
+          enabled: true
+          size: 2Gi
+          storageClass: longhorn

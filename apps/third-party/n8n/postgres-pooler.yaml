@@ -1,0 +1,17 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: n8n-postgres-pooler
+  namespace: n8n
+spec:
+  cluster:
+    name: n8n-postgres
+  type: rw
+  instances: 2
+  monitoring:
+    enablePodMonitor: true
+  pgbouncer:
+    poolMode: session
+    parameters:
+      default_pool_size: "25"
+      max_client_conn: "150"
