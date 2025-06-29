@@ -42,6 +42,15 @@ spec:
             secretKeyRef:
               name: n8n-postgres-credentials
               key: password
+        # Queue/Redis environment variables for proper webhook operation
+        N8N_EXECUTIONS_MODE:
+          value: "queue"
+        QUEUE_BULL_REDIS_HOST:
+          value: "n8n-valkey-primary"
+        QUEUE_BULL_REDIS_PORT:
+          value: "6379"
+        QUEUE_BULL_REDIS_DB:
+          value: "0"
 
       # Resources for main instances
       resources:
@@ -80,6 +89,13 @@ spec:
             secretKeyRef:
               name: n8n-postgres-credentials
               key: password
+        # Queue/Redis environment variables for worker operation
+        QUEUE_BULL_REDIS_HOST:
+          value: "n8n-valkey-primary"
+        QUEUE_BULL_REDIS_PORT:
+          value: "6379"
+        QUEUE_BULL_REDIS_DB:
+          value: "0"
 
       # Resources for worker instances
       resources:
@@ -100,6 +116,14 @@ spec:
     webhook:
       enabled: true
       replicaCount: 1
+      # Webhook-specific environment variables for Redis connection
+      extraEnv:
+        QUEUE_BULL_REDIS_HOST:
+          value: "n8n-valkey-primary"
+        QUEUE_BULL_REDIS_PORT:
+          value: "6379"
+        QUEUE_BULL_REDIS_TLS:
+          value: "false"
       resources:
         requests:
           cpu: 100m
@@ -109,7 +133,7 @@ spec:
           memory: 512Mi
 
     # Valkey/Redis configuration for queue management and webhooks
-    valkey:
+    redis:
       enabled: true
       architecture: standalone
       auth:
