@@ -4,7 +4,9 @@ resources:
   - namespace.yaml
   - postgres-credentials.sealed.yaml
   - n8n-secrets.sealed.yaml
+  - valkey-auth.sealed.yaml
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - release.yaml
+  - valkey-release.yaml
   - ingress.yaml

@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: n8n-valkey-auth
+  namespace: n8n
+spec:
+  encryptedData:
+    password: AgCyPGXzkWnO1/oMUUuViq6ka6+6CYKYeoaQwrJIf/4nlg5sNXgSARBAL4h1l4AWwPhUmsEhv4I9xu8uN9/uCJX7YkEQOt0L5S5grtQ0TDyHqSRCYVNDtpdk2wEXwwGHRuThkOquL16cPRvv4M/0K5EKN48+jNxRkl+G+OYJUaFJPjPVbM/y54Q7KnV5CnSLhcRyualIZXkOnWaovB5Zl/xt2WlqQF0vtFuN5gggt909SMtDG2pEO9WcUqcIsAAbFwlxIrR4j/bhdNlO9jpseCNVYH+bH3RtStQTddU8TmV5ND49iFgDG3PUL37CGVF/JGUskyitwUJtJAm8iIw7BskA8z4BtJSf7z3ofN5JHno7+ea4Htbe8giPGxJddtfzmku5G53VdX8LQ/O3mWHdUb9E3KExGFLueo2T6sVrPX2ham3k+DxWuANEzKtvT2CUybsO8J+Fi7y1aRA7kx4aVzCZVQnQV18vKwmnU8OpOqK0QL9e25g/bq80ivu9Q1A+4eAOgt+4HUxzbxPzWPWkaG0ENFoFqlSLul3V6b8yL7C8QAF97cHv0YVKFyQKH+vuEXGWQ3qQwlmOEydj+Sr/eB9DTj37CwhyAz6d33veRmg7S7YAY7OtEPYhQ0ZFwJeIOqGFKMIzzlEO7170evwZJgZc5LcpZ7yosPg01QwZ5OLmByyvBJUfijTZ5F5rhqdEKhMWP/fQHAOE5TdGhYY=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: n8n-valkey-auth
+      namespace: n8n
+    type: Opaque

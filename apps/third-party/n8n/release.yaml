@@ -27,8 +27,9 @@ spec:
         queue:
           bull:
             redis:
-              host: n8n-valkey-primary
+              host: n8n-valkey-master
               port: 6379
+              password: "" # Will be set via environment variable
 
       # Reference sealed secrets via extraEnv
       extraEnv:
@@ -46,11 +47,16 @@ spec:
         N8N_EXECUTIONS_MODE:
           value: "queue"
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-primary"
+          value: "n8n-valkey-master"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_DB:
           value: "0"
+        QUEUE_BULL_REDIS_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-valkey-auth
+              key: password
 
       # Resources for main instances
       resources:
@@ -91,11 +97,16 @@ spec:
               key: password
         # Queue/Redis environment variables for worker operation
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-primary"
+          value: "n8n-valkey-master"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_DB:
           value: "0"
+        QUEUE_BULL_REDIS_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-valkey-auth
+              key: password
 
       # Resources for worker instances
       resources:
@@ -119,11 +130,16 @@ spec:
       # Webhook-specific environment variables for Redis connection
       extraEnv:
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-primary"
+          value: "n8n-valkey-master"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_TLS:
           value: "false"
+        QUEUE_BULL_REDIS_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-valkey-auth
+              key: password
       resources:
         requests:
           cpu: 100m
@@ -132,14 +148,8 @@ spec:
           cpu: 250m
           memory: 512Mi
 
-    # Valkey/Redis configuration for queue management and webhooks
+    # Disable bundled Redis/Valkey - using separate installation
     redis:
-      enabled: true
-      architecture: standalone
-      auth:
-        enabled: false # Simplify auth for internal use
-      primary:
-        persistence:
-          enabled: true
-          size: 2Gi
-          storageClass: longhorn-single-replica
+      enabled: false
+    valkey:
+      enabled: false
