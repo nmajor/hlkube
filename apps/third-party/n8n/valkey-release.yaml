@@ -5,13 +5,10 @@ metadata:
   namespace: n8n
 spec:
   interval: 15m
-  chart:
-    spec:
-      chart: valkey
-      sourceRef:
-        kind: HelmRepository
-        name: bitnami
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: valkey
+    namespace: flux-system
   values:
     # Authentication configuration
     auth:

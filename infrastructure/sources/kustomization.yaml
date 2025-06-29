@@ -12,3 +12,4 @@ resources:
   - cloudnativepg.yaml
   - actions-runner-controller.yaml
   - n8n.yaml
+  - valkey.yaml
