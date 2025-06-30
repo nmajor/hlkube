@@ -31,3 +31,7 @@ spec:
       - Cookie
       - X-User
       - X-Email
+      - X-Forwarded-Host
+      - X-Forwarded-Proto
+      - X-Forwarded-For
+      - X-Real-IP
