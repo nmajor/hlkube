@@ -7,7 +7,8 @@ resources:
   # StorageClass parameters are immutable once created. Applying this manifest causes K8s errors.
   # Commented out after initial creation to prevent Flux reconciliation failures. apply
   # - storageclass.yaml
-  # - storageclass-single-replica.yaml
+  
+  - storageclass-single-replica.yaml
 
   - ingress.yaml
   - servicemonitor.yaml
