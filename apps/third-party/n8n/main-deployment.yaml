@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-main
+  namespace: n8n
+  labels:
+    app: n8n
+    component: main
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n
+      component: main
+  template:
+    metadata:
+      labels:
+        app: n8n
+        component: main
+    spec:
+      containers:
+        - name: n8n
+          image: n8nio/n8n:latest
+          ports:
+            - containerPort: 5678
+          env:
+            - name: N8N_EXECUTIONS_MODE
+              value: "queue"
+            - name: N8N_HIDE_USAGE_PAGE
+              value: "true"
+            - name: DB_TYPE
+              value: "postgresdb"
+            - name: DB_POSTGRESDB_HOST
+              value: "n8n-postgres-pooler.n8n.svc.cluster.local"
+            - name: DB_POSTGRESDB_PORT
+              value: "5432"
+            - name: DB_POSTGRESDB_DATABASE
+              value: "n8n"
+            - name: DB_POSTGRESDB_USER
+              value: "n8n"
+            - name: QUEUE_BULL_REDIS_HOST
+              value: "n8n-valkey-master"
+            - name: QUEUE_BULL_REDIS_PORT
+              value: "6379"
+            - name: QUEUE_BULL_REDIS_DB
+              value: "0"
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secrets
+                  key: encryption_key
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-postgres-credentials
+                  key: password
+            - name: QUEUE_BULL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-valkey-auth
+                  key: password
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          volumeMounts:
+            - name: n8n-storage
+              mountPath: /home/node/.n8n
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
+      volumes:
+        - name: n8n-storage
+          persistentVolumeClaim:
+            claimName: n8n-main-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: n8n-main-storage
+  namespace: n8n
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn-single-replica
+  resources:
+    requests:
+      storage: 20Gi

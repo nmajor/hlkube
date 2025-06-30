@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`n8n.hlkube.local`) || Host(`n8n.nmajor.net`)
       kind: Rule
+      middlewares:
+        - name: oauth2-auth
+          namespace: traefik
       services:
         - name: n8n
           port: 80
