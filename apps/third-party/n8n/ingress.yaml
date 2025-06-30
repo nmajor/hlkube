@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`n8n.hlkube.local`) || Host(`n8n.nmajor.net`)
+    - match: Host(`n8n.nmajor.net`)
       kind: Rule
       services:
         - name: n8n
