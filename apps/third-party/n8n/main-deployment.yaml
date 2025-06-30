@@ -28,6 +28,12 @@ spec:
               value: "queue"
             - name: N8N_HIDE_USAGE_PAGE
               value: "true"
+            - name: WEBHOOK_URL
+              value: "https://n8n.nmajor.net/"
+            - name: N8N_HOST
+              value: "n8n.nmajor.net"
+            - name: N8N_PROTOCOL
+              value: "https"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST
