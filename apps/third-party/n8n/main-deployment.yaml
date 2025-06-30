@@ -34,6 +34,8 @@ spec:
               value: "n8n.nmajor.net"
             - name: N8N_PROTOCOL
               value: "https"
+            - name: N8N_TRUST_PROXY
+              value: "true"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST
