@@ -66,9 +66,6 @@ spec:
             limits:
               cpu: 1000m
               memory: 2Gi
-          volumeMounts:
-            - name: n8n-storage
-              mountPath: /home/node/.n8n
           livenessProbe:
             httpGet:
               path: /healthz
@@ -85,20 +82,3 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 2
-      volumes:
-        - name: n8n-storage
-          persistentVolumeClaim:
-            claimName: n8n-main-storage
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: n8n-main-storage
-  namespace: n8n
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn-single-replica
-  resources:
-    requests:
-      storage: 20Gi
