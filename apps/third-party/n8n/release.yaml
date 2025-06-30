@@ -27,7 +27,7 @@ spec:
         queue:
           bull:
             redis:
-              host: n8n-valkey-master
+              host: n8n-valkey-primary
               port: 6379
               password: "" # Will be set via environment variable
 
@@ -47,7 +47,7 @@ spec:
         N8N_EXECUTIONS_MODE:
           value: "queue"
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-master"
+          value: "n8n-valkey-primary"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_DB:
@@ -97,7 +97,7 @@ spec:
               key: password
         # Queue/Redis environment variables for worker operation
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-master"
+          value: "n8n-valkey-primary"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_DB:
@@ -130,7 +130,7 @@ spec:
       # Webhook-specific environment variables for Redis connection
       extraEnv:
         QUEUE_BULL_REDIS_HOST:
-          value: "n8n-valkey-master"
+          value: "n8n-valkey-primary"
         QUEUE_BULL_REDIS_PORT:
           value: "6379"
         QUEUE_BULL_REDIS_TLS:
