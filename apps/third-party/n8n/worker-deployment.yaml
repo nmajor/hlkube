@@ -36,7 +36,7 @@ spec:
             - name: DB_POSTGRESDB_USER
               value: "n8n"
             - name: QUEUE_BULL_REDIS_HOST
-              value: "n8n-valkey-master"
+              value: "n8n-valkey-primary"
             - name: QUEUE_BULL_REDIS_PORT
               value: "6379"
             - name: QUEUE_BULL_REDIS_DB
