@@ -43,6 +43,10 @@ spec:
     additionalArguments:
       - "--api.dashboard=true"
       - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--accesslog.format=json"
+      - "--accesslog.fields.defaultmode=keep"
+      - "--accesslog.fields.headers.defaultmode=keep"
       - "--serverstransport.insecureskipverify=true"
       - "--providers.kubernetescrd.allowCrossNamespace=true"
     ports:
