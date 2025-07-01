@@ -37,7 +37,7 @@ spec:
             - name: N8N_EDITOR_BASE_URL
               value: "https://n8n.nmajor.net"
             - name: N8N_PROXY_HOPS
-              value: "3"
+              value: "2"
             - name: N8N_LOG_LEVEL
               value: "debug"
             - name: N8N_LOG_OUTPUT
