@@ -23,12 +23,8 @@ spec:
           image: n8nio/n8n:latest
           command: ["n8n", "worker"]
           env:
-            - name: N8N_EXECUTIONS_MODE
-              value: "queue"
             - name: N8N_LOG_LEVEL
               value: "debug"
-            - name: N8N_LOG_OUTPUT
-              value: "console"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST

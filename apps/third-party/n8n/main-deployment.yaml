@@ -32,6 +32,8 @@ spec:
               value: "2"
             - name: N8N_LOG_LEVEL
               value: "debug"
+            - name: N8N_SECURE_COOKIE
+              value: "false"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST
