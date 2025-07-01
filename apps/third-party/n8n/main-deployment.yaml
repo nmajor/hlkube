@@ -24,30 +24,20 @@ spec:
           ports:
             - containerPort: 5678
           env:
-            - name: N8N_EXECUTIONS_MODE
-              value: "queue"
-            - name: N8N_HIDE_USAGE_PAGE
-              value: "true"
             - name: WEBHOOK_URL
-              value: "https://n8n.nmajor.net/"
+              value: "https://n8n.nmajor.net"
             - name: N8N_HOST
               value: "n8n.nmajor.net"
             - name: N8N_PROTOCOL
               value: "https"
+            - name: N8N_PORT
+              value: "443"
             - name: N8N_EDITOR_BASE_URL
               value: "https://n8n.nmajor.net"
             - name: N8N_PROXY_HOPS
               value: "2"
             - name: N8N_LOG_LEVEL
               value: "debug"
-            - name: N8N_LOG_OUTPUT
-              value: "console"
-            - name: N8N_SECURE_COOKIE
-              value: "true"
-            - name: N8N_TRUST_PROXY
-              value: "true"
-            - name: N8N_COOKIE_SAME_SITE
-              value: "lax"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST
