@@ -37,7 +37,7 @@ spec:
             - name: N8N_EDITOR_BASE_URL
               value: "https://n8n.nmajor.net"
             - name: N8N_PROXY_HOPS
-              value: "1"
+              value: "3"
             - name: N8N_LOG_LEVEL
               value: "debug"
             - name: N8N_LOG_OUTPUT
@@ -46,6 +46,8 @@ spec:
               value: "true"
             - name: N8N_TRUST_PROXY
               value: "true"
+            - name: N8N_COOKIE_SAME_SITE
+              value: "lax"
             - name: DB_TYPE
               value: "postgresdb"
             - name: DB_POSTGRESDB_HOST
