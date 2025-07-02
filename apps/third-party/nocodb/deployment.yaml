@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nocodb
+  namespace: nocodb
+  labels:
+    app: nocodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nocodb
+  template:
+    metadata:
+      labels:
+        app: nocodb
+    spec:
+      containers:
+        - name: nocodb
+          image: nocodb/nocodb:latest
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: NC_DB
+              value: "pg://nocodb-postgres-pooler-rw.nocodb.svc.cluster.local:5432?u=$(POSTGRES_USER)&p=$(POSTGRES_PASSWORD)&d=nocodb"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nocodb-postgres-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nocodb-postgres-credentials
+                  key: password
+                    - name: NC_AUTH_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: nocodb-secrets
+              key: NC_AUTH_JWT_SECRET
+            - name: NC_PUBLIC_URL
+              value: "https://nocodb.nmajor.net"
+            - name: PORT
+              value: "8080"
+            - name: NC_TOOL_DIR
+              value: "/usr/app/data"
+            - name: NC_DISABLE_TELE
+              value: "true"
+                    - name: NC_DISABLE_ERR_REPORTS
+          value: "true"
+        - name: NC_DISABLE_EMAIL_AUTH
+          value: "true"
+        volumeMounts:
+            - name: data
+              mountPath: /usr/app/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: nocodb-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nocodb-data
+  namespace: nocodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-single-replica
+  resources:
+    requests:
+      storage: 2Gi
