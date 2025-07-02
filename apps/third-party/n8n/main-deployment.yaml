@@ -33,7 +33,7 @@ spec:
             - name: N8N_LOG_LEVEL
               value: "debug"
             - name: N8N_SECURE_COOKIE
-              value: "false"
+              value: "true"
             - name: N8N_USER_MANAGEMENT_JWT_SECRET
               valueFrom:
                 secretKeyRef:
