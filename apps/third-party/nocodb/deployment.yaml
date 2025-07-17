@@ -34,16 +34,6 @@ spec:
                     "database": "nocodb"
                   }
                 }
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: nocodb-postgres-credentials
-                  key: username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: nocodb-postgres-credentials
-                  key: password
             - name: NC_AUTH_JWT_SECRET
               valueFrom:
                 secretKeyRef:
