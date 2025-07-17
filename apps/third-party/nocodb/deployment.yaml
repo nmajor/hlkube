@@ -48,12 +48,6 @@ spec:
               value: "8080"
             - name: NC_TOOL_DIR
               value: "/usr/app/data"
-            - name: NC_DISABLE_TELE
-              value: "true"
-            - name: NC_DISABLE_ERR_REPORTS
-              value: "true"
-            - name: NC_DISABLE_EMAIL_AUTH
-              value: "true"
           volumeMounts:
             - name: data
               mountPath: /usr/app/data
