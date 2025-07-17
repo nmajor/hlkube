@@ -23,7 +23,7 @@ spec:
               name: http
           env:
             - name: NC_DB
-              value: "pg://nocodb-postgres-pooler-rw.nocodb.svc.cluster.local:5432?u=$(POSTGRES_USER)&p=$(POSTGRES_PASSWORD)&d=nocodb"
+              value: "pg://nocodb-postgres-pooler.nocodb.svc.cluster.local:5432?u=$(POSTGRES_USER)&p=$(POSTGRES_PASSWORD)&d=nocodb"
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
