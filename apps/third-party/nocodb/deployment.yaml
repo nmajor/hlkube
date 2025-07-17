@@ -23,17 +23,10 @@ spec:
               name: http
           env:
             - name: DATABASE_URL
-              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@nocodb-postgres-pooler.nocodb.svc.cluster.local:5432/nocodb"
-            - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: nocodb-postgres-credentials
-                  key: username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: nocodb-postgres-credentials
-                  key: password
+                  name: nocodb-secrets
+                  key: DATABASE_URL
             - name: NC_AUTH_JWT_SECRET
               valueFrom:
                 secretKeyRef:
