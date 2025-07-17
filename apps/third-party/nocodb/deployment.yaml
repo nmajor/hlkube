@@ -82,8 +82,8 @@ metadata:
   namespace: nocodb
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn-single-replica
+    - ReadWriteMany
+  storageClassName: longhorn
   resources:
     requests:
       storage: 2Gi
