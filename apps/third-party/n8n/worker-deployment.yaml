@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: n8n-worker
-          image: n8nio/n8n:latest
+          image: nmajor/n8n-hlkube:latest
           command: ["n8n", "worker"]
           env:
             - name: N8N_LOG_LEVEL
@@ -46,7 +46,7 @@ spec:
             - name: NODE_FUNCTION_ALLOW_BUILTIN
               value: "*"
             - name: NODE_FUNCTION_ALLOW_EXTERNAL
-              value: "dom-to-semantic-markdown"
+              value: "*"
             - name: N8N_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
