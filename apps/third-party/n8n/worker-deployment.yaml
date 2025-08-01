@@ -43,6 +43,10 @@ spec:
               value: "6379"
             - name: QUEUE_BULL_REDIS_DB
               value: "0"
+            - name: NODE_FUNCTION_ALLOW_BUILTIN
+              value: "*"
+            - name: NODE_FUNCTION_ALLOW_EXTERNAL
+              value: "dom-to-semantic-markdown"
             - name: N8N_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
