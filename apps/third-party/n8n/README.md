@@ -48,13 +48,13 @@ Contains the password for Valkey authentication.
 The n8n configuration uses these key environment variables for Valkey connection:
 
 - `N8N_EXECUTIONS_MODE: "queue"` - Enables queue mode
-- `QUEUE_BULL_REDIS_HOST: "n8n-valkey-master"` - Valkey service name
+- `QUEUE_BULL_REDIS_HOST: "n8n-valkey-primary"` - Valkey service name
 - `QUEUE_BULL_REDIS_PORT: "6379"` - Valkey port
 - `QUEUE_BULL_REDIS_DB: "0"` - Database number
 
 ### Service Names
 
-- Valkey: `n8n-valkey-master.n8n.svc.cluster.local`
+- Valkey: `n8n-valkey-primary.n8n.svc.cluster.local`
 - PostgreSQL: `n8n-postgres-pooler.n8n.svc.cluster.local`
 
 ## Deployment
