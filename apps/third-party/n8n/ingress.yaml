@@ -3,6 +3,11 @@ kind: IngressRoute
 metadata:
   name: n8n
   namespace: n8n
+  annotations:
+    traefik.ingress.kubernetes.io/affinity: "true"
+    traefik.ingress.kubernetes.io/session-cookie-name: "n8n-session"
+    traefik.ingress.kubernetes.io/session-cookie-secure: "true"
+    traefik.ingress.kubernetes.io/session-cookie-httponly: "true"
 spec:
   entryPoints:
     - websecure
