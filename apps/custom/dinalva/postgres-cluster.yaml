@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: dinalva-postgres
-  namespace: nocodb
+  namespace: dinalva
 spec:
   instances: 2
   primaryUpdateStrategy: unsupervised

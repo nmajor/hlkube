@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: dinalva-postgres-tcp
+  namespace: dinalva
+spec:
+  entryPoints:
+    - postgres
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: dinalva-postgres-pooler
+          port: 5432
+          # Use the connection pooler for better performance
+  # Optional: Add TLS termination
+  # tls:
+  #   passthrough: true  # Let PostgreSQL handle TLS

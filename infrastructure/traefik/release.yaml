@@ -60,6 +60,11 @@ spec:
         tls:
           enabled: true
           options: "default"
+      postgres:
+        port: 5432
+        expose: true
+        exposedPort: 5432
+        protocol: TCP
     service:
       enabled: true
       type: ClusterIP

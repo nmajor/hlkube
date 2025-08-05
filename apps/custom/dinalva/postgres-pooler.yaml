@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
   name: dinalva-postgres-pooler
-  namespace: nocodb
+  namespace: dinalva
 spec:
   cluster:
     name: dinalva-postgres
