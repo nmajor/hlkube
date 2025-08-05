@@ -6,6 +6,9 @@ resources:
   - postgres-cluster.yaml
   - postgres-credentials.sealed.yaml
   - postgres-pooler.yaml
+  - dinalva-postgres-cluster.yaml
+  - dinalva-postgres-credentials.sealed.yaml
+  - dinalva-postgres-pooler.yaml
   - nocodb-secrets.sealed.yaml
   - deployment.yaml
   - service.yaml
