@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 1h
   timeout: 20m
-  suspend: true
+  suspend: false
   chart:
     spec:
       chart: kube-prometheus-stack
