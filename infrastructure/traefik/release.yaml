@@ -67,8 +67,13 @@ spec:
     service:
       enabled: true
       type: ClusterIP
-      expose:
-        postgres: true
+    # Expose the postgres entrypoint on the Service
+    # Helm chart expects a map under ports.<name>.expose
+    # with keys like `default: true`
+    ports:
+      postgres:
+        expose:
+          default: true
     tlsOptions:
       default:
         sniStrict: false
