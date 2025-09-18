@@ -23,6 +23,8 @@ spec:
           image: nmajor/n8n-hlkube:latest
           command: ["n8n", "worker"]
           env:
+            - name: N8N_LISTEN_ADDRESS
+              value: "0.0.0.0"
             - name: N8N_LOG_LEVEL
               value: "debug"
             - name: N8N_RUNNERS_ENABLED
@@ -64,6 +66,8 @@ spec:
                   key: password
             - name: QUEUE_HEALTH_CHECK_ACTIVE
               value: "true"
+            - name: QUEUE_HEALTH_CHECK_PORT
+              value: "5678"
           resources:
             requests:
               cpu: 250m
@@ -75,7 +79,7 @@ spec:
             httpGet:
               path: /healthz
               port: 5678
-            initialDelaySeconds: 30
+            initialDelaySeconds: 45
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -83,7 +87,7 @@ spec:
             httpGet:
               path: /healthz/readiness
               port: 5678
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 3
