@@ -64,16 +64,11 @@ spec:
         port: 5432
         exposedPort: 5432
         protocol: TCP
+        expose:
+          default: true
     service:
       enabled: true
       type: ClusterIP
-    # Expose the postgres entrypoint on the Service
-    # Helm chart expects a map under ports.<name>.expose
-    # with keys like `default: true`
-    ports:
-      postgres:
-        expose:
-          default: true
     tlsOptions:
       default:
         sniStrict: false
