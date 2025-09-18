@@ -16,6 +16,8 @@ spec:
       interval: 1m
   # Configure Longhorn for a small home cluster
   values:
+    preUpgradeChecker:
+      jobEnabled: false
     persistence:
       defaultClassReplicaCount: 3
       # Using the same storage path on each node for the Longhorn volumes
