@@ -18,6 +18,7 @@ spec:
         app: n8n
         component: worker
     spec:
+      enableServiceLinks: false
       containers:
         - name: n8n-worker
           image: nmajor/n8n-hlkube:latest
