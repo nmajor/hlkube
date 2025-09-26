@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: coder-workspaces
+  labels:
+    coder.workspace.namespace: "true"
+    app.kubernetes.io/name: coder-workspaces
+    app.kubernetes.io/component: workspace-namespace
+    app.kubernetes.io/part-of: coder
+  annotations:
+    flux.weave.works/ignore: "false"
