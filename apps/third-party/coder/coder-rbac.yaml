@@ -1,0 +1,83 @@
+---
+# ClusterRole for namespace read access (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: coder-namespace-reader
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+
+---
+# Bind ClusterRole to Coder service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: coder-reads-namespaces
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: coder-namespace-reader
+subjects:
+- kind: ServiceAccount
+  name: coder
+  namespace: coder
+
+---
+# Namespace for workspaces (moved from separate file)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: coder-workspaces
+  labels:
+    coder.workspace.namespace: "true"
+    app.kubernetes.io/name: coder-workspaces
+    app.kubernetes.io/component: workspace-namespace
+    app.kubernetes.io/part-of: coder
+  annotations:
+    flux.weave.works/ignore: "false"
+
+---
+# Role for managing workspace resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coder-workspace-manager
+  namespace: coder-workspaces
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - services
+  - serviceaccounts
+  - persistentvolumeclaims
+  - secrets
+  - configmaps
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - statefulsets
+  verbs: ["*"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - roles
+  - rolebindings
+  verbs: ["*"]
+
+---
+# Bind workspace manager role to Coder service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coder-manages-workspaces
+  namespace: coder-workspaces
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coder-workspace-manager
+subjects:
+- kind: ServiceAccount
+  name: coder
+  namespace: coder
