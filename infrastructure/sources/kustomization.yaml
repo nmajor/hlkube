@@ -11,5 +11,6 @@ resources:
   - prometheus.yaml
   - cloudnativepg.yaml
   - actions-runner-controller.yaml
+  - coder.yaml
   - n8n.yaml
   - valkey.yaml

@@ -1,0 +1,28 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: coder-postgres
+  namespace: coder
+spec:
+  instances: 1
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"
+      effective_cache_size: "1GB"
+
+  bootstrap:
+    initdb:
+      database: coder
+      owner: coder
+      secret:
+        name: coder-postgres-credentials
+
+  storage:
+    size: 20Gi
+    storageClass: longhorn-single-replica
+
+  monitoring:
+    enabled: true
+    enablePodMonitor: true
