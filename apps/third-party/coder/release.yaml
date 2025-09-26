@@ -5,7 +5,7 @@ metadata:
   namespace: coder
 spec:
   interval: 15m
-  timeout: 15m
+  timeout: 30m
   chart:
     spec:
       chart: coder
@@ -17,9 +17,11 @@ spec:
   install:
     remediation:
       retries: 3
+    timeout: 30m
   upgrade:
     remediation:
       retries: 3
+    timeout: 30m
   values:
     coder:
       env:
@@ -70,12 +72,16 @@ spec:
       httpGet:
         path: /api/v2/buildinfo
         port: http
-      initialDelaySeconds: 60
+      initialDelaySeconds: 120
       periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 5
 
     readinessProbe:
       httpGet:
         path: /api/v2/buildinfo
         port: http
-      initialDelaySeconds: 30
-      periodSeconds: 10
+      initialDelaySeconds: 90
+      periodSeconds: 15
+      timeoutSeconds: 10
+      failureThreshold: 10
