@@ -23,11 +23,18 @@ spec:
   values:
     coder:
       env:
-        - name: CODER_PG_CONNECTION_URL
+        - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
               name: coder-postgres-credentials
-              key: uri
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: coder-postgres-credentials
+              key: password
+        - name: CODER_PG_CONNECTION_URL
+          value: "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@coder-postgres-rw:5432/coder?sslmode=require"
         - name: CODER_ACCESS_URL
           value: "https://coder.nmajor.net"
         - name: CODER_WILDCARD_ACCESS_URL
