@@ -193,27 +193,22 @@ resource "coder_agent" "main" {
 
     # Install Elixir tools
     echo "⚗️ Installing Elixir tools..."
+    # Create .mix directory structure (required for container environment)
+    mkdir -p /home/coder/.mix/archives
+    export MIX_HOME=/home/coder/.mix
     mix local.hex --force
     mix local.rebar --force
     mix archive.install hex phx_new --force
 
-    # Install code-server using official standalone method (no root needed)
+    # Install code-server using official method from Coder docs
     echo "💻 Installing code-server..."
-    if curl -fsSL https://code-server.dev/install.sh | sh -s -- --method standalone; then
-        export PATH="${HOME}/.local/bin:$PATH"
-        echo 'export PATH="${HOME}/.local/bin:$PATH"' >> /home/coder/.bashrc
-        echo "✅ Code-server installed successfully"
+    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
+    echo "✅ Code-server installed successfully"
 
-        # Start code-server in background
-        echo "🖥️ Starting code-server..."
-        nohup "${HOME}/.local/bin/code-server" --bind-addr 0.0.0.0:13337 --auth none --disable-telemetry /home/coder > /tmp/code-server.log 2>&1 &
-        echo "✅ Code-server started on port 13337"
-
-        # Wait a moment for code-server to start
-        sleep 3
-    else
-        echo "⚠️ Code-server installation failed, will be unavailable"
-    fi
+    # Start code-server in background (official Coder example pattern)
+    echo "🖥️ Starting code-server..."
+    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
+    echo "✅ Code-server started on port 13337"
 
     echo "🎉 Setup complete! Ready for Phoenix development!"
     echo "📊 Database Server: postgres://postgres:postgres@localhost:5432"
@@ -358,6 +353,7 @@ resource "kubernetes_pod" "main" {
     security_context {
       run_as_user = 1000
       fs_group    = 1000
+      run_as_non_root = true
     }
 
     container {
@@ -373,6 +369,14 @@ resource "kubernetes_pod" "main" {
       env {
         name  = "CODER_AGENT_TOKEN"
         value = coder_agent.main.token
+      }
+      env {
+        name  = "USER"
+        value = "coder"
+      }
+      env {
+        name  = "SHELL"
+        value = "/bin/bash"
       }
       env {
         name  = "DATABASE_URL"
