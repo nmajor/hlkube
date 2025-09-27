@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`coder.nmajor.net`) || HostRegexp(`{subdomain:[a-z0-9.-]+}.coder.nmajor.net`)
+    - match: Host(`coder.nmajor.net`) || Host(`*.coder.nmajor.net`)
       kind: Rule
       services:
         - name: coder
