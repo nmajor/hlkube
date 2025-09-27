@@ -5,10 +5,11 @@ metadata:
   namespace: coder
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`*.nmajor.dev`)
       kind: Rule
       services:
         - name: coder
           port: 80
+  tls: {}
