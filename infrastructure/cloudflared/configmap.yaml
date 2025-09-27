@@ -9,6 +9,12 @@ data:
     metrics: 0.0.0.0:2000
     # This YAML section maps traffic from hostnames to local services
     ingress:
+      # Coder workspace apps wildcard domain
+      - hostname: "*.nmajor.dev"
+        service: https://traefik.traefik.svc.cluster.local:443
+        originRequest:
+          noTLSVerify: true
+          disableChunkedEncoding: true
       # Catch-all rule to forward all traffic to Traefik
       - service: https://traefik.traefik.svc.cluster.local:443
         originRequest:
