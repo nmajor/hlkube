@@ -15,6 +15,12 @@ data:
         originRequest:
           noTLSVerify: true
           disableChunkedEncoding: true
+      # Coder workspace apps wildcard domain
+      - hostname: "*.nmajor.net"
+        service: https://traefik.traefik.svc.cluster.local:443
+        originRequest:
+          noTLSVerify: true
+          disableChunkedEncoding: true
       # Catch-all rule to forward all traffic to Traefik
       - service: https://traefik.traefik.svc.cluster.local:443
         originRequest:

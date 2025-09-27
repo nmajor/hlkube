@@ -109,7 +109,7 @@ resource "coder_agent" "main" {
     # Install minimal dependencies (no compilation needed!)
     echo "📦 Installing minimal dependencies..."
     sudo apt-get update
-    sudo apt-get install -y curl unzip
+    sudo apt-get install -y curl unzip zsh git
 
     # Download and run official Elixir install script
     echo "💎 Installing Elixir ${data.coder_parameter.elixir_version.value} with OTP ${data.coder_parameter.erlang_version.value}..."
@@ -145,6 +145,60 @@ resource "coder_agent" "main" {
     mix local.rebar --force
     mix archive.install hex phx_new --force
 
+    # Setup zsh with Oh My Zsh and Starship prompt
+    echo "🐚 Setting up zsh with Oh My Zsh and Starship prompt..."
+    # Install Oh My Zsh
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+    # Install Starship prompt
+    echo "⭐ Installing Starship prompt..."
+    curl -sS https://starship.rs/install.sh | sh
+
+    # Change default shell to zsh
+    sudo chsh -s $(which zsh) coder
+
+    # Configure zsh with Elixir paths and Starship
+    cat >> ~/.zshrc << 'ZSHEOF'
+
+# Elixir/Erlang paths
+export PATH=$HOME/.elixir-install/installs/otp/$(ls -1 $HOME/.elixir-install/installs/otp/ | head -1)/bin:$PATH
+export PATH=$HOME/.elixir-install/installs/elixir/$(ls -1 $HOME/.elixir-install/installs/elixir/ | head -1)/bin:$PATH
+
+# Phoenix development aliases
+alias phx="mix phx.server"
+alias phxd="MIX_ENV=dev mix phx.server"
+alias phxt="MIX_ENV=test mix test"
+alias ecto="mix ecto"
+alias iex="iex -S mix"
+
+# Database shortcuts
+alias db.create="mix ecto.create"
+alias db.migrate="mix ecto.migrate"
+alias db.reset="mix ecto.reset"
+alias db.seed="mix ecto.seed"
+
+# Initialize Starship prompt
+eval "$(starship init zsh)"
+ZSHEOF
+
+    # Install and start code-server (VS Code in browser)
+    echo "💻 Installing code-server..."
+    curl -fsSL https://code-server.dev/install.sh | sh
+
+    echo "🚀 Starting code-server..."
+    code-server --auth none --port 13337 --bind-addr 0.0.0.0:13337 >/tmp/code-server.log 2>&1 &
+
+    # Verify code-server is running
+    echo "🔍 Waiting for code-server to start..."
+    for i in {1..30}; do
+      if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/13337' 2>/dev/null; then
+        echo "✅ Code-server is ready!"
+        break
+      fi
+      echo "⏳ Waiting for code-server... ($i/30)"
+      sleep 2
+    done
+
     # Wait for PostgreSQL to be ready
     echo "🔍 Waiting for PostgreSQL..."
     for i in {1..30}; do
@@ -165,8 +219,10 @@ resource "coder_agent" "main" {
     echo "📋 Installed versions:"
     echo "  • Erlang: $(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell)"
     echo "  • Elixir: $(elixir --version | head -n1)"
+    echo "  • Shell: $(zsh --version)"
     echo "📝 Note: Pre-built binaries installed - no compilation required!"
     echo "📝 Note: Databases persist across workspace restarts"
+    echo "🐚 Note: zsh with Oh My Zsh and Starship prompt configured with Phoenix aliases"
   EOT
 
   # Metadata for monitoring
@@ -208,15 +264,15 @@ resource "coder_app" "code_server" {
   agent_id     = coder_agent.main.id
   slug         = "code-server"
   display_name = "VS Code"
-  url          = "http://localhost:8080"
+  url          = "http://localhost:13337"
   icon         = "/icon/code.svg"
   subdomain    = true
   share        = "owner"
 
   healthcheck {
-    url       = "http://localhost:8080/healthz"
+    url       = "http://localhost:13337/healthz"
     interval  = 5
-    threshold = 6
+    threshold = 10
   }
 }
 
