@@ -11,3 +11,4 @@ spec:
   dnsNames:
   - coder.nmajor.net
   - "*.coder.nmajor.net"
+  - "*.nmajor.dev"
