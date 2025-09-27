@@ -1,0 +1,20 @@
+name: Deploy Coder Template
+
+on:
+  push:
+    branches: [main]
+    paths: ['apps/third-party/coder/templates/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Coder Template
+        uses: matifali/update-coder-template@v3
+        with:
+          id: elixir-phoenix-postgres
+          dir: apps/third-party/coder/templates/elixir-phoenix-postgres
+          url: https://coder.nmajor.net
+          coder_session_token: ${{ secrets.CODER_SESSION_TOKEN }}
