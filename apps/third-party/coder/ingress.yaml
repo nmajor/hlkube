@@ -5,12 +5,10 @@ metadata:
   namespace: coder
 spec:
   entryPoints:
-    - websecure
+    - web
   routes:
     - match: Host(`coder.nmajor.net`) || Host(`*.coder.nmajor.net`)
       kind: Rule
       services:
         - name: coder
           port: 80
-  tls:
-    secretName: coder-wildcard-tls
