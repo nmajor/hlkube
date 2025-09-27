@@ -43,6 +43,10 @@ spec:
           value: "*.nmajor.dev"
         - name: CODER_DERP_SERVER_ENABLE
           value: "true"
+        - name: CODER_SAMESITE_AUTH_COOKIE
+          value: "none"
+        - name: CODER_SECURE_AUTH_COOKIE
+          value: "true"
 
     service:
       type: ClusterIP
