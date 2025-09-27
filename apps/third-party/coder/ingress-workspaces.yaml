@@ -12,5 +12,4 @@ spec:
       services:
         - name: coder
           port: 80
-  tls:
-    secretName: coder-wildcard-tls
+  tls: {}
