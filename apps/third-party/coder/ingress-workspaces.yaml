@@ -12,3 +12,4 @@ spec:
       services:
         - name: coder
           port: 80
+  tls: {}
