@@ -11,21 +11,18 @@ terraform {
   }
 }
 
-provider "coder" {
-  url = "http://coder.coder.svc.cluster.local"
-}
-
 data "coder_provisioner" "me" {
 }
 
 data "coder_workspace" "me" {
 }
 
-# Hardcoded namespace for workspace separation
+# Simplified namespace configuration
 locals {
   namespace = "coder-workspaces"
 }
 
+# Template parameters
 data "coder_parameter" "cpu" {
   name         = "cpu"
   display_name = "CPU Cores"
@@ -53,7 +50,7 @@ data "coder_parameter" "memory" {
 data "coder_parameter" "disk_size" {
   name         = "disk_size"
   display_name = "Disk Size (GB)"
-  description  = "Size of /home/coder (covers code, deps, DB, Claude artifacts). Min 10Gi for light use; 20-30Gi recommended for Phoenix/Ash/Claude."
+  description  = "Size of /home/coder for code, deps, DB. 20-30GB recommended for Phoenix development."
   default      = 20
   type         = "number"
   mutable      = false
@@ -63,27 +60,27 @@ data "coder_parameter" "disk_size" {
   }
 }
 
-data "coder_parameter" "elixir_image" {
-  name         = "elixir_image"
-  display_name = "Elixir Docker Image"
-  description  = "Elixir image tag (e.g., 1.18.4-otp-28, 1.17-otp-26). View available tags: https://hub.docker.com/_/elixir/tags"
-  default      = "1.18.4-otp-28"
+data "coder_parameter" "erlang_version" {
+  name         = "erlang_version"
+  display_name = "Erlang/OTP Version"
+  description  = "Erlang/OTP version to install (e.g., 27.3.4, 27.2, 26.2.5). Use format: otp@VERSION"
+  default      = "27.3.4"
   type         = "string"
   validation {
-    regex = "^\\d+\\.\\d+(\\.(\\d+))?(-otp-\\d+)?(-\\w+)?$"
-    error = "Please use a valid Elixir tag format like '1.18.4-otp-28' or '1.17-otp-26'"
+    regex = "^\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?$"
+    error = "Please use a valid OTP version format like '27.3.4' or '26.2.5'"
   }
 }
 
-data "coder_parameter" "postgres_image" {
-  name         = "postgres_image"
-  display_name = "PostgreSQL Docker Image"
-  description  = "PostgreSQL image tag (e.g., 17, 16.1, 15-alpine). View available tags: https://hub.docker.com/_/postgres/tags"
-  default      = "17"
+data "coder_parameter" "elixir_version" {
+  name         = "elixir_version"
+  display_name = "Elixir Version"
+  description  = "Elixir version to install (e.g., 1.18.4, 1.17.3, 1.16.3). Use format: elixir@VERSION"
+  default      = "1.18.4"
   type         = "string"
   validation {
-    regex = "^\\d+(\\.(\\d+))?(-\\w+)?$"
-    error = "Please use a valid PostgreSQL tag format like '17', '16.1', or '15-alpine'"
+    regex = "^\\d+\\.\\d+\\.\\d+$"
+    error = "Please use a valid Elixir version format like '1.18.4' or '1.17.3'"
   }
 }
 
@@ -91,97 +88,64 @@ provider "kubernetes" {
   config_path = null
 }
 
-# Reference existing namespace created by Flux GitOps
+# Reference existing namespace
 data "kubernetes_namespace" "workspace" {
   metadata {
     name = local.namespace
   }
 }
 
-# Create ServiceAccount for workspace
-resource "kubernetes_service_account" "workspace" {
-  metadata {
-    name      = "coder-${data.coder_workspace.me.id}"
-    namespace = data.kubernetes_namespace.workspace.metadata.0.name
-    labels = {
-      "coder.workspace.id"   = data.coder_workspace.me.id
-      "coder.workspace.name" = data.coder_workspace.me.name
-    }
-  }
-}
-
-# Create Role for workspace permissions
-resource "kubernetes_role" "workspace" {
-  metadata {
-    name      = "coder-${data.coder_workspace.me.id}"
-    namespace = data.kubernetes_namespace.workspace.metadata.0.name
-  }
-
-  rule {
-    api_groups = [""]
-    resources  = ["persistentvolumeclaims", "pods", "services", "secrets", "events"]
-    verbs      = ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
-  }
-
-  rule {
-    api_groups = ["apps"]
-    resources  = ["deployments"]
-    verbs      = ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
-  }
-}
-
-# Bind Role to ServiceAccount
-resource "kubernetes_role_binding" "workspace" {
-  metadata {
-    name      = "coder-${data.coder_workspace.me.id}"
-    namespace = data.kubernetes_namespace.workspace.metadata.0.name
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = kubernetes_role.workspace.metadata.0.name
-  }
-
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.workspace.metadata.0.name
-    namespace = data.kubernetes_namespace.workspace.metadata.0.name
-  }
-}
-
+# Coder agent configuration
 resource "coder_agent" "main" {
-  arch                     = data.coder_provisioner.me.arch
-  os                       = "linux"
-  startup_script_behavior  = "blocking"
+  arch                    = data.coder_provisioner.me.arch
+  os                      = "linux"
+  startup_script_behavior = "blocking"
   startup_script = <<-EOT
     #!/bin/bash
-    set -eo pipefail  # Remove 'u' flag to allow undefined variables
+    set -euo pipefail
 
-    echo "🚀 Starting Elixir Phoenix development environment setup..."
+    echo "🚀 Setting up Elixir Phoenix development environment..."
 
-    # Fix user environment immediately
-    export USER=coder
-    export HOME=/home/coder
+    # Install minimal dependencies (no compilation needed!)
+    echo "📦 Installing minimal dependencies..."
+    sudo apt-get update
+    sudo apt-get install -y curl unzip
 
-    # Ensure home directory exists (don't try to change ownership in container)
-    mkdir -p /home/coder
+    # Download and run official Elixir install script
+    echo "💎 Installing Elixir ${data.coder_parameter.elixir_version.value} with OTP ${data.coder_parameter.erlang_version.value}..."
+    curl -fsSO https://elixir-lang.org/install.sh
+    sh install.sh elixir@${data.coder_parameter.elixir_version.value} otp@${data.coder_parameter.erlang_version.value}
 
-    # Set environment for current session
-    cd /home/coder
+    # Set up PATH using the actual installed directories
+    installs_dir=$HOME/.elixir-install/installs
 
-    # Install Node.js/npm via binary download (no root needed)
-    echo "📥 Installing Node.js v20..."
-    cd /tmp
-    if curl -fsSL https://nodejs.org/dist/v20.15.0/node-v20.15.0-linux-x64.tar.xz | tar -xJ; then
-        export PATH="/tmp/node-v20.15.0-linux-x64/bin:$PATH"
-        echo 'export PATH="/tmp/node-v20.15.0-linux-x64/bin:$PATH"' >> /home/coder/.bashrc
-        echo "✅ Node.js installed successfully"
-    else
-        echo "⚠️ Node.js installation failed, continuing..."
-    fi
+    # Find the actual installed versions (install script may pick different versions)
+    otp_actual_dir=$(ls -1 $installs_dir/otp/ | head -1)
+    elixir_actual_dir=$(ls -1 $installs_dir/elixir/ | head -1)
 
-    # Wait for PostgreSQL using network connectivity check
+    echo "📋 Found installations:"
+    echo "  • OTP: $otp_actual_dir"
+    echo "  • Elixir: $elixir_actual_dir"
+
+    # Add to bashrc for future sessions using actual directories
+    echo "export PATH=\$HOME/.elixir-install/installs/otp/$otp_actual_dir/bin:\$PATH" >> ~/.bashrc
+    echo "export PATH=\$HOME/.elixir-install/installs/elixir/$elixir_actual_dir/bin:\$PATH" >> ~/.bashrc
+
+    # Export for current session using actual directories
+    export PATH=$installs_dir/otp/$otp_actual_dir/bin:$PATH
+    export PATH=$installs_dir/elixir/$elixir_actual_dir/bin:$PATH
+
+    # Verify PATH is working
+    echo "🔍 Verifying installation..."
+    which elixir && which mix
+
+    # Install Elixir development tools
+    echo "🔧 Installing Elixir development tools..."
+    mix local.hex --force
+    mix local.rebar --force
+    mix archive.install hex phx_new --force
+
+    # Wait for PostgreSQL to be ready
     echo "🔍 Waiting for PostgreSQL..."
     for i in {1..30}; do
       if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/5432' 2>/dev/null; then
@@ -192,36 +156,20 @@ resource "coder_agent" "main" {
       sleep 2
     done
 
-    # Database server ready for Phoenix apps
-    echo "🗄️ Database server ready for Phoenix development..."
-
-    # Install Elixir tools
-    echo "⚗️ Installing Elixir tools..."
-    # Create .mix directory structure (required for container environment)
-    mkdir -p /home/coder/.mix/archives
-    export MIX_HOME=/home/coder/.mix
-    mix local.hex --force
-    mix local.rebar --force
-    mix archive.install hex phx_new --force
-
-    # Install code-server using official method from Coder docs
-    echo "💻 Installing code-server..."
-    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone --prefix=/tmp/code-server
-    echo "✅ Code-server installed successfully"
-
-    # Start code-server in background (official Coder example pattern)
-    echo "🖥️ Starting code-server..."
-    /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
-    echo "✅ Code-server started on port 13337"
-
-    echo "🎉 Setup complete! Ready for Phoenix development!"
-    echo "📊 Database Server: postgres://postgres:postgres@localhost:5432"
-    echo "🐘 PostgreSQL Version: Available via container"
-    echo "⚗️ Elixir Version: Available via container"
-    echo "🚀 Create new Phoenix app: mix phx.new my_app"
-    echo "🗄️ Create database: mix ecto.create"
+    echo "🎉 Environment ready!"
+    echo "📊 Database: postgres://postgres:postgres@localhost:5432"
+    echo "🚀 Create Phoenix app: mix phx.new my_app"
+    echo "🗄️ Setup database: mix ecto.create"
+    echo "🌐 Start server: mix phx.server"
+    echo ""
+    echo "📋 Installed versions:"
+    echo "  • Erlang: $(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell)"
+    echo "  • Elixir: $(elixir --version | head -n1)"
+    echo "📝 Note: Pre-built binaries installed - no compilation required!"
+    echo "📝 Note: Databases persist across workspace restarts"
   EOT
 
+  # Metadata for monitoring
   metadata {
     display_name = "CPU Usage"
     key          = "cpu"
@@ -255,25 +203,18 @@ resource "coder_agent" "main" {
   }
 }
 
-# Cursor Desktop Integration
-module "cursor" {
-  count    = data.coder_workspace.me.start_count
-  source   = "registry.coder.com/coder/cursor/coder"
-  version  = "1.0.19"
-  agent_id = coder_agent.main.id
-}
-
+# Apps
 resource "coder_app" "code_server" {
   agent_id     = coder_agent.main.id
   slug         = "code-server"
   display_name = "VS Code"
-  url          = "http://localhost:13337"
+  url          = "http://localhost:8080"
   icon         = "/icon/code.svg"
   subdomain    = true
   share        = "owner"
 
   healthcheck {
-    url       = "http://localhost:13337/healthz"
+    url       = "http://localhost:8080/healthz"
     interval  = 5
     threshold = 6
   }
@@ -295,6 +236,7 @@ resource "coder_app" "phoenix" {
   }
 }
 
+# Storage
 resource "kubernetes_persistent_volume_claim" "home" {
   metadata {
     name      = "coder-${data.coder_workspace.me.id}-home"
@@ -337,6 +279,7 @@ resource "kubernetes_persistent_volume_claim" "postgres_data" {
   }
 }
 
+# Workspace pod
 resource "kubernetes_pod" "main" {
   count = data.coder_workspace.me.start_count
 
@@ -347,22 +290,21 @@ resource "kubernetes_pod" "main" {
       "coder.workspace.id"   = data.coder_workspace.me.id
       "coder.workspace.name" = data.coder_workspace.me.name
     }
-    annotations = {
-      "coder.workspace.id" = data.coder_workspace.me.id
-    }
   }
 
   spec {
-    service_account_name = kubernetes_service_account.workspace.metadata.0.name
+    # Simplified security context
     security_context {
-      run_as_user = 1000
-      fs_group    = 1000
+      run_as_user     = 1000
+      run_as_group    = 1000
+      fs_group        = 1000
       run_as_non_root = true
     }
 
+    # Main development container using Coder enterprise base
     container {
       name              = "dev"
-      image             = "elixir:${data.coder_parameter.elixir_image.value}"
+      image             = "codercom/enterprise-base:ubuntu"
       image_pull_policy = "Always"
       command           = ["sh", "-c", coder_agent.main.init_script]
 
@@ -375,16 +317,8 @@ resource "kubernetes_pod" "main" {
         value = coder_agent.main.token
       }
       env {
-        name  = "USER"
-        value = "coder"
-      }
-      env {
-        name  = "SHELL"
-        value = "/bin/bash"
-      }
-      env {
         name  = "DATABASE_URL"
-        value = "postgres://postgres:postgres@localhost:5432"
+        value = "postgres://postgres:postgres@localhost:5432/postgres"
       }
       env {
         name  = "PGUSER"
@@ -421,9 +355,10 @@ resource "kubernetes_pod" "main" {
       }
     }
 
+    # PostgreSQL sidecar container (using stable v16)
     container {
       name              = "postgres"
-      image             = "postgres:${data.coder_parameter.postgres_image.value}"
+      image             = "postgres:16"
       image_pull_policy = "Always"
 
       env {
@@ -432,6 +367,10 @@ resource "kubernetes_pod" "main" {
       }
       env {
         name  = "POSTGRES_USER"
+        value = "postgres"
+      }
+      env {
+        name  = "POSTGRES_DB"
         value = "postgres"
       }
       env {
