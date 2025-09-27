@@ -152,7 +152,7 @@ resource "coder_agent" "main" {
   startup_script_behavior  = "blocking"
   startup_script = <<-EOT
     #!/bin/bash
-    set -euo pipefail
+    set -eo pipefail  # Remove 'u' flag to allow undefined variables
 
     echo "🚀 Starting Elixir Phoenix development environment setup..."
 
@@ -160,14 +160,8 @@ resource "coder_agent" "main" {
     export USER=coder
     export HOME=/home/coder
 
-    # Create user if it doesn't exist (may fail in container, that's OK)
-    if command -v adduser >/dev/null 2>&1; then
-        adduser --disabled-password --gecos "" --uid 1000 coder 2>/dev/null || echo "User creation skipped (normal in container)"
-    fi
-
-    # Ensure home directory exists with correct permissions
+    # Ensure home directory exists (don't try to change ownership in container)
     mkdir -p /home/coder
-    chown 1000:1000 /home/coder 2>/dev/null || echo "Ownership change skipped (normal in container)"
 
     # Set environment for current session
     cd /home/coder
@@ -206,13 +200,13 @@ resource "coder_agent" "main" {
     # Install code-server using official standalone method (no root needed)
     echo "💻 Installing code-server..."
     if curl -fsSL https://code-server.dev/install.sh | sh -s -- --method standalone; then
-        export PATH="$HOME/.local/bin:$PATH"
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> /home/coder/.bashrc
+        export PATH="${HOME}/.local/bin:$PATH"
+        echo 'export PATH="${HOME}/.local/bin:$PATH"' >> /home/coder/.bashrc
         echo "✅ Code-server installed successfully"
 
         # Start code-server in background
         echo "🖥️ Starting code-server..."
-        nohup code-server --bind-addr 0.0.0.0:13337 --auth none --disable-telemetry /home/coder > /tmp/code-server.log 2>&1 &
+        nohup "${HOME}/.local/bin/code-server" --bind-addr 0.0.0.0:13337 --auth none --disable-telemetry /home/coder > /tmp/code-server.log 2>&1 &
         echo "✅ Code-server started on port 13337"
 
         # Wait a moment for code-server to start
