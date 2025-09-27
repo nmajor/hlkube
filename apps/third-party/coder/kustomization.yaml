@@ -7,4 +7,5 @@ resources:
   - postgres-cluster.yaml
   - release.yaml
   - ingress.yaml
+  - ingress-workspaces.yaml
   - certificate.yaml

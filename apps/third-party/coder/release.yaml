@@ -40,7 +40,7 @@ spec:
         - name: CODER_ACCESS_URL
           value: "https://coder.nmajor.net"
         - name: CODER_WILDCARD_ACCESS_URL
-          value: "*.coder.nmajor.net"
+          value: "*.nmajor.dev"
         - name: CODER_DERP_SERVER_ENABLE
           value: "true"
 
