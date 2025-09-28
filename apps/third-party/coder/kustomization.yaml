@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - coder-rbac.yaml
   - postgres-credentials.sealed.yaml
+  - workspace-secrets.sealed.yaml
   - postgres-cluster.yaml
   - release.yaml
   - ingress.yaml
