@@ -104,6 +104,15 @@ data "kubernetes_namespace" "workspace" {
   }
 }
 
+# Reference workspace secrets
+data "kubernetes_secret" "workspace_secrets" {
+  metadata {
+    name      = "workspace-secrets"
+    namespace = local.namespace
+  }
+}
+
+
 # Coder agent configuration
 resource "coder_agent" "main" {
   arch                    = data.coder_provisioner.me.arch
@@ -425,6 +434,7 @@ resource "kubernetes_pod" "main" {
     }
   }
 
+
   spec {
     hostname = data.coder_workspace.me.name
 
@@ -472,12 +482,12 @@ resource "kubernetes_pod" "main" {
         value = "postgres"
       }
 
-      # Inject workspace secrets (API keys, etc.) from sealed secret
       env_from {
         secret_ref {
           name = "workspace-secrets"
         }
       }
+
 
       resources {
         requests = {
