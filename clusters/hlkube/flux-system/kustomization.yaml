@@ -3,3 +3,36 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
+patches:
+# Increase Flux controller QPS/burst limits to resolve rate limiting
+# Expert consensus: moderate values for home lab (150/400)
+- patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-qps=150
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-burst=400
+  target:
+    kind: Deployment
+    name: kustomize-controller
+- patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-qps=150
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-burst=400
+  target:
+    kind: Deployment
+    name: helm-controller
+- patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-qps=150
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --kube-api-burst=400
+  target:
+    kind: Deployment
+    name: source-controller
