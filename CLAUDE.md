@@ -29,6 +29,15 @@ kubectl top nodes
 kubectl get events --all-namespaces --sort-by='.metadata.creationTimestamp' | tail -20
 ```
 
+## Coder Workspace Management
+
+When user says "Check coder workspaces" or "I think a coder workspace is stuck":
+
+1. Check for failed workspace pods: `kubectl get pods -n coder-workspaces | grep -E "(Error|CrashLoop|Pending|Failed)"`
+2. Delete any stuck/failed workspace pods: `kubectl delete pod <pod-name> -n coder-workspaces`
+
+Workspace pods often get stuck in CreateContainerConfigError or similar states and need to be deleted to restart properly.
+
 ## Repository Structure
 
 This is the Flux CD repository that manages all cluster resources. Any changes to cluster configuration should be committed here and will be automatically reconciled by Flux.

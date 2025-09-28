@@ -59,6 +59,7 @@ spec:
       seccompProfile:
         type: RuntimeDefault
 
+    # should be ClusterIP
     service:
       type: ClusterIP
       sessionAffinity: None
