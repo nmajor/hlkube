@@ -65,11 +65,16 @@ spec:
       size: 10Gi
       storageClass: longhorn
 
-    # Security context
+    # Security context - compliant with PodSecurity "restricted" standards
     securityContext:
       runAsNonRoot: true
       runAsUser: 1000
       fsGroup: 1000
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      seccompProfile:
+        type: RuntimeDefault
 
     # Liveness and readiness probes
     livenessProbe:
