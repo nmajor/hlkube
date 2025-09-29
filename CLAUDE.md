@@ -38,6 +38,22 @@ When user says "Check coder workspaces" or "I think a coder workspace is stuck":
 
 Workspace pods often get stuck in CreateContainerConfigError or similar states and need to be deleted to restart properly.
 
+### Stuck PVC Issues During Workspace Deletion
+
+When workspace deletion gets stuck (spinning for 5+ minutes), it's sometimes due to PVCs stuck in "Terminating" state:
+
+1. Check for stuck PVCs: `kubectl get pvc -n coder-workspaces`
+2. Look for PVCs with "Terminating" status
+3. Force delete stuck PVCs by removing finalizers:
+   ```bash
+   kubectl patch pvc <pvc-name> -n coder-workspaces -p '{"metadata":{"finalizers":null}}'
+   ```
+4. Verify cleanup: `kubectl get pvc -n coder-workspaces`
+
+Common stuck PVCs are usually named with patterns like:
+- `<workspace-id>-home`
+- `<workspace-id>-postgres`
+
 ## Repository Structure
 
 This is the Flux CD repository that manages all cluster resources. Any changes to cluster configuration should be committed here and will be automatically reconciled by Flux.
