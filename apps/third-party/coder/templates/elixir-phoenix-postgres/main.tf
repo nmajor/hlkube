@@ -60,41 +60,15 @@ data "coder_parameter" "disk_size" {
   }
 }
 
-data "coder_parameter" "erlang_version" {
-  name         = "erlang_version"
-  display_name = "Erlang/OTP Version"
-  description  = "Erlang/OTP version to install (e.g., 27.3.4, 27.2, 26.2.5). Use format: otp@VERSION"
-  default      = "27.3.4"
-  type         = "string"
-  validation {
-    regex = "^\\d+(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?$"
-    error = "Please use a valid OTP version format like '27.3.4' or '26.2.5'"
-  }
-}
-
-data "coder_parameter" "elixir_version" {
-  name         = "elixir_version"
-  display_name = "Elixir Version"
-  description  = "Elixir version to install (e.g., 1.18.4, 1.17.3, 1.16.3). Use format: elixir@VERSION"
-  default      = "1.18.4"
-  type         = "string"
-  validation {
-    regex = "^\\d+\\.\\d+\\.\\d+$"
-    error = "Please use a valid Elixir version format like '1.18.4' or '1.17.3'"
-  }
-}
-
-data "coder_parameter" "dotfiles_url" {
-  name         = "dotfiles_url"
-  display_name = "Dotfiles Repository"
-  description  = "Git repository URL for your dotfiles (leave empty to skip). Use SSH format (git@github.com:user/dotfiles.git) for private repos."
-  default      = ""
-  type         = "string"
-  mutable      = true
-}
-
 provider "kubernetes" {
   config_path = null
+}
+
+data "kubernetes_secret" "workspace_secrets" {
+  metadata {
+    name      = "workspace-secrets"
+    namespace = local.namespace
+  }
 }
 
 # Reference existing namespace
@@ -104,118 +78,12 @@ data "kubernetes_namespace" "workspace" {
   }
 }
 
-# Reference workspace secrets
-data "kubernetes_secret" "workspace_secrets" {
-  metadata {
-    name      = "workspace-secrets"
-    namespace = local.namespace
-  }
-}
-
-
 # Coder agent configuration
 resource "coder_agent" "main" {
   arch                    = data.coder_provisioner.me.arch
   os                      = "linux"
   startup_script_behavior = "blocking"
   startup_script = <<-EOT
-    #!/bin/bash
-    set -euo pipefail
-
-    echo "🚀 Setting up Elixir Phoenix development environment..."
-
-    # Install minimal dependencies (no compilation needed!)
-    echo "📦 Installing minimal dependencies..."
-    sudo apt-get update
-    sudo apt-get install -y curl unzip zsh git inotify-tools
-
-    # Download and run official Elixir install script
-    echo "💎 Installing Elixir ${data.coder_parameter.elixir_version.value} with OTP ${data.coder_parameter.erlang_version.value}..."
-    curl -fsSO https://elixir-lang.org/install.sh
-    sh install.sh elixir@${data.coder_parameter.elixir_version.value} otp@${data.coder_parameter.erlang_version.value}
-
-    # Set up PATH using the actual installed directories
-    installs_dir=$HOME/.elixir-install/installs
-
-    # Find the actual installed versions (install script may pick different versions)
-    otp_actual_dir=$(ls -1 $installs_dir/otp/ | head -1)
-    elixir_actual_dir=$(ls -1 $installs_dir/elixir/ | head -1)
-
-    echo "📋 Found installations:"
-    echo "  • OTP: $otp_actual_dir"
-    echo "  • Elixir: $elixir_actual_dir"
-
-    # Add to bashrc for future sessions using actual directories
-    echo "export PATH=\$HOME/.elixir-install/installs/otp/$otp_actual_dir/bin:\$PATH" >> ~/.bashrc
-    echo "export PATH=\$HOME/.elixir-install/installs/elixir/$elixir_actual_dir/bin:\$PATH" >> ~/.bashrc
-
-    # Export for current session using actual directories
-    export PATH=$installs_dir/otp/$otp_actual_dir/bin:$PATH
-    export PATH=$installs_dir/elixir/$elixir_actual_dir/bin:$PATH
-
-    # Verify PATH is working
-    echo "🔍 Verifying installation..."
-    which elixir && which mix
-
-    # Install Elixir development tools
-    echo "🔧 Installing Elixir development tools..."
-    mix local.hex --force
-    mix local.rebar --force
-    mix archive.install hex phx_new --force
-
-    # Install global elixir libs
-    mix archive.install hex igniter_new --force
-    mix archive.install hex phx_new 1.8.1 --force
-
-    # Create app directory and set as default
-    echo "📁 Creating app directory..."
-    mkdir -p /home/coder/app
-
-    # Setup zsh with Oh My Zsh and Starship prompt
-    echo "🐚 Setting up zsh with Oh My Zsh and Starship prompt..."
-    # Install Oh My Zsh (skip if already exists)
-    if [ -d "$HOME/.oh-my-zsh" ]; then
-        echo "Oh My Zsh is already installed, skipping installation."
-    else
-        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    fi
-
-    # Install Starship prompt
-    echo "⭐ Installing Starship prompt..."
-    curl -sS https://starship.rs/install.sh | sh -s -- --yes
-
-    # Change default shell to zsh
-    sudo chsh -s $(which zsh) coder
-
-    # Configure zsh with Elixir paths and Starship
-    cat >> ~/.zshrc << 'ZSHEOF'
-
-# Elixir/Erlang paths
-export PATH=$HOME/.elixir-install/installs/otp/$(ls -1 $HOME/.elixir-install/installs/otp/ | head -1)/bin:$PATH
-export PATH=$HOME/.elixir-install/installs/elixir/$(ls -1 $HOME/.elixir-install/installs/elixir/ | head -1)/bin:$PATH
-
-# Phoenix development aliases
-alias phx="mix phx.server"
-alias phxd="MIX_ENV=dev mix phx.server"
-alias phxt="MIX_ENV=test mix test"
-alias ecto="mix ecto"
-alias iex="iex -S mix"
-
-# Database shortcuts
-alias db.create="mix ecto.create"
-alias db.migrate="mix ecto.migrate"
-alias db.reset="mix ecto.reset"
-alias db.seed="mix ecto.seed"
-
-# Set default directory to app folder (only if starting from home)
-if [ "$PWD" = "$HOME" ]; then
-    cd ~/app
-fi
-
-# Initialize Starship prompt
-eval "$(starship init zsh)"
-ZSHEOF
-
     # Install and start code-server (VS Code in browser)
     echo "💻 Installing code-server..."
     curl -fsSL https://code-server.dev/install.sh | sh
@@ -226,80 +94,25 @@ ZSHEOF
     # Verify code-server is running
     echo "🔍 Waiting for code-server to start..."
     for i in {1..30}; do
-      if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/13337' 2>/dev/null; then
+        if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/13337' 2>/dev/null; then
         echo "✅ Code-server is ready!"
         break
-      fi
-      echo "⏳ Waiting for code-server... ($i/30)"
-      sleep 2
+        fi
+        echo "⏳ Waiting for code-server... ($i/30)"
+        sleep 2
     done
 
     # Wait for PostgreSQL to be ready
     echo "🔍 Waiting for PostgreSQL..."
     for i in {1..30}; do
-      if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/5432' 2>/dev/null; then
+        if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/5432' 2>/dev/null; then
         echo "✅ PostgreSQL is ready!"
         break
-      fi
-      echo "⏳ Waiting for PostgreSQL... ($i/30)"
-      sleep 2
+        fi
+        echo "⏳ Waiting for PostgreSQL... ($i/30)"
+        sleep 2
     done
 
-    # Configure dotfiles if URL provided
-    if [ -n "${data.coder_parameter.dotfiles_url.value}" ]; then
-      echo "🔧 Setting up dotfiles from ${data.coder_parameter.dotfiles_url.value}..."
-
-      # Configure SSH for private repositories if using SSH URL
-      if [[ "${data.coder_parameter.dotfiles_url.value}" == git@* ]]; then
-        mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-
-        # Check if SSH key secret exists and configure it
-        if coder secrets view dotfiles_ssh_key > /dev/null 2>&1; then
-          echo "📋 Configuring SSH key for private repository access..."
-          coder secrets view dotfiles_ssh_key > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          # Add GitHub to known_hosts to avoid interactive prompts
-          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null || true
-          ssh-keyscan gitlab.com >> ~/.ssh/known_hosts 2>/dev/null || true
-
-          echo "✅ SSH key configured for dotfiles access"
-        else
-          echo "⚠️  SSH key secret 'dotfiles_ssh_key' not found. Please add it via: coder secrets create dotfiles_ssh_key"
-        fi
-      fi
-
-      # Clone dotfiles using coder's built-in command
-      echo "📥 Cloning dotfiles repository..."
-      if coder dotfiles "${data.coder_parameter.dotfiles_url.value}"; then
-        echo "✅ Dotfiles applied successfully!"
-      else
-        echo "❌ Failed to apply dotfiles. Check repository URL and authentication."
-      fi
-    else
-      echo "📝 No dotfiles repository specified - skipping dotfiles setup"
-    fi
-
-    echo "🎉 Environment ready!"
-    echo "📊 Database: postgres://postgres:postgres@localhost:5432"
-    echo "📁 Default directory: ~/app (automatically set for SSH sessions)"
-    echo "🚀 Create Phoenix app: cd ~/app && mix phx.new my_app"
-    echo "🗄️ Setup database: mix ecto.create"
-    echo "🌐 Start server: mix phx.server"
-    echo ""
-    echo "📋 Installed versions:"
-    echo "  • Erlang: $(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell)"
-    echo "  • Elixir: $(elixir --version | head -n1)"
-    echo "  • Shell: $(zsh --version)"
-    echo "📝 Note: Pre-built binaries installed - no compilation required!"
-    echo "📝 Note: Databases persist across workspace restarts"
-    echo "🐚 Note: zsh with Oh My Zsh and Starship prompt configured with Phoenix aliases"
-    echo "📁 Note: ~/app directory created and set as default working directory"
-    if [ -n "${data.coder_parameter.dotfiles_url.value}" ]; then
-      echo "⚙️  Note: Dotfiles from ${data.coder_parameter.dotfiles_url.value} have been applied"
-      echo "🔑 Note: For private repos, ensure 'dotfiles_ssh_key' secret is configured"
-    fi
   EOT
 
   # Metadata for monitoring
@@ -334,6 +147,15 @@ ZSHEOF
     interval     = 30
     timeout      = 1
   }
+}
+
+# Dotfiles module for personalized development environment
+module "dotfiles" {
+  count                = data.coder_workspace.me.start_count
+  source               = "registry.coder.com/modules/dotfiles/coder"
+  version              = "1.0.14"
+  agent_id             = coder_agent.main.id
+  default_dotfiles_uri = "https://github.com/nmajor/coder-phoenix-dotfiles"
 }
 
 # Apps
@@ -372,7 +194,7 @@ resource "coder_app" "phoenix" {
 resource "coder_app" "cursor" {
   agent_id     = coder_agent.main.id
   slug         = "cursor"
-  display_name = "Cursor IDE"
+  display_name = "Cursor Desktop"
   icon         = "https://cursor.com/favicon.ico"
   url          = "cursor://open"
   share        = "owner"
@@ -434,7 +256,6 @@ resource "kubernetes_pod" "main" {
     }
   }
 
-
   spec {
     hostname = data.coder_workspace.me.name
 
@@ -455,6 +276,20 @@ resource "kubernetes_pod" "main" {
 
       security_context {
         run_as_user = 1000
+      }
+
+      dynamic "env" {
+        for_each = data.kubernetes_secret.workspace_secrets.data
+        content {
+          name = env.key
+
+          value_from {
+            secret_key_ref {
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              key  = env.key
+            }
+          }
+        }
       }
 
       env {
@@ -481,13 +316,6 @@ resource "kubernetes_pod" "main" {
         name  = "PGDATABASE"
         value = "postgres"
       }
-
-      env_from {
-        secret_ref {
-          name = "workspace-secrets"
-        }
-      }
-
 
       resources {
         requests = {
