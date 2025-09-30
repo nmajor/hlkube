@@ -84,6 +84,13 @@ resource "coder_agent" "main" {
   os                      = "linux"
   startup_script_behavior = "blocking"
   startup_script = <<-EOT
+    set -e
+
+    # Install PostgreSQL client for connection testing
+    echo "📦 Installing PostgreSQL client..."
+    sudo apt-get -o DPkg::Lock::Timeout=300 update -qq
+    sudo apt-get -o DPkg::Lock::Timeout=300 install -y -qq postgresql-client >/dev/null 2>&1
+
     # Install and start code-server (VS Code in browser)
     echo "💻 Installing code-server..."
     curl -fsSL https://code-server.dev/install.sh | sh
@@ -104,15 +111,27 @@ resource "coder_agent" "main" {
 
     # Wait for PostgreSQL to be ready
     echo "🔍 Waiting for PostgreSQL..."
-    for i in {1..30}; do
+    for i in {1..60}; do
         if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/5432' 2>/dev/null; then
-        echo "✅ PostgreSQL is ready!"
-        break
+        echo "✅ PostgreSQL port is open, checking if accepting connections..."
+        # Use pg_isready for proper readiness check
+        if pg_isready -h localhost -p 5432 -U postgres >/dev/null 2>&1; then
+            echo "✅ PostgreSQL is ready and accepting connections!"
+            # Verify we can actually query
+            if PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "SELECT 1" >/dev/null 2>&1; then
+                echo "✅ PostgreSQL query test successful!"
+                break
+            else
+                echo "⏳ PostgreSQL ready but query failed... ($i/60)"
+            fi
+        else
+            echo "⏳ PostgreSQL port open but not ready yet... ($i/60)"
         fi
-        echo "⏳ Waiting for PostgreSQL... ($i/30)"
+        else
+        echo "⏳ Waiting for PostgreSQL port... ($i/60)"
+        fi
         sleep 2
     done
-
   EOT
 
   # Metadata for monitoring
@@ -335,11 +354,15 @@ resource "kubernetes_pod" "main" {
       }
     }
 
-    # PostgreSQL sidecar container (using stable v16)
+    # PostgreSQL with TimescaleDB sidecar container (using stable v17)
     container {
       name              = "postgres"
-      image             = "postgres:16"
+      image             = "timescale/timescaledb:latest-pg17"
       image_pull_policy = "Always"
+
+      security_context {
+        run_as_user = 1000
+      }
 
       env {
         name  = "POSTGRES_PASSWORD"
