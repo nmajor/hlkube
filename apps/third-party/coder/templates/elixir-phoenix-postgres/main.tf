@@ -219,6 +219,54 @@ resource "coder_app" "cursor" {
   share        = "owner"
 }
 
+resource "coder_app" "crawl4ai" {
+  agent_id     = coder_agent.main.id
+  slug         = "crawl4ai"
+  display_name = "Crawl4AI"
+  url          = "http://localhost:11235"
+  icon         = "/icon/search.svg"
+  subdomain    = true
+  share        = "owner"
+
+  healthcheck {
+    url       = "http://localhost:11235/health"
+    interval  = 5
+    threshold = 24
+  }
+}
+
+resource "coder_app" "dataforseo_mcp" {
+  agent_id     = coder_agent.main.id
+  slug         = "dataforseo-mcp"
+  display_name = "DataForSEO MCP"
+  url          = "http://localhost:11577"
+  icon         = "/icon/terminal.svg"
+  subdomain    = true
+  share        = "owner"
+
+  healthcheck {
+    url       = "http://localhost:11577"
+    interval  = 10
+    threshold = 6
+  }
+}
+
+resource "coder_app" "playwright_mcp" {
+  agent_id     = coder_agent.main.id
+  slug         = "playwright-mcp"
+  display_name = "Playwright MCP"
+  url          = "http://localhost:11666"
+  icon         = "/icon/browser.svg"
+  subdomain    = true
+  share        = "owner"
+
+  healthcheck {
+    url       = "http://localhost:11666"
+    interval  = 10
+    threshold = 6
+  }
+}
+
 # Storage
 resource "kubernetes_persistent_volume_claim" "home" {
   metadata {
@@ -289,7 +337,7 @@ resource "kubernetes_pod" "main" {
     # Main development container using Coder enterprise base
     container {
       name              = "dev"
-      image             = "codercom/enterprise-base:ubuntu"
+      image             = "ghcr.io/nmajor/coder-workspace:latest"
       image_pull_policy = "Always"
       command           = ["sh", "-c", coder_agent.main.init_script]
 
@@ -334,6 +382,18 @@ resource "kubernetes_pod" "main" {
       env {
         name  = "PGDATABASE"
         value = "postgres"
+      }
+      env {
+        name  = "CRAWL4AI_MCP_URL"
+        value = "http://localhost:11235"
+      }
+      env {
+        name  = "DATAFORSEO_MCP_URL"
+        value = "http://localhost:11577"
+      }
+      env {
+        name  = "PLAYWRIGHT_MCP_URL"
+        value = "http://localhost:11666"
       }
 
       resources {
@@ -399,6 +459,151 @@ resource "kubernetes_pod" "main" {
       }
     }
 
+    # Crawl4AI sidecar container
+    container {
+      name              = "crawl4ai"
+      image             = "unclecode/crawl4ai:latest"
+      image_pull_policy = "IfNotPresent"
+
+      security_context {
+        run_as_user     = 999
+        run_as_non_root = false
+      }
+
+      # Inject only secrets intended for Crawl4AI (prefix: CRAWL4AI_)
+      dynamic "env" {
+        for_each = { for k, v in data.kubernetes_secret.workspace_secrets.data : k => v if startswith(k, "CRAWL4AI_") }
+        content {
+          name = env.key
+
+          value_from {
+            secret_key_ref {
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              key  = env.key
+            }
+          }
+        }
+      }
+
+      # The server listens on 11235; ensure it binds 0.0.0.0 inside the pod
+      port {
+        container_port = 11235
+      }
+
+      resources {
+        requests = {
+          cpu    = "200m"
+          memory = "512Mi"
+        }
+        limits = {
+          cpu    = "1000m"
+          memory = "2Gi"
+        }
+      }
+
+      volume_mount {
+        mount_path = "/dev/shm"
+        name       = "crawl4ai-shm"
+        read_only  = false
+      }
+    }
+
+    # Playwright MCP sidecar container
+    container {
+      name              = "playwright-mcp"
+      image             = "mcp/playwright:latest"
+      image_pull_policy = "IfNotPresent"
+      command           = ["node"]
+      args              = ["cli.js", "--headless", "--browser", "chromium", "--no-sandbox", "--port", "11666"]
+
+      security_context {
+        run_as_user = 1000
+      }
+
+      # Inject only secrets intended for Playwright (prefix: PLAYWRIGHT_)
+      dynamic "env" {
+        for_each = { for k, v in data.kubernetes_secret.workspace_secrets.data : k => v if startswith(k, "PLAYWRIGHT_") }
+        content {
+          name = env.key
+
+          value_from {
+            secret_key_ref {
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              key  = env.key
+            }
+          }
+        }
+      }
+
+      resources {
+        requests = {
+          cpu    = "200m"
+          memory = "512Mi"
+        }
+        limits = {
+          cpu    = "1000m"
+          memory = "2Gi"
+        }
+      }
+
+      volume_mount {
+        mount_path = "/dev/shm"
+        name       = "playwright-shm"
+        read_only  = false
+      }
+
+      port {
+        container_port = 11666
+      }
+    }
+
+    # DataForSEO MCP sidecar container
+    container {
+      name              = "dataforseo-mcp"
+      image             = "dataforseo/mcp:latest"
+      image_pull_policy = "IfNotPresent"
+
+      security_context {
+        run_as_user = 1000
+      }
+
+      # Inject only secrets intended for DataForSEO (prefix: DATAFORSEO_)
+      dynamic "env" {
+        for_each = { for k, v in data.kubernetes_secret.workspace_secrets.data : k => v if startswith(k, "DATAFORSEO_") }
+        content {
+          name = env.key
+
+          value_from {
+            secret_key_ref {
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              key  = env.key
+            }
+          }
+        }
+      }
+
+      # Use a fixed non-standard internal port supported via PORT env
+      env {
+        name  = "PORT"
+        value = "11577"
+      }
+
+      port {
+        container_port = 11577
+      }
+
+      resources {
+        requests = {
+          cpu    = "100m"
+          memory = "128Mi"
+        }
+        limits = {
+          cpu    = "500m"
+          memory = "512Mi"
+        }
+      }
+    }
+
     volume {
       name = "home"
       persistent_volume_claim {
@@ -412,6 +617,24 @@ resource "kubernetes_pod" "main" {
       persistent_volume_claim {
         claim_name = kubernetes_persistent_volume_claim.postgres_data.metadata.0.name
         read_only  = false
+      }
+    }
+
+    # Memory-backed /dev/shm for Crawl4AI (equivalent to --shm-size=1g)
+    volume {
+      name = "crawl4ai-shm"
+      empty_dir {
+        medium     = "Memory"
+        size_limit = "1Gi"
+      }
+    }
+
+    # Memory-backed /dev/shm for Playwright (browser needs large shared memory)
+    volume {
+      name = "playwright-shm"
+      empty_dir {
+        medium     = "Memory"
+        size_limit = "1Gi"
       }
     }
   }
