@@ -414,10 +414,10 @@ resource "kubernetes_pod" "main" {
       }
     }
 
-    # PostgreSQL with TimescaleDB sidecar container (using stable v17)
+    # PostgreSQL with PostGIS sidecar container (using stable v17)
     container {
       name              = "postgres"
-      image             = "timescale/timescaledb:latest-pg17"
+      image             = "postgis/postgis:17-3.5"
       image_pull_policy = "Always"
 
       security_context {
