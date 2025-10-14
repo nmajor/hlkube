@@ -2,7 +2,7 @@ terraform {
   required_providers {
     coder = {
       source  = "coder/coder"
-      version = "~> 0.12"
+      version = ">= 2.5.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -17,6 +17,9 @@ data "coder_provisioner" "me" {
 data "coder_workspace" "me" {
 }
 
+data "coder_workspace_owner" "me" {
+}
+
 # Simplified namespace configuration
 locals {
   namespace = "coder-workspaces"
@@ -27,8 +30,9 @@ data "coder_parameter" "cpu" {
   name         = "cpu"
   display_name = "CPU Cores"
   description  = "Number of CPU cores"
-  default      = 2
+  default      = 4
   type         = "number"
+  mutable      = true
   validation {
     min = 1
     max = 4
@@ -39,8 +43,9 @@ data "coder_parameter" "memory" {
   name         = "memory"
   display_name = "Memory (GB)"
   description  = "Amount of memory in GB"
-  default      = 4
+  default      = 8
   type         = "number"
+  mutable      = true
   validation {
     min = 2
     max = 8
@@ -53,10 +58,11 @@ data "coder_parameter" "disk_size" {
   description  = "Size of /home/coder for code, deps, DB. 20-30GB recommended for Phoenix development."
   default      = 20
   type         = "number"
-  mutable      = false
+  mutable      = true
   validation {
-    min = 10
-    max = 100
+    min       = 10
+    max       = 100
+    monotonic = "increasing"
   }
 }
 
@@ -199,24 +205,24 @@ resource "coder_app" "phoenix" {
   slug         = "phoenix"
   display_name = "Phoenix Server"
   url          = "http://localhost:4000"
-  icon         = "/icon/phoenix.svg"
+  icon         = "https://icon.icepanel.io/Technology/svg/Phoenix-Framework.svg"
   subdomain    = true
   share        = "owner"
 
   healthcheck {
     url       = "http://localhost:4000"
     interval  = 5
-    threshold = 6
+    threshold = 20
   }
 }
 
-resource "coder_app" "cursor" {
-  agent_id     = coder_agent.main.id
-  slug         = "cursor"
-  display_name = "Cursor Desktop"
-  icon         = "https://cursor.com/favicon.ico"
-  url          = "cursor://open"
-  share        = "owner"
+# Cursor Desktop module for one-click workspace access
+module "cursor" {
+  count    = data.coder_workspace.me.start_count
+  source   = "registry.coder.com/coder/cursor/coder"
+  version  = "1.3.2"
+  agent_id = coder_agent.main.id
+  folder   = "/home/coder/app"
 }
 
 resource "coder_app" "crawl4ai" {
