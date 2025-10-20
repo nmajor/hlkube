@@ -424,7 +424,7 @@ resource "kubernetes_pod" "main" {
     container {
       name              = "postgres"
       image             = "postgis/postgis:17-3.5"
-      image_pull_policy = "Always"
+      image_pull_policy = "IfNotPresent"
 
       security_context {
         run_as_user = 1000
