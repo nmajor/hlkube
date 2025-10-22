@@ -35,7 +35,7 @@ data "coder_parameter" "cpu" {
   mutable      = true
   validation {
     min = 1
-    max = 4
+    max = 6
   }
 }
 
@@ -47,8 +47,8 @@ data "coder_parameter" "memory" {
   type         = "number"
   mutable      = true
   validation {
-    min = 2
-    max = 8
+    min = 4
+    max = 12
   }
 }
 
