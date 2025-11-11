@@ -15,18 +15,16 @@ spec:
         namespace: tailscale
       interval: 12h
   releaseName: tailscale-operator
+  valuesFrom:
+    - kind: Secret
+      name: operator-oauth
+      valuesKey: client_id
+      targetPath: oauth.clientId
+    - kind: Secret
+      name: operator-oauth
+      valuesKey: client_secret
+      targetPath: oauth.clientSecret
   values:
-    oauth:
-      clientId:
-        valueFrom:
-          secretKeyRef:
-            name: operator-oauth
-            key: client_id
-      clientSecret:
-        valueFrom:
-          secretKeyRef:
-            name: operator-oauth
-            key: client_secret
     operatorConfig:
       defaultTags: "tag:k8s-operator"
       logging: "info"
