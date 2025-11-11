@@ -9,4 +9,5 @@ resources:
   - release.yaml
   - ingress.yaml
   - ingress-workspaces.yaml
+  - ingress-tailscale.yaml
   - certificate.yaml
