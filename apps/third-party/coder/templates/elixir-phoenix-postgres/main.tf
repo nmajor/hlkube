@@ -443,7 +443,7 @@ resource "kubernetes_pod" "main" {
     # PostgreSQL with PostGIS sidecar container (using stable v17)
     container {
       name              = "postgres"
-      image             = "postgis/postgis:17-3.5"
+      image             = "ghcr.io/nmajor/coder-workspace-postgres:17-postgis3.5-pgvector"
       image_pull_policy = "IfNotPresent"
 
       security_context {
