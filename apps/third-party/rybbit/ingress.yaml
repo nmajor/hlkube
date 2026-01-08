@@ -12,11 +12,11 @@ spec:
       kind: Rule
       services:
         - name: rybbit-backend
-          port: 3001
+          port: 3000
     # Client/dashboard routes
     - match: Host(`rybbit.nmajor.net`)
       kind: Rule
       services:
         - name: rybbit-client
-          port: 3002
+          port: 3000
   tls: {}
