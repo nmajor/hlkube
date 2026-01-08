@@ -88,6 +88,8 @@ spec:
     # Enable ClickHouse subchart
     clickhouse:
       enabled: true
+      shards: 1
+      replicaCount: 1
       image:
         registry: public.ecr.aws
         repository: bitnami/clickhouse
@@ -95,17 +97,9 @@ spec:
       auth:
         username: default
         # password is injected via valuesFrom from rybbit-helm-values secret
+      # Disable Keeper for single-node setup (not required without replication)
       keeper:
-        image:
-          registry: public.ecr.aws
-          repository: bitnami/clickhouse
-          tag: latest
-        extraEnvVars:
-          - name: CLICKHOUSE_ADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: rybbit-clickhouse-credentials
-                key: password
+        enabled: false
       persistence:
         enabled: true
         size: 40Gi
