@@ -81,6 +81,12 @@ spec:
         username: rybbit
         database: rybbit
         # password injected via valuesFrom
+      volumePermissions:
+        enabled: true
+        image:
+          registry: public.ecr.aws
+          repository: bitnami/os-shell
+          tag: latest
       primary:
         persistence:
           enabled: true
