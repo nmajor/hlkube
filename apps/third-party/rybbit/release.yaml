@@ -28,6 +28,11 @@ spec:
       name: rybbit-helm-values
       valuesKey: values.yaml
   values:
+    # Allow non-standard images (Bitnami Docker Hub deprecated, using ECR)
+    global:
+      security:
+        allowInsecureImages: true
+
     # Backend configuration
     backend:
       enabled: true
