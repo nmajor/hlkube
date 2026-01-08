@@ -94,8 +94,7 @@ spec:
         tag: latest
       auth:
         username: default
-        existingSecret: rybbit-clickhouse-credentials
-        existingSecretKey: password
+        # password is injected via valuesFrom from rybbit-helm-values secret
       keeper:
         image:
           registry: public.ecr.aws
