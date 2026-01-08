@@ -7,5 +7,6 @@ resources:
   - clickhouse-credentials.sealed.yaml
   - helm-values.sealed.yaml
   - postgres-cluster.yaml
+  - postgres-service-alias.yaml
   - release.yaml
   - ingress.yaml

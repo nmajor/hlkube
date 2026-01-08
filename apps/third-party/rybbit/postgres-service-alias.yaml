@@ -1,0 +1,10 @@
+# Service alias for Rybbit Helm chart compatibility
+# The chart's init container expects 'rybbit-postgresql' but we use CloudNativePG
+apiVersion: v1
+kind: Service
+metadata:
+  name: rybbit-postgresql
+  namespace: rybbit
+spec:
+  type: ExternalName
+  externalName: rybbit-postgres-rw.rybbit.svc.cluster.local
