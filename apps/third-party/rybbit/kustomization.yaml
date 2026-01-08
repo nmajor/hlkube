@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - postgres-credentials.sealed.yaml
   - rybbit-secrets.sealed.yaml
+  - clickhouse-credentials.sealed.yaml
   - helm-values.sealed.yaml
   - postgres-cluster.yaml
   - release.yaml
