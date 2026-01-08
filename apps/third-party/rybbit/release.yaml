@@ -47,21 +47,11 @@ spec:
         limits:
           cpu: 500m
           memory: 512Mi
-      # Reference to the BETTER_AUTH_SECRET from our sealed secret
       betterSecret:
         secretName: rybbit-secrets
         authKey: better_auth_secret
       env:
-        # External PostgreSQL (CloudNativePG)
-        POSTGRES_HOST: rybbit-postgres-rw
-        POSTGRES_PORT: "5432"
-        POSTGRES_DB: rybbit
-        POSTGRES_USER: rybbit
-        # POSTGRES_PASSWORD is injected from rybbit-helm-values secret
-        # Base URL for the application
         BASE_URL: https://rybbit.nmajor.net
-        # Disable public signup after initial setup (optional)
-        # DISABLE_SIGNUP: "true"
 
     # Client (frontend) configuration
     client:
@@ -79,13 +69,25 @@ spec:
           memory: 256Mi
       env:
         NEXT_PUBLIC_BACKEND_URL: https://rybbit.nmajor.net
-        # NEXT_PUBLIC_DISABLE_SIGNUP: "true"
 
-    # Disable built-in PostgreSQL (we use CloudNativePG)
+    # PostgreSQL subchart (managed by Helm)
     postgresql:
-      enabled: false
+      enabled: true
+      image:
+        registry: public.ecr.aws
+        repository: bitnami/postgresql
+        tag: latest
+      auth:
+        username: rybbit
+        database: rybbit
+        # password injected via valuesFrom
+      primary:
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClass: longhorn
 
-    # Enable ClickHouse subchart
+    # ClickHouse subchart
     clickhouse:
       enabled: true
       shards: 1
@@ -96,8 +98,7 @@ spec:
         tag: latest
       auth:
         username: default
-        # password is injected via valuesFrom from rybbit-helm-values secret
-      # Disable Keeper for single-node setup (not required without replication)
+        # password injected via valuesFrom
       keeper:
         enabled: false
       persistence:
