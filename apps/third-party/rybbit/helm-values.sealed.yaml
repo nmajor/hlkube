@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: rybbit-helm-values
+  namespace: rybbit
+spec:
+  encryptedData:
+    values.yaml: AgCagsSakPKOC2qklekoLuAoFFhCjk98TjqFbDV2IX3ba20MqU71cvnkmDsHV7izXwhFZWQGuK7GTtrtcJmc+Kk+EH9/SD38z9s/KCbJEzGYBebv9NRDZBfZJGO4djE20i79zzKGCGxvblflIYYjRmvAdEuiOft9e6nYzsZ01IHC9g2dvQ0gyaMMAIzbdSk2AFUGzHeZWm/0SdcGYUUFDYqiLHjIplLX6glMwRstlpbZc4r5bh2Cq6usLj5E7EENUiZRf72QKz9bAVzCjGH5DylKDNqVvwzbVUMk+0ycjS8HFiBu44oeuVVpLPLjHRKam/zxXrnuYOve6yt9rsuXUx/Iv+XnE603yuQ0MQDC1scO4nUajU7TiBJprtvZmNtksVHEPTgYTX04YsDnNQnUsG9hmeeEuH1G6fOhhg60B1StxN2gHvFwg/Cqqb9XCjm/Ct/7oXx1v1j1JfmEUir1sKWG+zzKZ+MYUBYzPDty7Zww8btNRtobqbfedUeYUGVcedMou1hSpiyhzBL7zePubZtJI9FkSUeRusdipTop3HhHPEifk7ABwVS3YgRwA1ziPQJ7yXUXEywBh5JmJxjJPHL+aqKzOthzCOYQOL8E57jEzKAkIY0OViwfH0Sarf2zz9lpf47dtk0jMbfwWyOCpCHaKR3fHG+bB5Qt1RHefiBQg9OiZf8w+Yeyadz1Si5zPNqhRkx9PAgvQKRjExKnszI4sr+dsl5WI7To+iKi47hYMGye97teYJzi+YomFcD1XvGruk0DDX20b8Tyn7+2yrPL3La0/Q64t2Iifth3gzjgB1hPocn3ZKBrDeFi8GVEQ2rudGhrbt9PMyMBhu0HVLAINZkGBvx2D2/xtFmeK5x4yBkkmwqJ
+  template:
+    metadata:
+      creationTimestamp: null
+      name: rybbit-helm-values
+      namespace: rybbit
+    type: Opaque

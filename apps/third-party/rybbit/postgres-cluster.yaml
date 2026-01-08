@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: rybbit-postgres
+  namespace: rybbit
+spec:
+  instances: 2
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: longhorn-single-replica
+  monitoring:
+    enablePodMonitor: true
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "256MB"
+      work_mem: "4MB"
+      maintenance_work_mem: "64MB"
+      effective_cache_size: "1GB"
+  replicationSlots:
+    highAvailability:
+      enabled: true
+  bootstrap:
+    initdb:
+      database: rybbit
+      owner: rybbit
+      secret:
+        name: rybbit-postgres-credentials

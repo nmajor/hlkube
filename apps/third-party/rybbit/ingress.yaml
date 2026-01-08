@@ -1,0 +1,22 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rybbit
+  namespace: rybbit
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # API routes (needed for tracking from external apps)
+    - match: Host(`rybbit.nmajor.net`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: rybbit-backend
+          port: 3001
+    # Client/dashboard routes
+    - match: Host(`rybbit.nmajor.net`)
+      kind: Rule
+      services:
+        - name: rybbit-client
+          port: 3002
+  tls: {}

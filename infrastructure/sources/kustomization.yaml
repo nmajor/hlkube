@@ -14,3 +14,4 @@ resources:
   - coder.yaml
   - n8n.yaml
   - valkey.yaml
+  - rybbit.yaml
