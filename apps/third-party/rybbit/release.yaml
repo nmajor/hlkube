@@ -52,6 +52,7 @@ spec:
         authKey: better_auth_secret
       env:
         BASE_URL: https://rybbit.nmajor.net
+        DISABLE_SIGNUP: "false"
 
     # Client (frontend) configuration
     client:
@@ -69,6 +70,7 @@ spec:
           memory: 256Mi
       env:
         NEXT_PUBLIC_BACKEND_URL: https://rybbit.nmajor.net
+        NEXT_PUBLIC_DISABLE_SIGNUP: "false"
 
     # PostgreSQL subchart (managed by Helm)
     postgresql:
