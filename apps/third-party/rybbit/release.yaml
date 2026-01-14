@@ -82,7 +82,9 @@ spec:
       auth:
         username: rybbit
         database: rybbit
-        # password injected via valuesFrom
+        # Fix: Tell rybbit chart to read 'password' key (app user) instead of 'postgres-password' (superuser)
+        secretKeys:
+          adminPasswordKey: password
       volumePermissions:
         enabled: true
         image:
