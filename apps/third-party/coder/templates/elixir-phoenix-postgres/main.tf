@@ -48,7 +48,7 @@ data "coder_parameter" "memory" {
   mutable      = true
   validation {
     min = 4
-    max = 12
+    max = 14
   }
 }
 
