@@ -92,26 +92,6 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -e
 
-    # Start Tailscale for direct SSH access
-    echo "🔌 Starting Tailscale..."
-    sudo mkdir -p /var/lib/tailscale /var/run/tailscale
-    sudo tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock --tun=userspace-networking >/tmp/tailscaled.log 2>&1 &
-
-    # Wait for tailscaled to start
-    sleep 3
-
-    # Authenticate with unique hostname
-    WORKSPACE_HOSTNAME="${data.coder_workspace_owner.me.name}-${data.coder_workspace.me.name}"
-    echo "🌐 Connecting to Tailscale as: $WORKSPACE_HOSTNAME"
-    sudo -E tailscale up \
-      --authkey="$TAILSCALE_AUTHKEY" \
-      --hostname="$WORKSPACE_HOSTNAME" \
-      --ssh \
-      --accept-routes=false \
-      --advertise-tags=tag:coder-workspace
-
-    echo "✅ Tailscale connected! SSH available at: $WORKSPACE_HOSTNAME.kooka-woodpecker.ts.net"
-
     # Install PostgreSQL client for connection testing
     echo "📦 Installing PostgreSQL client..."
     sudo apt-get -o DPkg::Lock::Timeout=300 update -qq

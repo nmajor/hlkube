@@ -67,8 +67,6 @@ hlkube-flux/
 │   │   └── kustomization.yaml
 │   ├── traefik/             # Traefik manifests/HelmRelease
 │   │   └── kustomization.yaml
-│   ├── tailscale/           # Tailscale operator/subnet router manifests
-│   │   └── kustomization.yaml
 │   └── kustomization.yaml     # Kustomization linking all infra/* subdirs
 ├── apps/                    # Application deployments
 │   ├── sources/             # Optional: App-specific Git/Helm sources
