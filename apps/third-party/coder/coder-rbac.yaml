@@ -35,6 +35,9 @@ metadata:
     app.kubernetes.io/name: coder-workspaces
     app.kubernetes.io/component: workspace-namespace
     app.kubernetes.io/part-of: coder
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
   annotations:
     flux.weave.works/ignore: "false"
 

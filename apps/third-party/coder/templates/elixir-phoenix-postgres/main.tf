@@ -349,6 +349,15 @@ resource "kubernetes_pod" "main" {
 
       security_context {
         run_as_user = 1000
+        capabilities {
+          add = ["NET_ADMIN", "NET_RAW"]
+        }
+      }
+
+      volume_mount {
+        mount_path = "/dev/net/tun"
+        name       = "tun"
+        read_only  = false
       }
 
       dynamic "env" {
@@ -632,6 +641,15 @@ resource "kubernetes_pod" "main" {
       empty_dir {
         medium     = "Memory"
         size_limit = "1Gi"
+      }
+    }
+
+    # TUN device for WireGuard VPN support
+    volume {
+      name = "tun"
+      host_path {
+        path = "/dev/net/tun"
+        type = "CharDevice"
       }
     }
 
