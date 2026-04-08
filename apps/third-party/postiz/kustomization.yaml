@@ -10,6 +10,7 @@ resources:
   - postgres-pooler.yaml
   - temporal-postgres-cluster.yaml
   - temporal-dynamicconfig.yaml
+  - temporal-add-text-columns-job.yaml
   - temporal-deployment.yaml
   - temporal-service.yaml
   - valkey-release.yaml
