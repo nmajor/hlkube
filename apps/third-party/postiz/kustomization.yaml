@@ -9,6 +9,7 @@ resources:
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - temporal-postgres-cluster.yaml
+  - temporal-dynamicconfig.yaml
   - temporal-deployment.yaml
   - temporal-service.yaml
   - valkey-release.yaml

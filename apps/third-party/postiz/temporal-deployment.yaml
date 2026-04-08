@@ -39,10 +39,32 @@ spec:
                 secretKeyRef:
                   name: temporal-postgres-credentials
                   key: password
+            - name: VISIBILITY_DBNAME
+              value: "temporal_visibility"
+            - name: VISIBILITY_DB_PORT
+              value: "5432"
+            - name: VISIBILITY_POSTGRES_SEEDS
+              value: "temporal-postgres-rw.postiz.svc.cluster.local"
+            - name: VISIBILITY_POSTGRES_USER
+              value: "temporal"
+            - name: VISIBILITY_POSTGRES_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: temporal-postgres-credentials
+                  key: password
+            - name: ENABLE_ES
+              value: "false"
+            - name: SQL_MAX_CONNS
+              value: "20"
+            - name: SQL_MAX_IDLE_CONNS
+              value: "20"
             - name: DYNAMIC_CONFIG_FILE_PATH
-              value: "config/dynamicconfig/docker.yaml"
+              value: "config/dynamicconfig/dynamic-config.yaml"
             - name: SKIP_DB_CREATE
               value: "true"
+          volumeMounts:
+            - name: dynamic-config
+              mountPath: /etc/temporal/config/dynamicconfig
           resources:
             requests:
               cpu: 200m
@@ -64,3 +86,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
+      volumes:
+        - name: dynamic-config
+          configMap:
+            name: temporal-dynamic-config
