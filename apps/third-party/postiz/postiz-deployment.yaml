@@ -75,27 +75,32 @@ spec:
               subPath: .env
           resources:
             requests:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 750m
+              memory: 1.5Gi
             limits:
-              cpu: 1000m
-              memory: 2Gi
+              cpu: 2000m
+              memory: 3Gi
+          startupProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
           livenessProbe:
             httpGet:
               path: /
               port: 5000
-            initialDelaySeconds: 90
             periodSeconds: 15
             timeoutSeconds: 5
-            failureThreshold: 5
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
               port: 5000
-            initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 3
-            failureThreshold: 3
+            failureThreshold: 2
       volumes:
         - name: uploads
           persistentVolumeClaim:
