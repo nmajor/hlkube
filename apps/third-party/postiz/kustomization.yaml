@@ -9,8 +9,9 @@ resources:
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - temporal-postgres-cluster.yaml
+  - elasticsearch-deployment.yaml
+  - elasticsearch-service.yaml
   - temporal-dynamicconfig.yaml
-  - temporal-add-text-columns-job.yaml
   - temporal-deployment.yaml
   - temporal-service.yaml
   - valkey-release.yaml

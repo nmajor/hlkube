@@ -18,7 +18,7 @@ spec:
         app: postiz
         component: temporal
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-04-08T14:05:00Z"
+        kubectl.kubernetes.io/restartedAt: "2026-04-08T14:15:00Z"
     spec:
       enableServiceLinks: false
       containers:
@@ -55,7 +55,15 @@ spec:
                   name: temporal-postgres-credentials
                   key: password
             - name: ENABLE_ES
-              value: "false"
+              value: "true"
+            - name: ES_SEEDS
+              value: "elasticsearch.postiz.svc.cluster.local"
+            - name: ES_PORT
+              value: "9200"
+            - name: ES_VERSION
+              value: "v7"
+            - name: ES_SCHEME
+              value: "http"
             - name: SQL_MAX_CONNS
               value: "20"
             - name: SQL_MAX_IDLE_CONNS
