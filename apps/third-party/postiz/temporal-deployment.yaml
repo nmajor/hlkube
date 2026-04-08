@@ -41,8 +41,8 @@ spec:
                   key: password
             - name: DYNAMIC_CONFIG_FILE_PATH
               value: "config/dynamicconfig/development-sql.yaml"
-            - name: SKIP_SCHEMA_SETUP
-              value: "false"
+            - name: SKIP_DB_CREATE
+              value: "true"
           resources:
             requests:
               cpu: 200m
