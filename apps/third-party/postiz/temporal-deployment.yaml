@@ -27,7 +27,7 @@ spec:
               name: grpc
           env:
             - name: DB
-              value: "postgresql"
+              value: "postgres12"
             - name: DB_PORT
               value: "5432"
             - name: POSTGRES_SEEDS
