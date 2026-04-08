@@ -18,7 +18,7 @@ spec:
         app: postiz
         component: main
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-04-08T15:35:00Z"
+        kubectl.kubernetes.io/restartedAt: "2026-04-08T16:00:00Z"
     spec:
       enableServiceLinks: false
       initContainers:
@@ -59,6 +59,16 @@ spec:
               value: "temporal.postiz.svc.cluster.local:7233"
             - name: IS_GENERAL
               value: "true"
+            - name: LINKEDIN_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: linkedin_client_id
+            - name: LINKEDIN_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: linkedin_client_secret
             - name: STORAGE_PROVIDER
               value: "local"
             - name: UPLOAD_DIRECTORY
