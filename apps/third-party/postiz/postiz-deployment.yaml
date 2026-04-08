@@ -17,6 +17,8 @@ spec:
       labels:
         app: postiz
         component: main
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-04-08T13:15:00Z"
     spec:
       enableServiceLinks: false
       containers:
