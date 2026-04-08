@@ -40,7 +40,7 @@ spec:
                   name: temporal-postgres-credentials
                   key: password
             - name: DYNAMIC_CONFIG_FILE_PATH
-              value: "config/dynamicconfig/development-sql.yaml"
+              value: "config/dynamicconfig/docker.yaml"
             - name: SKIP_DB_CREATE
               value: "true"
           resources:
