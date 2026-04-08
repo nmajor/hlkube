@@ -7,6 +7,11 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - match: Host(`postiz.nmajor.net`) && (PathPrefix(`/terms`) || PathPrefix(`/privacy`))
+      kind: Rule
+      services:
+        - name: postiz-static
+          port: 80
     - match: Host(`postiz.nmajor.net`)
       kind: Rule
       services:

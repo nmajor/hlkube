@@ -1,0 +1,360 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postiz-static-pages
+  namespace: postiz
+data:
+  terms.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Terms of Service - NMajor Studios LLC</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1rem; line-height: 1.7; color: #e0e0e0; background: #111; }
+        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+        h2 { font-size: 1.3rem; margin-top: 2.5rem; color: #fff; }
+        h3 { font-size: 1.1rem; margin-top: 1.5rem; color: #ccc; }
+        .date { color: #888; margin-bottom: 2rem; }
+        a { color: #7c9dff; }
+        ul { padding-left: 1.5rem; }
+        li { margin-bottom: 0.4rem; }
+      </style>
+    </head>
+    <body>
+      <h1>Terms of Service</h1>
+      <p class="date">Effective date: April 8, 2026</p>
+
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing or using the social media management service ("Service") available at postiz.nmajor.net and operated by NMajor Studios LLC ("Company", "we", "us", "our"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.</p>
+
+      <h2>2. Description of Service</h2>
+      <p>The Service is a social media scheduling, publishing, analytics, and management platform. It allows authorized users to connect their accounts on third-party platforms &mdash; including but not limited to Facebook, Instagram, LinkedIn, X (formerly Twitter), TikTok, YouTube, Reddit, Pinterest, Threads, Bluesky, and Mastodon &mdash; and to create, schedule, and publish content to those platforms through the Service.</p>
+
+      <h2>3. Eligibility and Access</h2>
+      <p>The Service is provided for private, authorized use only. You must be at least 13 years of age (or the minimum age required in your jurisdiction) to use the Service. Access is by invitation and is not open to the general public. We reserve the right to refuse access to anyone at our sole discretion.</p>
+
+      <h2>4. User Accounts</h2>
+      <p>You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. You agree to provide accurate, current, and complete information when creating an account and to update it as necessary. You must notify us immediately of any unauthorized use of your account.</p>
+
+      <h2>5. Connected Third-Party Platforms</h2>
+      <p>When you connect a third-party social media account to the Service, you authorize us to access that platform on your behalf using the permissions you grant (via OAuth or similar authorization mechanisms). You acknowledge that:</p>
+      <ul>
+        <li>Your use of each third-party platform is subject to that platform's own terms of service and policies</li>
+        <li>We act solely as your agent when transmitting content to connected platforms</li>
+        <li>We are not responsible for changes to third-party platform APIs, policies, or availability</li>
+        <li>You may revoke access to any connected platform at any time through the Service or through the platform directly</li>
+      </ul>
+
+      <h3>Platform-Specific Terms</h3>
+      <p>By using the Service with the following platforms, you also agree to their respective terms:</p>
+      <ul>
+        <li><strong>Facebook &amp; Instagram:</strong> <a href="https://www.facebook.com/terms.php" rel="noopener">Meta Terms of Service</a> and <a href="https://developers.facebook.com/terms/" rel="noopener">Meta Platform Terms</a></li>
+        <li><strong>YouTube:</strong> <a href="https://www.youtube.com/t/terms" rel="noopener">YouTube Terms of Service</a>. By using YouTube features of the Service, you are also agreeing to be bound by the YouTube Terms of Service.</li>
+        <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/legal/user-agreement" rel="noopener">LinkedIn User Agreement</a></li>
+        <li><strong>X (Twitter):</strong> <a href="https://x.com/en/tos" rel="noopener">X Terms of Service</a></li>
+        <li><strong>TikTok:</strong> <a href="https://www.tiktok.com/legal/terms-of-service" rel="noopener">TikTok Terms of Service</a></li>
+        <li><strong>Reddit:</strong> <a href="https://www.redditinc.com/policies/user-agreement" rel="noopener">Reddit User Agreement</a></li>
+        <li><strong>Pinterest:</strong> <a href="https://policy.pinterest.com/en/terms-of-service" rel="noopener">Pinterest Terms of Service</a></li>
+      </ul>
+
+      <h2>6. Acceptable Use</h2>
+      <p>You agree not to use the Service to:</p>
+      <ul>
+        <li>Violate any applicable local, national, or international law or regulation</li>
+        <li>Post or distribute spam, misleading, defamatory, or harmful content</li>
+        <li>Infringe on the intellectual property rights of any third party</li>
+        <li>Interfere with or disrupt the Service, its servers, or connected networks</li>
+        <li>Attempt to gain unauthorized access to any part of the Service</li>
+        <li>Violate the terms, policies, or guidelines of any connected third-party platform</li>
+        <li>Use the Service for surveillance, profiling, or discrimination against any individual or group</li>
+        <li>Collect, store, or process data obtained through the Service in violation of applicable privacy laws</li>
+      </ul>
+
+      <h2>7. Content Ownership</h2>
+      <p>You retain full ownership of all content you create, upload, or publish through the Service. By using the Service, you grant us a limited, non-exclusive, royalty-free license to process, store, and transmit your content solely for the purpose of providing and operating the Service. This license terminates when you delete your content or your account.</p>
+
+      <h2>8. Data Deletion and Account Termination</h2>
+      <p>You may request deletion of your account and all associated data at any time by using the account deletion feature in the Service. Upon account deletion:</p>
+      <ul>
+        <li>All stored personal data, content, scheduling data, and OAuth tokens will be permanently deleted within 30 days</li>
+        <li>Data that has already been published to third-party platforms is governed by those platforms' policies and is outside our control</li>
+        <li>Anonymized, aggregated data that cannot identify you may be retained for operational purposes</li>
+      </ul>
+
+      <h2>9. Disclaimer of Warranties</h2>
+      <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY. WE DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, TIMELY, SECURE, OR ERROR-FREE.</p>
+
+      <h2>10. Limitation of Liability</h2>
+      <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, NMAJOR STUDIOS LLC SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE SERVICE, WHETHER BASED ON WARRANTY, CONTRACT, TORT, OR ANY OTHER LEGAL THEORY.</p>
+
+      <h2>11. Indemnification</h2>
+      <p>You agree to indemnify, defend, and hold harmless NMajor Studios LLC from and against any claims, liabilities, damages, losses, and expenses arising out of or in connection with your use of the Service, your violation of these Terms, or your violation of any rights of a third party.</p>
+
+      <h2>12. Termination</h2>
+      <p>We reserve the right to suspend or terminate your access to the Service at any time, with or without cause, and with or without notice. Upon termination, your right to use the Service ceases immediately. Sections 9, 10, 11, and 12 survive termination.</p>
+
+      <h2>13. Changes to These Terms</h2>
+      <p>We may update these Terms from time to time by posting the revised Terms on this page with an updated effective date. Your continued use of the Service after such changes constitutes your acceptance of the revised Terms.</p>
+
+      <h2>14. Governing Law</h2>
+      <p>These Terms are governed by and construed in accordance with the laws of the United States, without regard to conflict of law principles.</p>
+
+      <h2>15. Contact</h2>
+      <p>If you have questions about these Terms, you may reach us through the account settings within the Service.</p>
+
+      <p style="margin-top: 3rem; color: #666; font-size: 0.9rem;">&copy; 2026 NMajor Studios LLC. All rights reserved.</p>
+    </body>
+    </html>
+  privacy.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Privacy Policy - NMajor Studios LLC</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1rem; line-height: 1.7; color: #e0e0e0; background: #111; }
+        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+        h2 { font-size: 1.3rem; margin-top: 2.5rem; color: #fff; }
+        h3 { font-size: 1.1rem; margin-top: 1.5rem; color: #ccc; }
+        .date { color: #888; margin-bottom: 2rem; }
+        a { color: #7c9dff; }
+        ul { padding-left: 1.5rem; }
+        li { margin-bottom: 0.4rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { text-align: left; padding: 0.6rem 0.8rem; border: 1px solid #333; }
+        th { background: #1a1a1a; color: #fff; }
+      </style>
+    </head>
+    <body>
+      <h1>Privacy Policy</h1>
+      <p class="date">Effective date: April 8, 2026</p>
+
+      <h2>1. Introduction</h2>
+      <p>NMajor Studios LLC ("Company", "we", "us", "our") operates the social media management service at postiz.nmajor.net ("Service"). This Privacy Policy explains what information we collect, how we use it, how we share it, and your rights regarding your data.</p>
+      <p>By using the Service, you consent to the collection and use of your information as described in this policy. If you do not agree, do not use the Service.</p>
+
+      <h2>2. Information We Collect</h2>
+
+      <h3>2.1 Account Information</h3>
+      <p>When you create an account, we collect:</p>
+      <ul>
+        <li>Email address</li>
+        <li>Name or display name</li>
+        <li>Password (stored in hashed form; we never store plaintext passwords)</li>
+      </ul>
+
+      <h3>2.2 Social Media Platform Data</h3>
+      <p>When you connect third-party social media accounts, we receive and store the following through OAuth authorization:</p>
+      <table>
+        <tr><th>Platform</th><th>Data Collected</th></tr>
+        <tr><td>Facebook &amp; Instagram (Meta)</td><td>Profile information (name, profile picture, page/account IDs), page access tokens, post metrics and analytics data, comments and engagement data</td></tr>
+        <tr><td>LinkedIn</td><td>Profile information (name, profile ID), organization page access, post metrics</td></tr>
+        <tr><td>X (Twitter)</td><td>Profile information (name, handle, profile ID), tweet engagement metrics</td></tr>
+        <tr><td>YouTube (Google)</td><td>Channel information (name, channel ID), video upload capability, video metrics. Our use of YouTube API Services is subject to the <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a>.</td></tr>
+        <tr><td>TikTok</td><td>Profile information (username, user ID), video publishing capability, video metrics</td></tr>
+        <tr><td>Reddit</td><td>Account information (username), subreddit posting capability</td></tr>
+        <tr><td>Pinterest</td><td>Profile information, board and pin data, pin metrics</td></tr>
+        <tr><td>Other platforms</td><td>Profile information, posting capability, and analytics as provided by each platform's API</td></tr>
+      </table>
+      <p><strong>We do not store your social media passwords.</strong> We only store OAuth access tokens and refresh tokens provided by each platform, which you can revoke at any time.</p>
+
+      <h3>2.3 Content Data</h3>
+      <p>We store content you create within the Service, including:</p>
+      <ul>
+        <li>Post text, images, and videos you upload for scheduling</li>
+        <li>Scheduling dates and times</li>
+        <li>Publishing history and status</li>
+      </ul>
+
+      <h3>2.4 Automatically Collected Data</h3>
+      <p>We automatically collect:</p>
+      <ul>
+        <li>IP addresses (from server access logs)</li>
+        <li>Browser type and version</li>
+        <li>Access timestamps</li>
+      </ul>
+      <p>We do <strong>not</strong> use third-party analytics, advertising trackers, or tracking pixels.</p>
+
+      <h2>3. How We Use Your Information</h2>
+      <p>We use your information exclusively for the following purposes:</p>
+      <ul>
+        <li><strong>Service operation:</strong> To authenticate you, schedule and publish content to your connected platforms, and display analytics</li>
+        <li><strong>Platform API communication:</strong> To make API calls on your behalf to the social media platforms you have connected</li>
+        <li><strong>Service maintenance:</strong> To monitor, troubleshoot, and improve the Service</li>
+        <li><strong>Security:</strong> To detect and prevent unauthorized access or abuse</li>
+      </ul>
+      <p>We do <strong>not</strong> use your data for:</p>
+      <ul>
+        <li>Advertising or ad targeting</li>
+        <li>Selling or renting to third parties</li>
+        <li>Profiling, surveillance, or discrimination</li>
+        <li>Training machine learning or AI models</li>
+        <li>Credit, lending, or insurance decisions</li>
+      </ul>
+
+      <h2>4. Data Sharing and Disclosure</h2>
+      <p>We do not sell, rent, trade, or otherwise share your personal information with third parties, except in the following limited circumstances:</p>
+      <ul>
+        <li><strong>Connected social media platforms:</strong> When you instruct the Service to publish content, that content is transmitted to the platform(s) you have selected, in accordance with your explicit instructions</li>
+        <li><strong>Legal obligations:</strong> If required by law, regulation, legal process, or governmental request</li>
+        <li><strong>Protection of rights:</strong> To enforce our Terms of Service or protect our rights, privacy, safety, or property</li>
+      </ul>
+      <p>We do not use data sub-processors or third-party cloud services for storing your social media data. All data is stored on privately operated infrastructure.</p>
+
+      <h2>5. Data Storage and Security</h2>
+      <p>Your data is stored on privately operated servers. We implement the following security measures:</p>
+      <ul>
+        <li>Encryption of all data in transit (TLS/HTTPS)</li>
+        <li>Encrypted storage for sensitive credentials (OAuth tokens, passwords)</li>
+        <li>Access controls limiting who can access server infrastructure</li>
+        <li>Regular security updates to all system components</li>
+      </ul>
+      <p>While we take reasonable precautions to protect your data, no method of electronic transmission or storage is 100% secure. We cannot guarantee absolute security.</p>
+
+      <h2>6. Data Retention</h2>
+      <ul>
+        <li><strong>Account data:</strong> Retained for as long as your account remains active</li>
+        <li><strong>OAuth tokens:</strong> Retained until you disconnect the associated platform or delete your account</li>
+        <li><strong>Content and scheduling data:</strong> Retained until you delete it or delete your account</li>
+        <li><strong>Server logs:</strong> Retained for up to 90 days for operational and security purposes, then automatically deleted</li>
+      </ul>
+      <p>When you disconnect a social media platform, all OAuth tokens and platform-specific data for that connection are deleted immediately.</p>
+
+      <h2>7. Data Deletion</h2>
+      <p>You have the right to request deletion of your data at any time. You can:</p>
+      <ul>
+        <li><strong>Disconnect a platform:</strong> Use the Service settings to disconnect any linked social media account. All associated tokens and platform data are deleted immediately.</li>
+        <li><strong>Delete your account:</strong> Use the account deletion feature within the Service. All personal data, content, OAuth tokens, and associated records will be permanently deleted within 30 days.</li>
+        <li><strong>Request manual deletion:</strong> Contact us through the Service to request deletion of specific data.</li>
+      </ul>
+      <p>Content that has already been published to third-party platforms is governed by those platforms' retention policies and is outside our control.</p>
+
+      <h3>Facebook and Instagram Data Deletion</h3>
+      <p>In accordance with Meta's platform requirements, when you remove or deauthorize our application from your Facebook or Instagram account, we will delete all data received from Meta APIs associated with your account within 30 days. You may also use the account deletion feature in the Service to trigger immediate deletion.</p>
+
+      <h2>8. Your Rights</h2>
+
+      <h3>8.1 General Rights</h3>
+      <p>All users of the Service have the right to:</p>
+      <ul>
+        <li><strong>Access</strong> your personal data stored by the Service</li>
+        <li><strong>Correct</strong> inaccurate personal data</li>
+        <li><strong>Delete</strong> your account and all associated personal data</li>
+        <li><strong>Disconnect</strong> any linked social media account at any time</li>
+        <li><strong>Export</strong> your data in a portable format upon request</li>
+      </ul>
+
+      <h3>8.2 Rights for European Economic Area (EEA) Residents (GDPR)</h3>
+      <p>If you are located in the EEA, you have additional rights under the General Data Protection Regulation (GDPR):</p>
+      <ul>
+        <li><strong>Lawful basis:</strong> We process your data based on your consent (provided when you create an account and connect platforms) and our legitimate interest in operating the Service</li>
+        <li><strong>Right to erasure:</strong> You may request that we delete all personal data we hold about you</li>
+        <li><strong>Right to restriction:</strong> You may request that we restrict processing of your data</li>
+        <li><strong>Right to data portability:</strong> You may request a copy of your data in a structured, machine-readable format</li>
+        <li><strong>Right to object:</strong> You may object to our processing of your personal data</li>
+        <li><strong>Right to withdraw consent:</strong> You may withdraw your consent at any time by deleting your account</li>
+      </ul>
+      <p>To exercise any of these rights, use the account management features within the Service or contact us through the Service.</p>
+
+      <h3>8.3 Rights for California Residents (CCPA)</h3>
+      <p>If you are a California resident, you have the right to:</p>
+      <ul>
+        <li>Know what personal information is collected about you</li>
+        <li>Know whether your personal information is sold or disclosed and to whom</li>
+        <li>Request deletion of your personal information</li>
+        <li>Not be discriminated against for exercising your privacy rights</li>
+      </ul>
+      <p>We do not sell personal information. To exercise your rights, use the account management features within the Service.</p>
+
+      <h2>9. YouTube API Services</h2>
+      <p>If you connect a YouTube account through the Service, our use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements. In addition to our normal data deletion procedures, you can revoke our access to your YouTube data via the <a href="https://security.google.com/settings/security/permissions" rel="noopener">Google security settings page</a>. Google's Privacy Policy is available at <a href="https://policies.google.com/privacy" rel="noopener">https://policies.google.com/privacy</a>.</p>
+
+      <h2>10. Cookies</h2>
+      <p>The Service uses only essential, first-party cookies for:</p>
+      <ul>
+        <li>Authentication and session management</li>
+        <li>Security (CSRF protection)</li>
+      </ul>
+      <p>We do not use advertising cookies, tracking cookies, or any third-party cookies.</p>
+
+      <h2>11. Children's Privacy</h2>
+      <p>The Service is not intended for use by anyone under the age of 13 (or the minimum age required in your jurisdiction). We do not knowingly collect personal information from children. If we learn that we have collected information from a child, we will delete it promptly.</p>
+
+      <h2>12. International Data Transfers</h2>
+      <p>The Service is operated from the United States. If you access the Service from outside the United States, your information may be transferred to and processed in the United States. By using the Service, you consent to this transfer.</p>
+
+      <h2>13. Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time by posting the revised policy on this page with an updated effective date. Your continued use of the Service after any changes constitutes your acceptance of the revised policy.</p>
+
+      <h2>14. Contact</h2>
+      <p>If you have questions about this Privacy Policy or wish to exercise your data rights, you may reach us through the account settings within the Service.</p>
+
+      <p style="margin-top: 3rem; color: #666; font-size: 0.9rem;">&copy; 2026 NMajor Studios LLC. All rights reserved.</p>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postiz-static
+  namespace: postiz
+  labels:
+    app: postiz
+    component: static
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postiz
+      component: static
+  template:
+    metadata:
+      labels:
+        app: postiz
+        component: static
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: pages
+              mountPath: /usr/share/nginx/html/terms/index.html
+              subPath: terms.html
+            - name: pages
+              mountPath: /usr/share/nginx/html/privacy/index.html
+              subPath: privacy.html
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+      volumes:
+        - name: pages
+          configMap:
+            name: postiz-static-pages
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postiz-static
+  namespace: postiz
+  labels:
+    app: postiz
+    component: static
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: postiz
+    component: static

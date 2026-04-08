@@ -17,5 +17,6 @@ resources:
   - valkey-release.yaml
   - uploads-pvc.yaml
   - postiz-deployment.yaml
+  - static-pages.yaml
   - service.yaml
   - ingress.yaml
