@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: postiz-valkey-auth
+  namespace: postiz
+spec:
+  encryptedData:
+    password: AgCfs/HYFaT8Afj0Xz/VhMlldS+htiOuR2+ls2yPF2Ims1J/H8PE/Hed3mMN7a8abWoZQM4p0E02E+nYuolvdmiD5IRfvZlh2vI8vqStqVXO1qJNSFBEFADy1YOpAyA0yxQROLLYYaodv7bfU0T0rEoAOYyRrs2P2fhRtghYUCNxqLZipcCLkbbFDP/ix9MF24GNAOCVnXpzbPQI7+VShaGECAbIXahllUlMJM4G6hCX6MfUsVcjWcy5jibs5IJkxFouy8w9tyQ5zS6UxVGzU31XWwTQolC9zDzidCyvr+1HiLpVhSPSH5alnA9WN1nm1xHLWKn7YBQaLxa4z5DZixBpk9TRpt/cufle009G7At/rlp9JAwS4hHUlroyUIW28ARBY1RTwzwgyCbUeon+sDPKstp9a3I7jcickkuIi0qI/a0CooIKW/PkJN+LwI7CZMr0e6CreDhDHv+mL7xhYAkx+20OBOD+Q4fFdKObmvOcHWT0AkYLYXwZFxZJvgLVUie19/D/EgKrhstG4O7h71tOkDCQ/G7E5xd0cGSfA8EUXPNuzY57/LeaOUc4ccW9h1hY+ggpxcN39hMZ9dD47qvWaFaFEdCB2c0MpRFvwwObubz9Wza2afO6WnZsV+IW8uOhTHHZCzO27pSV1K6arAEcoXfSlbN8vs55psHRDRQo74l/Wn6Ki2sP/R0w2G4KibEgZGqjdtmNQCiluRhSC16ifmlCIMjElnk2NXAcVVLwFQ==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: postiz-valkey-auth
+      namespace: postiz
+    type: Opaque

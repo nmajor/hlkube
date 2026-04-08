@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - postgres-credentials.sealed.yaml
+  - temporal-postgres-credentials.sealed.yaml
+  - postiz-secrets.sealed.yaml
+  - valkey-auth.sealed.yaml
+  - postgres-cluster.yaml
+  - postgres-pooler.yaml
+  - temporal-postgres-cluster.yaml
+  - temporal-deployment.yaml
+  - temporal-service.yaml
+  - valkey-release.yaml
+  - uploads-pvc.yaml
+  - postiz-deployment.yaml
+  - service.yaml
+  - ingress.yaml
