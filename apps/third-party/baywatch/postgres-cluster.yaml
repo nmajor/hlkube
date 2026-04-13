@@ -47,7 +47,7 @@ spec:
       owner: baywatch
       secret:
         name: baywatch-postgres-credentials
-      postInitSQL:
+      postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS timescaledb;
         - CREATE EXTENSION IF NOT EXISTS vector;
         - CREATE EXTENSION IF NOT EXISTS postgis;
