@@ -4,6 +4,8 @@ FROM ghcr.io/imusmanmalik/timescaledb-postgis:${BASE_TAG}
 ARG PG_MAJOR=17
 ARG PGVECTOR_VERSION=0.8.0
 
+USER root
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
@@ -17,3 +19,5 @@ RUN apt-get update && \
     apt-get purge -y build-essential git postgresql-server-dev-${PG_MAJOR} && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/pgvector
+
+USER postgres
