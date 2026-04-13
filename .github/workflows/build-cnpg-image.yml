@@ -27,14 +27,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Detect PostgreSQL version
+        id: pgversion
+        run: |
+          PG_VERSION=$(docker run --rm ghcr.io/imusmanmalik/timescaledb-postgis:17-3.5-109 pg_config --version | grep -oP '\d+\.\d+')
+          echo "version=$PG_VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=pg17-latest
-            type=sha,prefix=pg17-
+            type=raw,value=${{ steps.pgversion.outputs.version }}
+            type=sha,prefix=${{ steps.pgversion.outputs.version }}-
 
       - name: Build and push
         uses: docker/build-push-action@v6

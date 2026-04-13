@@ -5,7 +5,9 @@ metadata:
   namespace: baywatch
 spec:
   instances: 3
-  imageName: ghcr.io/nmajor/cnpg-timescaledb:pg17-latest
+  # Tag is set by the build-cnpg-image workflow (detects PG version from base image)
+  # Format: <major>.<minor> e.g. 17.4
+  imageName: ghcr.io/nmajor/cnpg-timescaledb:17.4
   primaryUpdateStrategy: unsupervised
 
   storage:
