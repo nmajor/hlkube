@@ -13,6 +13,13 @@
 - Changes should be made via Git commits, not direct kubectl commands
 - Follow strict infrastructure as code practices
 
+## Cluster Auth Renewal
+
+- `talosconfig` and `kubeconfig` client certs expire and must be refreshed periodically
+- If `kubectl`, `flux`, or `talosctl` suddenly return `Unauthorized`, check the local cert expiry before assuming the cluster is broken
+- Use [`./scripts/refresh-cluster-auth.sh`](./scripts/refresh-cluster-auth.sh) to regenerate local cluster auth from [`talos-cluster/controlplane.yaml`](./talos-cluster/controlplane.yaml)
+- See [`docs/cluster-auth-renewal.md`](./docs/cluster-auth-renewal.md) for the full explanation and recovery procedure
+
 ## Cluster Health Commands
 
 ```bash
