@@ -13,6 +13,8 @@ spec:
         - name: uptime-kuma
           port: 80
       middlewares:
+        - name: oauth2-auth
+          namespace: traefik
         - name: header-transform
           namespace: traefik
   tls: {}
