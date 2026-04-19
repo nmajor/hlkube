@@ -92,52 +92,36 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     set -e
 
-    # Install PostgreSQL client for connection testing
-    echo "📦 Installing PostgreSQL client..."
-    sudo apt-get -o DPkg::Lock::Timeout=300 update -qq
-    sudo apt-get -o DPkg::Lock::Timeout=300 install -y -qq postgresql-client >/dev/null 2>&1
-
-    # Install and start code-server (VS Code in browser)
-    echo "💻 Installing code-server..."
-    curl -fsSL https://code-server.dev/install.sh | sh
+    # code-server, postgresql-client, and all dev tooling are pre-baked in the
+    # workspace image (ghcr.io/nmajor/coder-workspace). Startup only launches
+    # services, waits for sidecars, and pulls latest Claude Code.
 
     echo "🚀 Starting code-server..."
     code-server --auth none --port 13337 --bind-addr 0.0.0.0:13337 >/tmp/code-server.log 2>&1 &
 
-    # Verify code-server is running
-    echo "🔍 Waiting for code-server to start..."
+    echo "🔍 Waiting for code-server..."
     for i in {1..30}; do
         if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/13337' 2>/dev/null; then
-        echo "✅ Code-server is ready!"
-        break
+            echo "✅ Code-server is ready!"
+            break
         fi
         echo "⏳ Waiting for code-server... ($i/30)"
         sleep 2
     done
 
-    # Wait for PostgreSQL to be ready
     echo "🔍 Waiting for PostgreSQL..."
     for i in {1..60}; do
-        if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/5432' 2>/dev/null; then
-        echo "✅ PostgreSQL port is open, checking if accepting connections..."
-        # Use pg_isready for proper readiness check
-        if pg_isready -h localhost -p 5432 -U postgres >/dev/null 2>&1; then
-            echo "✅ PostgreSQL is ready and accepting connections!"
-            # Verify we can actually query
-            if PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "SELECT 1" >/dev/null 2>&1; then
-                echo "✅ PostgreSQL query test successful!"
-                break
-            else
-                echo "⏳ PostgreSQL ready but query failed... ($i/60)"
-            fi
-        else
-            echo "⏳ PostgreSQL port open but not ready yet... ($i/60)"
+        if pg_isready -h localhost -p 5432 -U postgres >/dev/null 2>&1 \
+           && PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "SELECT 1" >/dev/null 2>&1; then
+            echo "✅ PostgreSQL is ready!"
+            break
         fi
-        else
-        echo "⏳ Waiting for PostgreSQL port... ($i/60)"
-        fi
+        echo "⏳ Waiting for PostgreSQL... ($i/60)"
         sleep 2
     done
+
+    echo "⬆️  Pulling latest Claude Code..."
+    claude install latest --force || true
   EOT
 
   # Metadata for monitoring
