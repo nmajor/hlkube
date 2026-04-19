@@ -122,6 +122,9 @@ resource "coder_agent" "main" {
 
     echo "⬆️  Pulling latest Claude Code..."
     claude install latest --force || true
+
+    echo "⏰ Starting supercronic (user crontab at ~/.crontab, edit with \`scron\`)..."
+    start-supercronic
   EOT
 
   # Metadata for monitoring
