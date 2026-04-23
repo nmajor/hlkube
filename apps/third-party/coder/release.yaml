@@ -48,50 +48,52 @@ spec:
         - name: CODER_SECURE_AUTH_COOKIE
           value: "true"
 
-    # Security context - compliant with PodSecurity "restricted" standards
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 1000
-      fsGroup: 1000
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop: ["ALL"]
-      seccompProfile:
-        type: RuntimeDefault
+      # Security context - compliant with PodSecurity "restricted" standards
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile:
+          type: RuntimeDefault
 
-    # should be ClusterIP
-    service:
-      type: ClusterIP
-      sessionAffinity: None
+      podSecurityContext:
+        fsGroup: 1000
 
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 1Gi
+      # Traefik owns external access; the Helm service must not wait for a LoadBalancer IP.
+      service:
+        type: ClusterIP
+        sessionAffinity: None
 
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: longhorn
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
 
-    # Liveness and readiness probes
-    livenessProbe:
-      httpGet:
-        path: /api/v2/buildinfo
-        port: http
-      initialDelaySeconds: 120
-      periodSeconds: 30
-      timeoutSeconds: 10
-      failureThreshold: 5
+      persistence:
+        enabled: true
+        size: 10Gi
+        storageClass: longhorn
 
-    readinessProbe:
-      httpGet:
-        path: /api/v2/buildinfo
-        port: http
-      initialDelaySeconds: 90
-      periodSeconds: 15
-      timeoutSeconds: 10
-      failureThreshold: 10
+      # Liveness and readiness probes
+      livenessProbe:
+        httpGet:
+          path: /api/v2/buildinfo
+          port: http
+        initialDelaySeconds: 120
+        periodSeconds: 30
+        timeoutSeconds: 10
+        failureThreshold: 5
+
+      readinessProbe:
+        httpGet:
+          path: /api/v2/buildinfo
+          port: http
+        initialDelaySeconds: 90
+        periodSeconds: 15
+        timeoutSeconds: 10
+        failureThreshold: 10
