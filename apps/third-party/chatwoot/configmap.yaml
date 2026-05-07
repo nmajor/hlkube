@@ -6,6 +6,7 @@ metadata:
 data:
   ACTIVE_STORAGE_SERVICE: local
   ENABLE_ACCOUNT_SIGNUP: "true"
+  ENABLE_PUSH_RELAY_SERVER: "true"
   FORCE_SSL: "true"
   FRONTEND_URL: https://chatwoot.nmajor.net
   INSTALLATION_ENV: kubernetes
@@ -16,4 +17,3 @@ data:
   RAILS_ENV: production
   RAILS_LOG_TO_STDOUT: "true"
   RAILS_SERVE_STATIC_FILES: "true"
-

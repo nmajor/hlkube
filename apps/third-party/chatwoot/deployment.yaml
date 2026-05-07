@@ -20,7 +20,7 @@ spec:
   template:
     metadata:
       annotations:
-        chatwoot.nmajor.net/rollout: "2026-05-07-extensions-v3"
+        chatwoot.nmajor.net/rollout: "2026-05-07-push-relay"
       labels:
         app: chatwoot
         component: web
