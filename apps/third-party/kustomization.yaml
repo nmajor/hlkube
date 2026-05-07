@@ -4,6 +4,7 @@ resources:
   - echo
   - coder
   - n8n
+  - chatwoot
   - rybbit
   - postiz
   - baywatch

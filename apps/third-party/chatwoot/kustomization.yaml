@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - postgres-credentials.sealed.yaml
+  - valkey-auth.sealed.yaml
+  - chatwoot-secrets.sealed.yaml
+  - postgres-cluster.yaml
+  - postgres-pooler.yaml
+  - valkey-release.yaml
+  - storage-pvc.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - worker-deployment.yaml
+  - service.yaml
+  - ingress.yaml
+

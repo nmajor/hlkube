@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatwoot-web
+  namespace: chatwoot
+  labels:
+    app: chatwoot
+    component: web
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: chatwoot
+      component: web
+  template:
+    metadata:
+      labels:
+        app: chatwoot
+        component: web
+    spec:
+      enableServiceLinks: false
+      initContainers:
+        - name: db-prepare
+          image: chatwoot/chatwoot:v4.13.0
+          command: ["bundle", "exec", "rails", "db:chatwoot_prepare"]
+          envFrom:
+            - configMapRef:
+                name: chatwoot-config
+          env:
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: password
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-valkey-auth
+                  key: password
+            - name: REDIS_URL
+              value: "redis://:$(VALKEY_PASSWORD)@chatwoot-valkey-primary.chatwoot.svc.cluster.local:6379/0"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-secrets
+                  key: SECRET_KEY_BASE
+      containers:
+        - name: chatwoot
+          image: chatwoot/chatwoot:v4.13.0
+          command: ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: chatwoot-config
+          env:
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: password
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-valkey-auth
+                  key: password
+            - name: REDIS_URL
+              value: "redis://:$(VALKEY_PASSWORD)@chatwoot-valkey-primary.chatwoot.svc.cluster.local:6379/0"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-secrets
+                  key: SECRET_KEY_BASE
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage
+          resources:
+            requests:
+              cpu: 750m
+              memory: 1536Mi
+            limits:
+              cpu: "2"
+              memory: 3Gi
+          startupProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: chatwoot-storage
+

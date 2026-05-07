@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatwoot
+  namespace: chatwoot
+  labels:
+    app: chatwoot
+    component: web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: chatwoot
+    component: web
+

@@ -1,0 +1,35 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: chatwoot-postgres
+  namespace: chatwoot
+spec:
+  instances: 2
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 20Gi
+    storageClass: longhorn-single-replica
+  monitoring:
+    enablePodMonitor: true
+  postgresql:
+    parameters:
+      max_connections: "150"
+      shared_buffers: "256MB"
+      work_mem: "4MB"
+      maintenance_work_mem: "64MB"
+      effective_cache_size: "1GB"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      max_worker_processes: "4"
+      max_parallel_workers: "4"
+      max_parallel_workers_per_gather: "2"
+  replicationSlots:
+    highAvailability:
+      enabled: true
+  bootstrap:
+    initdb:
+      database: chatwoot
+      owner: chatwoot
+      secret:
+        name: chatwoot-postgres-credentials
+

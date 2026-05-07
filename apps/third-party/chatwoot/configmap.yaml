@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatwoot-config
+  namespace: chatwoot
+data:
+  ACTIVE_STORAGE_SERVICE: local
+  ENABLE_ACCOUNT_SIGNUP: "true"
+  FORCE_SSL: "true"
+  FRONTEND_URL: https://chatwoot.nmajor.net
+  INSTALLATION_ENV: kubernetes
+  NODE_ENV: production
+  POSTGRES_DATABASE: chatwoot
+  POSTGRES_HOST: chatwoot-postgres-pooler.chatwoot.svc.cluster.local
+  POSTGRES_PORT: "5432"
+  RAILS_ENV: production
+  RAILS_LOG_TO_STDOUT: "true"
+  RAILS_SERVE_STATIC_FILES: "true"
+

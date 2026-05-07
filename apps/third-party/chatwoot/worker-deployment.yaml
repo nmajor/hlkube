@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatwoot-worker
+  namespace: chatwoot
+  labels:
+    app: chatwoot
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatwoot
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: chatwoot
+        component: worker
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: sidekiq
+          image: chatwoot/chatwoot:v4.13.0
+          command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+          envFrom:
+            - configMapRef:
+                name: chatwoot-config
+          env:
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-credentials
+                  key: password
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-valkey-auth
+                  key: password
+            - name: REDIS_URL
+              value: "redis://:$(VALKEY_PASSWORD)@chatwoot-valkey-primary.chatwoot.svc.cluster.local:6379/0"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-secrets
+                  key: SECRET_KEY_BASE
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1500m
+              memory: 2Gi
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: chatwoot-storage
+

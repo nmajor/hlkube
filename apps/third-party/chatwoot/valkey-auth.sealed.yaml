@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: chatwoot-valkey-auth
+  namespace: chatwoot
+spec:
+  encryptedData:
+    password: AgATBcmZ4U+p3wgQr2ptHhrNE6uRCk6N8YmHpv33mRcq+jNtLg/n93IdMa72mHZr/34kcCWG/dAdKjt6pBbEm8+RathXrYCKauJx2ddc9Af0Yn3StsiDrwN9G00qkeMvMRlT3WVdzcheHqYvnCr4eleShiiIJqBv5UKi/x1X7eyI9y+ZogGsEE4LthX54OATHQl4Go9Pqi/cyxNFPHWoV1LaVH1oCe6e0R7vNsr/EMiIE2YDJNJb5Iaed6T0ItmXlAqpCQ421rC1xHoH0A9IxLfQQ7+9DH/nfQP0ZM0lXkE27W9T7ziC/FxtGe/zyDXLmLrGAf0MAmnWJuT/Lk4nxDYrHbAHKuTgxGe0AjOsm3RskmGQ+SqjOhXlHExLfbTXVAl48ggTnDSxy9cgUtp765m/ruGlVtR+lNNYs299ZzgXNw+63z9oWylGpz5Uvch+L9Usqj/kIhFVgt/SNh0NT+W9doMVvz0p9n6471eteYWGVl6fgInXsqSNRBsGvQddWl2P84HASUZ+0qBZ8QSqcoqfAP/ETKJxER55R9naJ+OPM6MEahEzh+3uImLD8izr4Vx63IQcdbPZTuHqSy56D1uXXzqjwT5Y69Vpcc7P8aBkw8yuRXvCOPr38v97sXUv5oWVaxUJQaZttcFdhwfLSArj4xeOihSObJNhzZGQppk0x1cKenNATJgcS5Q+mh7LQdMfRsydNXDXE8eiTZj4NEMRyBpTnO+uNpdTDuw1WbhPOoXaPtSiuGHOsLL+Dkyod5MM7f8wg/wuYhZbIcqR+AAb
+  template:
+    metadata:
+      creationTimestamp: null
+      name: chatwoot-valkey-auth
+      namespace: chatwoot
+    type: Opaque
