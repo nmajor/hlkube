@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: healthchecks
+  namespace: healthchecks
+  labels:
+    app: healthchecks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: healthchecks
+  template:
+    metadata:
+      labels:
+        app: healthchecks
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: healthchecks
+          image: healthchecks/healthchecks:v4.1.1
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: DB
+              value: postgres
+            - name: DB_HOST
+              value: healthchecks-postgres-rw.healthchecks.svc.cluster.local
+            - name: DB_NAME
+              value: healthchecks
+            - name: DB_USER
+              value: healthchecks
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: healthchecks-postgres-credentials
+                  key: password
+            - name: DEBUG
+              value: "False"
+            - name: SITE_ROOT
+              value: https://hc.nmajor.net
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healthchecks-secrets
+                  key: secret-key
+            - name: SECURE_PROXY_SSL_HEADER
+              value: HTTP_X_FORWARDED_PROTO,https
+            - name: REMOTE_USER_HEADER
+              value: HTTP_X_EMAIL
+            - name: REGISTRATION_OPEN
+              value: "False"
+            - name: DEFAULT_FROM_EMAIL
+              value: healthchecks@nmajor.net
+            - name: UWSGI_PROCESSES
+              value: "2"
+            - name: UWSGI_THREADS
+              value: "2"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

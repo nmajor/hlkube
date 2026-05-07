@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: healthchecks-public-headers
+  namespace: healthchecks
+spec:
+  headers:
+    customRequestHeaders:
+      X-Auth-Request-Access-Token: ""
+      X-Auth-Request-Email: ""
+      X-Auth-Request-User: ""
+      X-Email: ""
+      X-User: ""

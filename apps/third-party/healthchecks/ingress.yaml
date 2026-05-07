@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: healthchecks
+  namespace: healthchecks
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hc.nmajor.net`) && (PathPrefix(`/ping/`) || PathPrefix(`/api/`) || PathPrefix(`/badge/`))
+      kind: Rule
+      services:
+        - name: healthchecks
+          port: 80
+      middlewares:
+        - name: healthchecks-public-headers
+    - match: Host(`hc.nmajor.net`)
+      kind: Rule
+      services:
+        - name: healthchecks
+          port: 80
+      middlewares:
+        - name: oauth2-auth
+          namespace: traefik
+        - name: header-transform
+          namespace: traefik
+  tls: {}
