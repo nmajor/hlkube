@@ -14,6 +14,8 @@ spec:
       component: worker
   template:
     metadata:
+      annotations:
+        chatwoot.nmajor.net/rollout: "2026-05-07-pgvector"
       labels:
         app: chatwoot
         component: worker
@@ -63,4 +65,3 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: chatwoot-storage
-
