@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chatwoot-postgres-extensions-v3
+  namespace: chatwoot
+spec:
+  backoffLimit: 12
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: create-extensions
+          image: ghcr.io/nmajor/cnpg-timescaledb:17.5
+          command:
+            - sh
+            - -c
+            - |
+              psql -v ON_ERROR_STOP=1 \
+                -h chatwoot-postgres-rw.chatwoot.svc.cluster.local \
+                -d chatwoot <<'SQL'
+              SELECT current_database(), current_user, inet_server_addr();
+              DROP EXTENSION IF EXISTS pg_stat_statements;
+              CREATE EXTENSION pg_stat_statements;
+              CREATE EXTENSION IF NOT EXISTS vector;
+              SELECT extname FROM pg_extension ORDER BY extname;
+              SQL
+          env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-superuser
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chatwoot-postgres-superuser
+                  key: password
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+
