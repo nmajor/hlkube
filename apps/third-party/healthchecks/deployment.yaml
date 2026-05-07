@@ -73,8 +73,6 @@ spec:
                   key: secret-key
             - name: SECURE_PROXY_SSL_HEADER
               value: HTTP_X_FORWARDED_PROTO,https
-            - name: REMOTE_USER_HEADER
-              value: HTTP_X_AUTH_REQUEST_EMAIL
             - name: REGISTRATION_OPEN
               value: "False"
             - name: DEFAULT_FROM_EMAIL
@@ -110,8 +108,6 @@ spec:
                   key: secret-key
             - name: SECURE_PROXY_SSL_HEADER
               value: HTTP_X_FORWARDED_PROTO,https
-            - name: REMOTE_USER_HEADER
-              value: HTTP_X_AUTH_REQUEST_EMAIL
             - name: REGISTRATION_OPEN
               value: "False"
             - name: DEFAULT_FROM_EMAIL

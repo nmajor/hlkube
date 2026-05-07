@@ -19,7 +19,4 @@ spec:
       services:
         - name: healthchecks
           port: 80
-      middlewares:
-        - name: oauth2-auth
-          namespace: traefik
   tls: {}
