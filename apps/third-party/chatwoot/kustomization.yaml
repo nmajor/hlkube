@@ -7,6 +7,7 @@ resources:
   - chatwoot-secrets.sealed.yaml
   - postgres-cluster.yaml
   - postgres-pooler.yaml
+  - postgres-extensions-job.yaml
   - valkey-release.yaml
   - storage-pvc.yaml
   - configmap.yaml
@@ -14,4 +15,3 @@ resources:
   - worker-deployment.yaml
   - service.yaml
   - ingress.yaml
-
