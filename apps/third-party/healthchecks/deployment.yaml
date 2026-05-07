@@ -16,6 +16,69 @@ spec:
         app: healthchecks
     spec:
       enableServiceLinks: false
+      initContainers:
+        - name: migrate
+          image: healthchecks/healthchecks:v4.1.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              python - <<'PY'
+              import os
+              import time
+
+              import psycopg
+
+              deadline = time.time() + 300
+              while True:
+                  try:
+                      with psycopg.connect(
+                          host=os.environ["DB_HOST"],
+                          dbname=os.environ["DB_NAME"],
+                          user=os.environ["DB_USER"],
+                          password=os.environ["DB_PASSWORD"],
+                          connect_timeout=5,
+                      ):
+                          break
+                  except Exception as exc:
+                      if time.time() > deadline:
+                          raise
+                      print(f"waiting for postgres: {exc}", flush=True)
+                      time.sleep(5)
+              PY
+              cd /opt/healthchecks
+              ./manage.py migrate --noinput
+          env:
+            - name: DB
+              value: postgres
+            - name: DB_HOST
+              value: healthchecks-postgres-rw.healthchecks.svc.cluster.local
+            - name: DB_NAME
+              value: healthchecks
+            - name: DB_USER
+              value: healthchecks
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: healthchecks-postgres-credentials
+                  key: password
+            - name: DEBUG
+              value: "False"
+            - name: SITE_ROOT
+              value: https://hc.nmajor.net
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healthchecks-secrets
+                  key: secret-key
+            - name: SECURE_PROXY_SSL_HEADER
+              value: HTTP_X_FORWARDED_PROTO,https
+            - name: REMOTE_USER_HEADER
+              value: HTTP_X_EMAIL
+            - name: REGISTRATION_OPEN
+              value: "False"
+            - name: DEFAULT_FROM_EMAIL
+              value: healthchecks@nmajor.net
       containers:
         - name: healthchecks
           image: healthchecks/healthchecks:v4.1.1
