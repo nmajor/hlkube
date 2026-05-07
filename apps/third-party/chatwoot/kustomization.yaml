@@ -8,6 +8,7 @@ resources:
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - postgres-extensions-job.yaml
+  - postgres-extensions-v2-job.yaml
   - valkey-release.yaml
   - storage-pvc.yaml
   - configmap.yaml
