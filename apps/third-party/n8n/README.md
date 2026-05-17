@@ -10,9 +10,9 @@ This directory contains the n8n deployment configuration with a separate Valkey 
 
 ## Components
 
-### n8n Release (`release.yaml`)
+### n8n Deployments
 
-- Main n8n application with queue mode enabled
+- Main n8n application pinned to `docker.n8n.io/n8nio/n8n:2.20.6` with queue mode enabled
 - Worker processes for distributed job processing
 - Webhook processes for external integrations
 - Uses separate Valkey instance for Redis operations
@@ -47,13 +47,17 @@ Contains the password for Valkey authentication.
 
 The n8n configuration uses these key environment variables for Valkey connection:
 
-- `N8N_EXECUTIONS_MODE: "queue"` - Enables queue mode
+- `EXECUTIONS_MODE: "queue"` / `N8N_EXECUTIONS_MODE: "queue"` - Enables queue mode
 - `QUEUE_BULL_REDIS_HOST: "n8n-valkey-primary"` - Valkey service name
 - `QUEUE_BULL_REDIS_PORT: "6379"` - Valkey port
 - `QUEUE_BULL_REDIS_DB: "0"` - Database number
+- `N8N_DISABLE_PRODUCTION_MAIN_PROCESS: "true"` - Keeps production webhooks on webhook pods
+- `N8N_DEFAULT_BINARY_DATA_MODE: "database"` - Keeps binary data usable across queue-mode processes
 
 ### Service Names
 
+- n8n main: `n8n.n8n.svc.cluster.local`
+- n8n webhook: `n8n-webhook.n8n.svc.cluster.local`
 - Valkey: `n8n-valkey-primary.n8n.svc.cluster.local`
 - PostgreSQL: `n8n-postgres-pooler.n8n.svc.cluster.local`
 
@@ -97,13 +101,13 @@ The resources are deployed via Flux CD. Any changes to the configuration files w
 
 ```bash
 # n8n main pods
-kubectl logs -n n8n -l app.kubernetes.io/name=n8n,app.kubernetes.io/type=master
+kubectl logs -n n8n -l app=n8n,component=main
 
 # n8n worker pods
-kubectl logs -n n8n -l app.kubernetes.io/name=n8n,app.kubernetes.io/type=worker
+kubectl logs -n n8n -l app=n8n,component=worker
 
 # n8n webhook pods
-kubectl logs -n n8n -l app.kubernetes.io/name=n8n,app.kubernetes.io/type=webhook
+kubectl logs -n n8n -l app=n8n,component=webhook
 
 # Valkey pods
 kubectl logs -n n8n -l app.kubernetes.io/name=valkey

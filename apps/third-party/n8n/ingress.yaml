@@ -12,8 +12,18 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - match: Host(`n8n.nmajor.net`) && (PathPrefix(`/webhook/`) || PathPrefix(`/webhook-waiting/`))
+      kind: Rule
+      priority: 20
+      services:
+        - name: n8n-webhook
+          port: 80
+      middlewares:
+        - name: header-transform
+          namespace: traefik
     - match: Host(`n8n.nmajor.net`)
       kind: Rule
+      priority: 10
       services:
         - name: n8n
           port: 80

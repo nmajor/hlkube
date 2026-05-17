@@ -9,5 +9,8 @@ resources:
   - postgres-pooler.yaml
   - valkey-release.yaml
   - main-deployment.yaml
+  - worker-deployment.yaml
+  - webhook-deployment.yaml
   - service.yaml
+  - webhook-service.yaml
   - ingress.yaml
