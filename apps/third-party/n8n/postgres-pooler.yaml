@@ -14,4 +14,5 @@ spec:
     poolMode: session
     parameters:
       default_pool_size: "25"
+      ignore_startup_parameters: "statement_timeout"
       max_client_conn: "150"
