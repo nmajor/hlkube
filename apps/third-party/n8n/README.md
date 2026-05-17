@@ -59,7 +59,7 @@ The n8n configuration uses these key environment variables for Valkey connection
 - n8n main: `n8n.n8n.svc.cluster.local`
 - n8n webhook: `n8n-webhook.n8n.svc.cluster.local`
 - Valkey: `n8n-valkey-primary.n8n.svc.cluster.local`
-- PostgreSQL: `n8n-postgres-pooler.n8n.svc.cluster.local`
+- PostgreSQL: `n8n-postgres-rw.n8n.svc.cluster.local`
 
 ## Deployment
 
