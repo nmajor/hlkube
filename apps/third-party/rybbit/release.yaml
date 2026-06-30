@@ -83,8 +83,11 @@ spec:
     postgresql:
       enabled: true
       image:
+        # bitnamilegacy is frozen at PG 17.x; existing on-disk data is PG 18,
+        # so we use the still-public bitnami "secure" :latest tag on Docker
+        # Hub which currently ships PG 18.4.
         registry: docker.io
-        repository: bitnamilegacy/postgresql
+        repository: bitnami/postgresql
         tag: latest
       auth:
         username: rybbit
@@ -96,7 +99,7 @@ spec:
         enabled: true
         image:
           registry: docker.io
-          repository: bitnamilegacy/os-shell
+          repository: bitnami/os-shell
           tag: latest
       primary:
         persistence:
