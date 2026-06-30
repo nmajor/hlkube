@@ -28,7 +28,9 @@ spec:
       name: rybbit-helm-values
       valuesKey: values.yaml
   values:
-    # Allow non-standard images (Bitnami Docker Hub deprecated, using ECR)
+    # Allow non-standard images. Bitnami removed their free images from both
+    # Docker Hub and public.ecr.aws (Aug 2025); using the community
+    # bitnamilegacy/ archive on Docker Hub.
     global:
       security:
         allowInsecureImages: true
@@ -76,8 +78,8 @@ spec:
     postgresql:
       enabled: true
       image:
-        registry: public.ecr.aws
-        repository: bitnami/postgresql
+        registry: docker.io
+        repository: bitnamilegacy/postgresql
         tag: latest
       auth:
         username: rybbit
@@ -88,8 +90,8 @@ spec:
       volumePermissions:
         enabled: true
         image:
-          registry: public.ecr.aws
-          repository: bitnami/os-shell
+          registry: docker.io
+          repository: bitnamilegacy/os-shell
           tag: latest
       primary:
         persistence:
@@ -103,8 +105,8 @@ spec:
       shards: 1
       replicaCount: 1
       image:
-        registry: public.ecr.aws
-        repository: bitnami/clickhouse
+        registry: docker.io
+        repository: bitnamilegacy/clickhouse
         tag: latest
       auth:
         username: default
