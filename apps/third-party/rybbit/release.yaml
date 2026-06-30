@@ -18,10 +18,15 @@ spec:
     remediation:
       retries: 3
     timeout: 30m
+    # The bundled bitnami subcharts can take a while to roll, and gating
+    # remediation on Ready creates a rollback loop when images are
+    # transiently unavailable. Apply the manifests and let pods settle.
+    disableWait: true
   upgrade:
     remediation:
       retries: 3
     timeout: 30m
+    disableWait: true
   # Merge sensitive values from sealed secret
   valuesFrom:
     - kind: Secret
