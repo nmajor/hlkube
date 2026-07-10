@@ -36,7 +36,11 @@ The cloudflared tunnel exposes a public hostname that TCP-proxies to the pooler:
 
 - Public hostname: `landscout-db.nmajor.net`
 - Tunnel route (in `infrastructure/cloudflared/configmap.yaml`):
-  `tcp://landscout-db-pooler.landscout.svc.cluster.local:5432`
+  `tcp://landscout-db-rw.landscout.svc.cluster.local:5432`
+
+The tunnel points at the primary (`-rw`) service directly, **not** the PgBouncer
+pooler — Hyperdrive is itself a connection pooler and must not sit behind a
+transaction-mode PgBouncer (it breaks Hyperdrive's prepared statements).
 
 Access to that hostname is locked down with a Cloudflare Access application +
 service token so that **only Hyperdrive** can use it. Workers never talk to the
