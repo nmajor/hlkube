@@ -1,8 +1,14 @@
 # Landscout
 
 Landscout is a CNPG-backed PostgreSQL database for the Landscout project. It is
-reachable from Cloudflare Workers via **Cloudflare Hyperdrive over the existing
-Cloudflare Tunnel** (no raw public exposure of the database).
+reached two ways:
+
+- **From a Cloudflare Worker** (production app) — via **Cloudflare Workers VPC +
+  Hyperdrive**. No public exposure of the database.
+- **From inside the cluster** (e.g. a script in a Coder workspace) — directly over
+  the internal service DNS. No Cloudflare involved.
+
+Both are documented below.
 
 ## PostgreSQL
 
@@ -24,11 +30,32 @@ Cloudflare Tunnel** (no raw public exposure of the database).
 
 ## Connection Details
 
-### Internal (from within the cluster)
+### In-cluster / Coder workspace (direct — full access)
 
+A script running in a Coder workspace (namespace `coder-workspaces`) or any pod in
+the cluster connects **directly** to the database over internal DNS — no Cloudflare,
+no Hyperdrive, no VPC. Cross-namespace DNS is open (verified: a `coder-workspaces`
+pod reaches `landscout-db-rw` with no NetworkPolicy in the way).
+
+For a build/maintenance script that needs **full access** (DDL, migrations,
+extensions, session-level features) connect to the **primary** service — not the
+pooler, whose transaction-pooling mode disables session features and prepared
+statements:
+
+```bash
+# Primary (read-write, full session features) — use this for the workspace agent:
+export DATABASE_URL='postgresql://landscout:<password>@landscout-db-rw.landscout.svc.cluster.local:5432/landscout?sslmode=require'
+psql "$DATABASE_URL" -c '\dx'   # e.g. list installed extensions
 ```
-postgresql://landscout:<password>@landscout-db-pooler.landscout.svc.cluster.local:5432/landscout
-```
+
+Service options:
+- `landscout-db-rw.landscout.svc.cluster.local:5432` — primary, read-write (default).
+- `landscout-db-ro.landscout.svc.cluster.local:5432` — replicas, read-only.
+- `landscout-db-pooler.landscout.svc.cluster.local:5432` — PgBouncer (transaction
+  mode); use only for high-connection-count app workloads, not for migrations/DDL.
+
+CNPG serves TLS; `sslmode=require` works. If a client insists on verifying the CA,
+fetch it with `kubectl get secret landscout-db-ca -n landscout -o jsonpath='{.data.ca\.crt}' | base64 -d`.
 
 ### External — Cloudflare Workers (Hyperdrive via Workers VPC)
 
