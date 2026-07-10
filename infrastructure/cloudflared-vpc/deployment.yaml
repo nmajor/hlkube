@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-vpc
+  namespace: cloudflared-vpc
+spec:
+  selector:
+    matchLabels:
+      app: cloudflared-vpc
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: cloudflared-vpc
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:2025.8.1
+          # Token-based (remotely-managed) connector for Cloudflare Workers VPC.
+          # Routing is defined on Cloudflare's side by VPC Services (created with
+          # `wrangler vpc service create`), NOT by a local ingress config. This
+          # connector only provides outbound egress from the cluster network, so a
+          # single deployment can back many databases across namespaces.
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --metrics
+            - 0.0.0.0:2000
+            - run
+            - --token
+            - $(TUNNEL_TOKEN)
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflared-vpc-token
+                  key: token
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            failureThreshold: 1
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - cloudflared-vpc
+                topologyKey: kubernetes.io/hostname

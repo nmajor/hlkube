@@ -9,14 +9,6 @@ data:
     metrics: 0.0.0.0:2000
     # This YAML section maps traffic from hostnames to local services
     ingress:
-      # landscout-db: raw Postgres TCP for Cloudflare Hyperdrive.
-      # Must stay ABOVE the wildcard/catch-all HTTP rules (first match wins).
-      # Access to this hostname is restricted to Hyperdrive via a Cloudflare
-      # Access application + service token (configured in the Zero Trust dashboard).
-      # Points at the primary (-rw) directly, NOT the PgBouncer pooler: Hyperdrive
-      # is itself a pooler and must not sit behind a transaction-mode PgBouncer.
-      - hostname: "landscout-db.nmajor.net"
-        service: tcp://landscout-db-rw.landscout.svc.cluster.local:5432
       # Coder workspace apps wildcard domain
       - hostname: "*.nmajor.dev"
         service: https://traefik.traefik.svc.cluster.local:443

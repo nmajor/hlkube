@@ -30,62 +30,50 @@ Cloudflare Tunnel** (no raw public exposure of the database).
 postgresql://landscout:<password>@landscout-db-pooler.landscout.svc.cluster.local:5432/landscout
 ```
 
-### External — Cloudflare Workers (Hyperdrive over Tunnel)
+### External — Cloudflare Workers (Hyperdrive via Workers VPC)
 
-The cloudflared tunnel exposes a public hostname that TCP-proxies to the pooler:
+Workers reach this database through the shared Workers VPC connector documented in
+[`infrastructure/cloudflared-vpc`](../../../infrastructure/cloudflared-vpc). There
+is **no public hostname and no DNS record** — the connector provides private egress
+into the cluster and Hyperdrive routes to the primary (`-rw`) service.
 
-- Public hostname: `landscout-db.nmajor.net`
-- Tunnel route (in `infrastructure/cloudflared/configmap.yaml`):
-  `tcp://landscout-db-rw.landscout.svc.cluster.local:5432`
-
-The tunnel points at the primary (`-rw`) service directly, **not** the PgBouncer
-pooler — Hyperdrive is itself a connection pooler and must not sit behind a
-transaction-mode PgBouncer (it breaks Hyperdrive's prepared statements).
-
-Access to that hostname is locked down with a Cloudflare Access application +
-service token so that **only Hyperdrive** can use it. Workers never talk to the
-database directly — they use a Hyperdrive binding.
+We target `landscout-db-rw` (the primary), **not** the PgBouncer pooler — Hyperdrive
+is itself a connection pooler and must not sit behind a transaction-mode PgBouncer.
 
 ## Cloudflare-side setup (one-time, done outside this repo)
 
-1. **DNS route** — point the public hostname at the tunnel:
-   ```bash
-   cloudflared tunnel route dns hlkube-tunnel landscout-db.nmajor.net
-   ```
-2. **Access application + service token** — in the Zero Trust dashboard, create a
-   Self-hosted / Access application for `landscout-db.nmajor.net` with a policy of
-   type *Service Auth* that requires a valid service token. Note the
-   `Client ID` and `Client Secret`.
-3. **Create the Hyperdrive config** (Wrangler v3.65+). Omit `--port`; the tunnel
-   handles routing:
-   ```bash
-   npx wrangler hyperdrive create landscout \
-     --host=landscout-db.nmajor.net \
-     --database=landscout \
-     --user=landscout \
-     --password='<password>' \
-     --access-client-id='<CLIENT_ID>' \
-     --access-client-secret='<CLIENT_SECRET>'
-   ```
-4. **Bind it in `wrangler.toml`:**
-   ```toml
-   [[hyperdrive]]
-   binding = "HYPERDRIVE"
-   id = "<hyperdrive-config-id>"
-   ```
-   At runtime the Worker reads `env.HYPERDRIVE.connectionString`.
+Prerequisite: the shared `cloudflared-vpc` connector is deployed (see its README)
+and you have its **VPC Tunnel ID**.
 
-TimescaleDB/CNPG serves TLS by default, which Hyperdrive requires.
+```bash
+# 1. VPC Service -> the DB's primary service (resolved via in-cluster DNS).
+npx wrangler vpc service create landscout \
+  --type tcp --tcp-port 5432 --app-protocol postgresql \
+  --tunnel-id <HLKUBE_VPC_TUNNEL_ID> \
+  --hostname landscout-db-rw.landscout.svc.cluster.local
+# -> note the VPC Service ID
+
+# 2. Hyperdrive config. CNPG serves a self-signed cert, so relax verification
+#    (traffic is still TLS-encrypted end to end).
+npx wrangler hyperdrive create landscout \
+  --service-id <VPC_SERVICE_ID> \
+  --database landscout --user landscout --password '<password>' \
+  --scheme postgresql --cert-verification-mode disabled
+
+# 3. Bind it in the Worker's wrangler.toml:
+#    [[hyperdrive]]
+#    binding = "HYPERDRIVE"
+#    id = "<hyperdrive-config-id>"
+#    -> at runtime: env.HYPERDRIVE.connectionString
+```
 
 ## Local development (without deploying a Worker)
 
-Use the `cloudflared access` client to open a local TCP tunnel, then connect
-with any Postgres client:
+Workers VPC has no public endpoint, so for local access port-forward the primary
+service and connect over localhost:
 
 ```bash
-cloudflared access tcp --hostname landscout-db.nmajor.net --url 127.0.0.1:5432 \
-  --service-token-id '<CLIENT_ID>' --service-token-secret '<CLIENT_SECRET>'
-# then, in another shell:
+kubectl port-forward -n landscout svc/landscout-db-rw 5432:5432
 psql 'postgresql://landscout:<password>@127.0.0.1:5432/landscout?sslmode=require'
 ```
 
