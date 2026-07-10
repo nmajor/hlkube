@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: cloudflared-vpc-token
+  namespace: cloudflared-vpc
+spec:
+  encryptedData:
+    token: AgCv9Ch4/pAiUxVweKFvlAiylWRMEqfVA0o5vE+5n24YUneQQk1H0HBW2jmERcg8eIbyidcLjlFho16z+mQ7+PBruMnt1ufVwhM6MVyBuOPR8slsNNsDTuO+72wQl46UpzXoZnL1p0DuxtohIGbURXU0TxZZTD1AaA4WzIy3YufD8z7HfcSN/jTZ0ahItIj/X16M6SL2VBjZQo4EVxPSBWGepvYdoHtkEPPEjRWVzmRnwmbAGYBrvfCnAXWvCCphzl9z2iKZQJU3OPqjW/yWETLT5VeS8UdC+5Z+Xt5HpJkqgx70hecoSuIzP4j5SZS5KGK1YePZn60r1udtiwjFgm4gA6fYhEap3SqFx+PkHxJiDTIqsxlQfCEICdPAlMWBQSxIum+ccw43hBWGQxfkigdZ5BSLlvb/SrXSxVRYAlK7tGoLr3RVC+FGiMwVLS0XIzV7dxnDATEZ9E6tDudSrxDCoQeEH+kpKCzNPkMB0I1BJmazaEolLDJ+MIu+zrqUq0EvP6MzcoOtCTpalFSUgJ9G3uNEjowAXndxYpW4LoaSIbRhZAUmEZRgXHTLN/VExLOTyjZbWbYE0OG5ZHK19yr8ANv5hTm+l8OUgyEEFbH7kltTOGqdGHAJ1c2/PyqyNfmhEhrMrCFkKiWnZK6ArOLhK3/PWsyMm6sEYd4QiD5NZkp+ujsK3Z+ceSff5LFXCCSsSxq0wxcxjybWbRbEOsl6ic/tFs2nxbJ9omIstjIeHYOV29LuymWV9JGbyYhoAFWkrUT5nxD2iJvD+BuUL4OLY9NKbP8p4RfTlpHYLzlzgwAhZq6wugt08/zOhauwSxbvpM1Wmm780hPctwEwYRivb28hDMezYwaOkkLV5VeMxe3eXDX/Oav6JdKvMfj1Aeaf/xDtZIF+06YwSYvsK44br5fwTgKKb96DeaCWudCBDq9q4INGna54
+  template:
+    metadata:
+      creationTimestamp: null
+      name: cloudflared-vpc-token
+      namespace: cloudflared-vpc
+    type: Opaque

@@ -6,6 +6,7 @@ resources:
   - traefik
   - sealed-secrets
   - cloudflared
+  - cloudflared-vpc
   - metrics-server
   - longhorn
   - oauth2-proxy
