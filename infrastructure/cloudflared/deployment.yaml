@@ -16,6 +16,10 @@ spec:
     metadata:
       labels:
         app: cloudflared
+      annotations:
+        # sha256 of configmap.yaml — bump when the tunnel config changes so Flux
+        # rolls the pods (cloudflared reads its config only at startup).
+        checksum/config: "b5d498d81d172d5604bdb403a42358099fcda3a918f9aca94a3037e4bd9dd101"
     spec:
       containers:
         - name: cloudflared
