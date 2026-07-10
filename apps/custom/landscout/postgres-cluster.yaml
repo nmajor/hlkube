@@ -1,8 +1,8 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: marketmap-db
-  namespace: marketmap
+  name: landscout-db
+  namespace: landscout
 spec:
   instances: 3
   # Tag is set by the build-cnpg-image workflow (detects PG version from base image)
@@ -43,10 +43,10 @@ spec:
 
   bootstrap:
     initdb:
-      database: marketmap
-      owner: marketmap
+      database: landscout
+      owner: landscout
       secret:
-        name: marketmap-postgres-credentials
+        name: landscout-postgres-credentials
       postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS timescaledb;
         - CREATE EXTENSION IF NOT EXISTS vector;
