@@ -29,7 +29,7 @@ spec:
     architecture: standalone
 
     # Master/Primary configuration
-    master:
+    primary:
       persistence:
         enabled: true
         size: 2Gi
