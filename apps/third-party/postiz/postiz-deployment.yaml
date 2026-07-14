@@ -35,7 +35,7 @@ spec:
               mountPath: /app-env
       containers:
         - name: postiz
-          image: ghcr.io/gitroomhq/postiz-app:v2.21.4
+          image: ghcr.io/gitroomhq/postiz-app:v2.21.10
           ports:
             - containerPort: 5000
           env:
