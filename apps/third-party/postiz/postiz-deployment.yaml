@@ -84,6 +84,18 @@ spec:
                 secretKeyRef:
                   name: postiz-secrets
                   key: facebook_app_secret
+            - name: YOUTUBE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: youtube_client_id
+                  optional: true
+            - name: YOUTUBE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: youtube_client_secret
+                  optional: true
             - name: DISABLE_REGISTRATION
               value: "true"
             - name: STORAGE_PROVIDER
