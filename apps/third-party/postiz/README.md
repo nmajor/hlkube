@@ -2,6 +2,21 @@
 
 Postiz runs at `https://postiz.nmajor.net`.
 
+## X (Twitter)
+
+The Postiz X provider uses OAuth 1.0a consumer credentials:
+
+- `X_API_KEY`
+- `X_API_SECRET`
+
+Configure the X app with:
+
+- App permissions: `Read and Write`
+- App type: `Native App`
+- Callback URI: `https://postiz.nmajor.net/integrations/social/x`
+
+The X bearer token is not used by Postiz for this integration.
+
 ## Meta: Facebook and Instagram
 
 The Postiz Facebook and Instagram providers both use the same Meta app credentials:

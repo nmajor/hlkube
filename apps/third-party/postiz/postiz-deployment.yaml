@@ -96,6 +96,16 @@ spec:
                   name: postiz-secrets
                   key: youtube_client_secret
                   optional: true
+            - name: X_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: x_api_key
+            - name: X_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-secrets
+                  key: x_api_secret
             - name: DISABLE_REGISTRATION
               value: "true"
             - name: STORAGE_PROVIDER
