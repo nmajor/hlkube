@@ -45,17 +45,19 @@ spec:
           args:
             - |
               marker=/data/.aof-repaired-20260714
-              manifest=/data/appendonlydir/appendonly.aof.manifest
-              backup=/data/appendonlydir.backup-20260714
+              manifest="$(find /data -name appendonly.aof.manifest -print -quit)"
 
               if [[ -f "${marker}" ]]; then
                 echo "AOF repair already completed"
                 exit 0
               fi
 
-              test -f "${manifest}"
+              test -n "${manifest}"
+              source_dir="$(dirname "${manifest}")"
+              backup="${source_dir}.backup-20260714"
+              echo "Repairing ${manifest}"
               if [[ ! -e "${backup}" ]]; then
-                cp -a /data/appendonlydir "${backup}"
+                cp -a "${source_dir}" "${backup}"
               fi
               printf 'y\n' | /opt/bitnami/valkey/bin/valkey-check-aof --fix "${manifest}"
               touch "${marker}"
