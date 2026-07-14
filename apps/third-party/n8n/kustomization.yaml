@@ -8,6 +8,7 @@ resources:
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - valkey-release.yaml
+  - valkey-aof-repair-job.yaml
   - main-deployment.yaml
   - worker-deployment.yaml
   - webhook-deployment.yaml
