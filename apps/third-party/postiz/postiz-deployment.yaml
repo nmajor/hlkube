@@ -23,7 +23,7 @@ spec:
         app: postiz
         component: main
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-04-28T15:35:54Z"
+        kubectl.kubernetes.io/restartedAt: "2026-07-14T15:16:00Z"
     spec:
       enableServiceLinks: false
       initContainers:
