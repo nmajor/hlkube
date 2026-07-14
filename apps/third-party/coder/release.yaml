@@ -24,6 +24,7 @@ spec:
     timeout: 30m
   values:
     coder:
+      replicaCount: 0
       env:
         - name: POSTGRES_USER
           valueFrom:
