@@ -6,6 +6,8 @@ resources:
   - postgres-credentials.sealed.yaml
   - workspace-secrets.sealed.yaml
   - postgres-cluster.yaml
+  - database-backup-pvc.yaml
+  - database-backup-job.yaml
   - release.yaml
   - ingress.yaml
   - ingress-workspaces.yaml

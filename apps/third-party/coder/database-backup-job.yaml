@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: coder-database-backup-pre-2-26-6
+  namespace: coder
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: coder-database-backup
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: pg-dump
+          image: postgres:17.4
+          command: ["/bin/bash", "-ec"]
+          args:
+            - |
+              backup=/backups/coder-pre-2.26.6-20260714.dump
+              pg_dump --format=custom --file="${backup}"
+              pg_restore --list "${backup}" >/dev/null
+              sha256sum "${backup}" >"${backup}.sha256"
+              ls -lh "${backup}" "${backup}.sha256"
+          env:
+            - name: PGHOST
+              value: coder-postgres-rw.coder.svc.cluster.local
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: coder
+            - name: PGUSER
+              value: coder
+            - name: PGSSLMODE
+              value: require
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: coder-postgres-credentials
+                  key: password
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      volumes:
+        - name: backups
+          persistentVolumeClaim:
+            claimName: coder-database-backups
