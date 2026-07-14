@@ -32,8 +32,9 @@ spec:
     primary:
       persistence:
         enabled: true
-        size: 2Gi
-        storageClass: longhorn-single-replica
+        # Keep the live StatefulSet claim template unchanged. The existing PVC
+        # was originally provisioned as 2Gi on longhorn-single-replica.
+        size: 8Gi
 
       # One-time recovery for the corrupt AOF discovered on 2026-07-14.
       # Remove this init container after Valkey has recovered successfully.
