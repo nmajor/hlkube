@@ -35,6 +35,33 @@ spec:
         size: 2Gi
         storageClass: longhorn-single-replica
 
+      # One-time recovery for the corrupt AOF discovered on 2026-07-14.
+      # Remove this init container after Valkey has recovered successfully.
+      initContainers:
+        - name: repair-aof-20260714
+          image: docker.io/bitnamilegacy/valkey:8.1.2-debian-12-r0
+          command: ["/bin/bash", "-ec"]
+          args:
+            - |
+              marker=/data/.aof-repaired-20260714
+              manifest=/data/appendonlydir/appendonly.aof.manifest
+              backup=/data/appendonlydir.backup-20260714
+
+              if [[ -f "${marker}" ]]; then
+                echo "AOF repair already completed"
+                exit 0
+              fi
+
+              test -f "${manifest}"
+              if [[ ! -e "${backup}" ]]; then
+                cp -a /data/appendonlydir "${backup}"
+              fi
+              printf 'y\n' | /opt/bitnami/valkey/bin/valkey-check-aof --fix "${manifest}"
+              touch "${marker}"
+          volumeMounts:
+            - name: valkey-data
+              mountPath: /data
+
       # Resource limits
       resources:
         requests:
