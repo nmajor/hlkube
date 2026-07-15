@@ -1,13 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rybbit-database-backup-20260715
+  name: rybbit-database-backup-20260715-v2
   namespace: rybbit
 spec:
   backoffLimit: 2
   template:
     spec:
       restartPolicy: Never
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
       initContainers:
         - name: postgres-backup
           image: docker.io/bitnami/postgresql:latest@sha256:8eeb02134f13e3d504046748e67a736a7bf911cadb3a99bdb1ce17246878f9ce
