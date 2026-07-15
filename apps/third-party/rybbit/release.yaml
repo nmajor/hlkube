@@ -46,7 +46,9 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/rybbit-io/rybbit-backend
-        tag: latest
+        # Keep the currently deployed build reproducible until the 0.5.x
+        # database migration is planned and backed up.
+        tag: latest@sha256:5cc0bd7b835119c12704b41c43681956c258a682f7fa0b9fb3c80fd66f242f91
       resources:
         requests:
           cpu: 200m
@@ -67,7 +69,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/rybbit-io/rybbit-client
-        tag: latest
+        tag: latest@sha256:7977a4b7742aebde575c6087490f8c00d8c21499fb0e60fbce88103c4a0f2176
       resources:
         requests:
           cpu: 100m
@@ -88,7 +90,7 @@ spec:
         # Hub which currently ships PG 18.4.
         registry: docker.io
         repository: bitnami/postgresql
-        tag: latest
+        tag: latest@sha256:8eeb02134f13e3d504046748e67a736a7bf911cadb3a99bdb1ce17246878f9ce
       auth:
         username: rybbit
         database: rybbit
@@ -100,7 +102,7 @@ spec:
         image:
           registry: docker.io
           repository: bitnami/os-shell
-          tag: latest
+          tag: latest@sha256:2fc2f223aa3723d4aac80fb5d4ce01d7154e8651d2f0522ca184bcc93501609a
       primary:
         persistence:
           enabled: true
@@ -115,7 +117,7 @@ spec:
       image:
         registry: docker.io
         repository: bitnamilegacy/clickhouse
-        tag: latest
+        tag: latest@sha256:aca8db51b177630eb405c6401e5f820e9e71d366d60562974d709bbddea7ad12
       auth:
         username: default
         # password injected via valuesFrom
