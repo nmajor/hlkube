@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rybbit-database-backup-20260715
+  namespace: rybbit
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: postgres-backup
+          image: docker.io/bitnami/postgresql:latest@sha256:8eeb02134f13e3d504046748e67a736a7bf911cadb3a99bdb1ce17246878f9ce
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              backup_dir=/backups/2026-07-15/postgresql
+              mkdir -p "$backup_dir"
+              export PGPASSWORD="$(cat /credentials/password)"
+              pg_dump \
+                --host=rybbit-postgresql \
+                --username=rybbit \
+                --dbname=rybbit \
+                --format=custom \
+                --no-owner \
+                --file="$backup_dir/rybbit.dump"
+              pg_restore --list "$backup_dir/rybbit.dump" > "$backup_dir/rybbit.restore-list"
+              sha256sum "$backup_dir/rybbit.dump" > "$backup_dir/SHA256SUMS"
+              date -u +%FT%TZ > "$backup_dir/completed-at"
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+            - name: postgres-credentials
+              mountPath: /credentials
+              readOnly: true
+        - name: clickhouse-backup
+          image: docker.io/bitnamilegacy/clickhouse:latest@sha256:aca8db51b177630eb405c6401e5f820e9e71d366d60562974d709bbddea7ad12
+          env:
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rybbit-clickhouse
+                  key: admin-password
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              backup_dir=/backups/2026-07-15/clickhouse
+              mkdir -p "$backup_dir"
+              ch=(clickhouse-client --host rybbit-clickhouse --user default --password "$CLICKHOUSE_PASSWORD")
+              mapfile -t tables < <("${ch[@]}" --query "SELECT name FROM system.tables WHERE database = 'default' ORDER BY name FORMAT TSVRaw")
+              test "${#tables[@]}" -gt 0
+              index=0
+              for table in "${tables[@]}"; do
+                case "$table" in
+                  *[!A-Za-z0-9_]*|'') echo "Unsafe table name: $table" >&2; exit 1 ;;
+                esac
+                index=$((index + 1))
+                prefix=$(printf '%03d-%s' "$index" "$table")
+                "${ch[@]}" --query "SHOW CREATE TABLE default.$table" > "$backup_dir/$prefix.sql"
+                "${ch[@]}" --query "SELECT count() FROM default.$table FORMAT TSVRaw" > "$backup_dir/$prefix.rows"
+                "${ch[@]}" --query "SELECT * FROM default.$table FORMAT Native" > "$backup_dir/$prefix.native"
+              done
+              (cd "$backup_dir" && sha256sum -- *.sql *.rows *.native > SHA256SUMS)
+              date -u +%FT%TZ > "$backup_dir/completed-at"
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      containers:
+        - name: complete
+          image: busybox:1.35
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              test -s /backups/2026-07-15/postgresql/rybbit.dump
+              test -s /backups/2026-07-15/clickhouse/SHA256SUMS
+              touch /backups/2026-07-15/COMPLETE
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      volumes:
+        - name: backups
+          persistentVolumeClaim:
+            claimName: rybbit-database-backups
+        - name: postgres-credentials
+          secret:
+            secretName: rybbit-postgresql
+            items:
+              - key: password
+                path: password
