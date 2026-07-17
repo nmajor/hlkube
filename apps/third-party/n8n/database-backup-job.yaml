@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: n8n-database-backup-20260717
+  namespace: n8n
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: backup
+          image: postgres:17
+          command: ["/bin/sh", "-c"]
+          args:
+            - pg_dump -Fc --no-owner --no-acl -h n8n-postgres-rw -U n8n -d n8n -f /backup/n8n-20260717.dump
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-postgres-credentials
+                  key: password
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+      volumes:
+        - name: backup
+          persistentVolumeClaim:
+            claimName: n8n-database-backups
