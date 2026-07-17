@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postiz-database-backup-20260717
+  namespace: postiz
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        fsGroup: 26
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: postiz-backup
+          image: ghcr.io/cloudnative-pg/postgresql:17.4@sha256:fcaeeb1af6d4d4aad002e0b7d571819689dcdab83aa64a258251f2f17aec003e
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-postgres-credentials
+                  key: password
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              backup_dir=/backups/2026-07-17/postiz
+              mkdir -p "$backup_dir"
+              pg_dump --host=postiz-postgres-rw --username=postiz --dbname=postiz \
+                --format=custom --no-owner --file="$backup_dir/postiz.dump"
+              pg_restore --list "$backup_dir/postiz.dump" > "$backup_dir/postiz.restore-list"
+              sha256sum "$backup_dir/postiz.dump" > "$backup_dir/SHA256SUMS"
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+        - name: temporal-backup
+          image: ghcr.io/cloudnative-pg/postgresql:17.4@sha256:fcaeeb1af6d4d4aad002e0b7d571819689dcdab83aa64a258251f2f17aec003e
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: temporal-postgres-credentials
+                  key: password
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              backup_dir=/backups/2026-07-17/temporal
+              mkdir -p "$backup_dir"
+              for database in temporal temporal_visibility; do
+                pg_dump --host=temporal-postgres-rw --username=temporal --dbname="$database" \
+                  --format=custom --no-owner --file="$backup_dir/$database.dump"
+                pg_restore --list "$backup_dir/$database.dump" > "$backup_dir/$database.restore-list"
+              done
+              (cd "$backup_dir" && sha256sum -- *.dump > SHA256SUMS)
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      containers:
+        - name: complete
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              (cd /backups/2026-07-17/postiz && sha256sum -c SHA256SUMS)
+              (cd /backups/2026-07-17/temporal && sha256sum -c SHA256SUMS)
+              wc -c /backups/2026-07-17/postiz/postiz.dump
+              wc -c /backups/2026-07-17/temporal/*.dump
+              date -u +%FT%TZ > /backups/2026-07-17/COMPLETE
+          volumeMounts:
+            - name: backups
+              mountPath: /backups
+      volumes:
+        - name: backups
+          persistentVolumeClaim:
+            claimName: postiz-database-backups
