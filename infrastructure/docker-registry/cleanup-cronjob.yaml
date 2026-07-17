@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: registry-cleanup
+  name: registry-cleanup-suspended
   namespace: docker-registry
 spec:
   # Garbage collection must run during a registry maintenance window with
