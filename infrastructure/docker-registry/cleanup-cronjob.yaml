@@ -4,6 +4,9 @@ metadata:
   name: registry-cleanup
   namespace: docker-registry
 spec:
+  # Garbage collection must run during a registry maintenance window with
+  # writes stopped; the registry-data PVC is ReadWriteOnce.
+  suspend: true
   schedule: "0 1 * * 0" # Weekly at 1:00 AM on Sunday
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
