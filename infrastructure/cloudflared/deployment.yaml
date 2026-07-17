@@ -19,7 +19,7 @@ spec:
       annotations:
         # sha256 of configmap.yaml — bump when the tunnel config changes so Flux
         # rolls the pods (cloudflared reads its config only at startup).
-        checksum/config: "be499b2235086f1ea7a09bc914a18b67119180548520048663d2457b367d56a8"
+        checksum/config: "960c095a17faa0b1dec8c77d22c5db8e59f43fa460b42c9b013d5a49a3cfe9e8"
     spec:
       containers:
         - name: cloudflared
