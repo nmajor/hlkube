@@ -6,5 +6,4 @@ resources:
   - helm-values.sealed.yaml
   - release.yaml
   - database-backup-pvc.yaml
-  - database-backup-job.yaml
   - ingress.yaml

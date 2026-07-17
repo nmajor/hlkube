@@ -7,7 +7,6 @@ resources:
   - postiz-secrets.sealed.yaml
   - valkey-auth.sealed.yaml
   - database-backup-pvc.yaml
-  - database-backup-job.yaml
   - postgres-cluster.yaml
   - postgres-pooler.yaml
   - temporal-postgres-cluster.yaml
