@@ -53,7 +53,7 @@ spec:
       cookie-csrf-per-request: false
       set-xauthrequest: true
       session-cookie-minimal: true
-      cookie-refresh: "168h"
+      cookie-refresh: "0"
       cookie-expire: "168h"
       session-store-type: "cookie"
       pass-basic-auth: false
