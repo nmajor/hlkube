@@ -12,7 +12,7 @@ This directory contains the n8n deployment configuration with a separate Valkey 
 
 ### n8n Deployments
 
-- Main n8n application pinned to `docker.n8n.io/n8nio/n8n:2.20.6` with queue mode enabled
+- Main n8n application pinned to `docker.n8n.io/n8nio/n8n:2.30.7` with queue mode enabled
 - Worker processes for distributed job processing
 - Webhook processes for external integrations
 - Uses separate Valkey instance for Redis operations
