@@ -6,3 +6,4 @@ resources:
   - postgres-cluster.yaml
   - postgres-credentials.sealed.yaml
   - postgres-pooler.yaml
+  - postgres-resize-job.yaml
