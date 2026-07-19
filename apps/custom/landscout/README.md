@@ -18,7 +18,7 @@ Both are documented below.
 - Owner: `landscout`
 - Image: `ghcr.io/nmajor/cnpg-timescaledb:17.5` (PostgreSQL 17 + TimescaleDB)
 - Instances: 3 (HA)
-- Storage: `50Gi` per instance on `longhorn-single-replica`
+- Storage: `100Gi` per instance on `longhorn-single-replica`
 - Extensions: `timescaledb`, `vector`, `postgis`, `pg_trgm`
 - Credential secret: `landscout-postgres-credentials` (`kubernetes.io/basic-auth`)
 
