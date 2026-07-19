@@ -35,7 +35,7 @@ subjects:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: landscout-db-resize-100gi
+  name: landscout-db-resize-100gi-v2
   namespace: landscout
 spec:
   backoffLimit: 3
@@ -75,3 +75,4 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 100
