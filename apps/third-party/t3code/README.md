@@ -6,10 +6,9 @@ T3 Code runs as a single, persistent coding environment at
 ## Access and security
 
 - Traefik terminates HTTPS and proxies WebSockets.
-- The shared `oauth2-auth` middleware limits the outer route to the configured
-  GitHub user.
-- T3 Code also requires its own one-time pairing flow and maintains revocable
-  client sessions.
+- T3 Code requires its own one-time pairing flow and maintains revocable client
+  sessions. There is no outer ForwardAuth layer so desktop, mobile, hosted-web,
+  HTTP, and WebSocket clients all use T3's native authentication protocol.
 - A NetworkPolicy accepts application traffic only from the Traefik namespace.
 - The pod does not receive a Kubernetes service-account token and runs as UID
   1000 with all Linux capabilities dropped.
@@ -35,9 +34,9 @@ the startup log:
 kubectl logs -n t3code deployment/t3code
 ```
 
-Open `https://t3code.nmajor.net`, complete GitHub authentication, and use the
-pairing token shown in the log. Provider and GitHub CLI login can then be
-completed from T3 Code's terminal; those credentials persist on the PVC.
+Open `https://t3code.nmajor.net` and use the pairing token shown in the log.
+Provider and GitHub CLI login can then be completed from T3 Code's terminal;
+those credentials persist on the PVC.
 
 ## Versions
 

@@ -12,7 +12,4 @@ spec:
       services:
         - name: t3code
           port: 80
-      middlewares:
-        - name: oauth2-auth
-          namespace: traefik
   tls: {}
