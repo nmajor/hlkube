@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1
 
-# T3 Code 0.0.28 requires Node >=24.10. Keep its runtime separate from the
+# T3 Code 0.0.28 requires Node >=24.10, and its current dependency tree requires
+# Node >=24.15. Keep its runtime separate from the
 # workspace image's asdf-managed Node installation so existing projects retain
 # their selected Node version.
-FROM node:24.13.1-bookworm-slim@sha256:85a395c77b811fa7f5b5e4aa69cd6eb4c3b80c7f1a8e34704dc0ce061e5b404e AS node-runtime
+FROM node:24.18.0-bookworm-slim@sha256:d45d78e7929b46875bbd4e29bea672d5bc48186c6c3588306521c815e78352d6 AS node-runtime
 
 # Pin the exact workspace image currently running in the cluster. This gives
 # T3's child agent processes the same Elixir, Git, database, and development
