@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openseo
+  namespace: openseo
+  labels:
+    app.kubernetes.io/name: openseo
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: openseo
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

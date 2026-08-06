@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openseo
+  namespace: openseo
+  labels:
+    app.kubernetes.io/name: openseo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openseo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openseo
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: openseo
+          image: ghcr.io/every-app/open-seo:v0.1.3
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3001"
+            - name: ALLOWED_HOST
+              value: openseo.nmajor.net
+            - name: AUTH_MODE
+              value: local_noauth
+            - name: CLOUDFLARE_INCLUDE_PROCESS_ENV
+              value: "true"
+            - name: OPENSEO_TELEMETRY_DISABLED
+              value: "1"
+            - name: DO_NOT_TRACK
+              value: "1"
+            - name: VITE_SHOW_DEVTOOLS
+              value: "false"
+            - name: DATAFORSEO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openseo-secrets
+                  key: dataforseo-api-key
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /app/.wrangler
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: openseo-data
