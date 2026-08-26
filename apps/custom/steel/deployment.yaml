@@ -44,6 +44,12 @@ spec:
             capabilities:
               drop:
                 - ALL
+              # The upstream image starts Nginx as root, changes ownership of
+              # its cache directories, then drops privileges for its workers.
+              add:
+                - CHOWN
+                - SETGID
+                - SETUID
           resources:
             requests:
               cpu: "1"
