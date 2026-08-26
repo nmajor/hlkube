@@ -48,6 +48,7 @@ spec:
               # its cache directories, then drops privileges for its workers.
               add:
                 - CHOWN
+                - DAC_OVERRIDE
                 - SETGID
                 - SETUID
           resources:
