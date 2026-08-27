@@ -34,12 +34,11 @@ spec:
           env:
             - name: HOST
               value: 0.0.0.0
-            # Stealth stays OFF for the first go-live: upstream Steel can crash on
-            # browser-create with fingerprint injection enabled (the reason the
-            # original deployment set this). Flip to enable stealth only after
-            # validating one pod doesn't crash. Captcha solving is unaffected.
+            # Stealth ON. The stealth-canary validated that fingerprint injection
+            # launches cleanly on this image (sessions go live, scraping works) —
+            # the old browser-create crash concern does not apply here.
             - name: SKIP_FINGERPRINT_INJECTION
-              value: "true"
+              value: "false"
             # Drives per-pod DOMAIN=steel-api.nmajor.net/s/<ordinal> in the
             # image entrypoint, so returned wss/https URLs route via the gateway.
             - name: STEEL_PUBLIC_HOST
