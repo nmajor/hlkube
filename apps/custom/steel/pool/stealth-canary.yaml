@@ -1,0 +1,78 @@
+# TEMPORARY stealth-validation canary. Verifies fingerprint injection does NOT
+# crash browser-create on our image (the reason stealth is off pool-wide) BEFORE
+# flipping the fleet. Isolated: distinct label, not selected by the pool Service,
+# headless Service, gateway, or their NetworkPolicies. Tested via direct
+# port-forward. DELETE this file (and its kustomization entry) after validation.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: steel-stealth-canary
+  namespace: steel
+  labels:
+    app.kubernetes.io/name: steel-stealth-canary
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: steel-stealth-canary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: steel-stealth-canary
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: steel
+          image: ghcr.io/nmajor/steel-browser:latest
+          imagePullPolicy: Always
+          env:
+            - name: HOST
+              value: 0.0.0.0
+            # The whole point: stealth ON.
+            - name: SKIP_FINGERPRINT_INJECTION
+              value: "false"
+          envFrom:
+            - secretRef:
+                name: steel-secrets
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - SETGID
+                - SETUID
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi

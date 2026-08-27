@@ -16,5 +16,6 @@ resources:
   - pool/gateway-service.yaml
   - pool/gateway-ingressroute.yaml
   - pool/network-policy.yaml
+  - pool/stealth-canary.yaml        # TEMP: stealth validation; remove after
   # Removed (pruned by Flux): deployment.yaml, pvc.yaml — replaced by the
   # StatefulSet + its volumeClaimTemplates.
