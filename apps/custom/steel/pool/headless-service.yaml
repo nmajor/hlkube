@@ -1,0 +1,19 @@
+# Headless service gives each Steel pod stable DNS: steel-<ordinal>.steel-headless.steel.svc.cluster.local
+# The gateway connects directly to steel-<i>...:3000 (pod port; no kube-proxy remap for headless DNS).
+apiVersion: v1
+kind: Service
+metadata:
+  name: steel-headless
+  namespace: steel
+  labels:
+    app.kubernetes.io/name: steel
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: false
+  selector:
+    app.kubernetes.io/name: steel
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      protocol: TCP

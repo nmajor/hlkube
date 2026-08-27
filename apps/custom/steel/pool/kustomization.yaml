@@ -1,0 +1,16 @@
+# Pool + gateway resources (self-contained; no cross-root `../` refs, so it
+# validates and works under Flux's kustomize load restrictions).
+#
+# INERT until wired. At go-live, edit apps/custom/steel/kustomization.yaml to
+# reference these from the parent root alongside namespace.yaml +
+# steel-secrets.sealed.yaml (see README.md). Flux ignores this dir until then.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - gateway-secrets.sealed.yaml       # STEEL_API_KEYS (per-agent)
+  - statefulset.yaml
+  - headless-service.yaml
+  - gateway-deployment.yaml
+  - gateway-service.yaml
+  - gateway-ingressroute.yaml
+  - network-policy.yaml

@@ -1,0 +1,20 @@
+# Agent-facing endpoint. Auth is enforced BY the gateway (per-agent API keys),
+# so no oauth2 middleware here — agents can't do interactive OAuth.
+#
+# GO-LIVE TODO: add a DNS record for steel-api.nmajor.net (Cloudflare) pointing
+# at the same tunnel/ingress as your other *.nmajor.net hosts.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: steel-gateway
+  namespace: steel
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`steel-api.nmajor.net`)
+      kind: Rule
+      services:
+        - name: steel-gateway
+          port: 80
+  tls: {}

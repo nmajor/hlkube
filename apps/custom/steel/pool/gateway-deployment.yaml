@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: steel-gateway
+  namespace: steel
+  labels:
+    app.kubernetes.io/name: steel-gateway
+spec:
+  # Single replica: the broker holds lease state in memory and reconstructs it
+  # from pod status on restart. One instance is plenty for a small pool.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: steel-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: steel-gateway
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+      containers:
+        - name: gateway
+          # TODO(go-live): pin to @sha256 digest from CI build
+          image: ghcr.io/nmajor/steel-gateway:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "8080"
+            - name: STEEL_REPLICAS
+              value: "3"
+            - name: STEEL_STATEFULSET_NAME
+              value: steel
+            - name: STEEL_HEADLESS_SVC
+              value: steel-headless.steel.svc.cluster.local
+            - name: STEEL_UPSTREAM_PORT
+              value: "3000"
+            - name: LEASE_TTL_MS
+              value: "1800000"
+          envFrom:
+            # Provides STEEL_API_KEYS (per-agent keys).
+            - secretRef:
+                name: steel-gateway-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
