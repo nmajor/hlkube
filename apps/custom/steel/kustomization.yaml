@@ -2,8 +2,19 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  - pvc.yaml
-  - deployment.yaml
+  - steel-secrets.sealed.yaml       # CAPSOLVER_API_KEY (+ 2captcha/proxy later)
+  # Human UI at steel.nmajor.net (oauth). The `steel` Service now load-balances
+  # across the pool pods; the per-pod session viewer is reachable via the gateway.
   - service.yaml
   - ingressroute.yaml
-  - network-policy.yaml
+  - network-policy.yaml             # traefik -> steel pods :3000 (UI)
+  # Pool + gateway.
+  - pool/gateway-secrets.sealed.yaml
+  - pool/statefulset.yaml
+  - pool/headless-service.yaml
+  - pool/gateway-deployment.yaml
+  - pool/gateway-service.yaml
+  - pool/gateway-ingressroute.yaml
+  - pool/network-policy.yaml
+  # Removed (pruned by Flux): deployment.yaml, pvc.yaml — replaced by the
+  # StatefulSet + its volumeClaimTemplates.

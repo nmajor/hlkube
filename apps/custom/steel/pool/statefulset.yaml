@@ -1,13 +1,7 @@
 # Steel pool. Each pod = one concurrent browser session. The gateway leases pods.
-#
-# GO-LIVE TODO:
-#   1. Pin `image:` to the digest of ghcr.io/nmajor/steel-browser built by CI
-#      (replace :latest with @sha256:...).
-#   2. Reconcile this pod spec with the other agent's crash-loop fix on
-#      apps/custom/steel/deployment.yaml (securityContext/probes/args), then
-#      delete deployment.yaml + steel-cache PVC (replaced by volumeClaimTemplates).
-#   3. Fingerprint stealth is ON here (no SKIP_FINGERPRINT_INJECTION) — only flip
-#      live once that fix confirms fingerprint injection no longer crashes.
+# Pod spec mirrors the fixed single Deployment (incl. DAC_OVERRIDE, commit 775a5ea).
+# Uses :latest + imagePullPolicy: Always (cluster pulls ghcr.io/nmajor via node
+# creds); pin to @sha256 later for immutable rollouts if desired.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -35,12 +29,17 @@ spec:
           type: RuntimeDefault
       containers:
         - name: steel
-          # TODO(go-live): pin to @sha256 digest from CI build
           image: ghcr.io/nmajor/steel-browser:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: HOST
               value: 0.0.0.0
+            # Stealth stays OFF for the first go-live: upstream Steel can crash on
+            # browser-create with fingerprint injection enabled (the reason the
+            # original deployment set this). Flip to enable stealth only after
+            # validating one pod doesn't crash. Captcha solving is unaffected.
+            - name: SKIP_FINGERPRINT_INJECTION
+              value: "true"
             # Drives per-pod DOMAIN=steel-api.nmajor.net/s/<ordinal> in the
             # image entrypoint, so returned wss/https URLs route via the gateway.
             - name: STEEL_PUBLIC_HOST
@@ -58,8 +57,11 @@ spec:
             capabilities:
               drop:
                 - ALL
+              # DAC_OVERRIDE inherited from the fixed Deployment (commit 775a5ea)
+              # — lets nginx write /var/log/nginx/access.log without crash-looping.
               add:
                 - CHOWN
+                - DAC_OVERRIDE
                 - SETGID
                 - SETUID
           resources:

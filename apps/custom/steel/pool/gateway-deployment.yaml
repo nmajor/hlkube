@@ -27,9 +27,8 @@ spec:
         runAsNonRoot: true
       containers:
         - name: gateway
-          # TODO(go-live): pin to @sha256 digest from CI build
           image: ghcr.io/nmajor/steel-gateway:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: PORT
               value: "8080"
