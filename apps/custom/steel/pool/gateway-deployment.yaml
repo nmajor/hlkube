@@ -25,6 +25,10 @@ spec:
         seccompProfile:
           type: RuntimeDefault
         runAsNonRoot: true
+        # node:alpine's `node` user is UID/GID 1000; numeric so the kubelet can
+        # verify non-root (a bare `USER node` fails runAsNonRoot admission).
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: gateway
           image: ghcr.io/nmajor/steel-gateway:latest
