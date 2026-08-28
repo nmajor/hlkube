@@ -66,12 +66,12 @@ curl -sX POST https://steel-api.nmajor.net/v1/screenshot \
 
 ## CAPTCHA solving (automatic)
 
-CapSolver runs inside the browser and solves challenges in-page with no action
-from you — just navigate and wait for the page to proceed.
-- ✅ Works: reCAPTCHA v2/v3/invisible/enterprise, hCaptcha, GeeTest, AWS WAF,
-  Amazon, image-to-text. (reCAPTCHA validated: solves headless in ~50s.)
-- ⚠️ Cloudflare **Turnstile** is currently NOT solving (`ERROR_INVALID_TASK_DATA`) —
-  don't rely on it yet.
+Two solver extensions run inside the browser and solve challenges in-page with
+no action from you — just navigate and wait for the page to proceed. They're
+partitioned by type so they never race:
+- **CapSolver** ✅ reCAPTCHA v2/v3/invisible/enterprise, hCaptcha, GeeTest,
+  AWS WAF, Amazon, image-to-text. (reCAPTCHA validated: solves headless in ~50s.)
+- **2Captcha** ✅ Cloudflare **Turnstile** (CapSolver's weak spot).
 - To **disable** captcha solving for a session, create it with `{"noCaptcha": true}`.
 
 ## Sensible defaults + per-session control

@@ -8,7 +8,7 @@ session and browse — no captcha/proxy flags to think about.
 
 | Capability | How | Where configured |
 |---|---|---|
-| **Captcha auto-solve** | Bakes the [CapSolver browser extension](https://github.com/capsolver/capsolver-browser-extension) into `/app/api/extensions/capsolver` and appends it to Steel's default-load list so it loads on **every** session | `Dockerfile` + `entrypoint-capsolver.sh` |
+| **Captcha auto-solve** | Bakes two solver extensions — [CapSolver](https://github.com/capsolver/capsolver-browser-extension) (`/app/api/extensions/capsolver`) and [2Captcha](https://github.com/rucaptcha/2captcha-solver) (`/app/api/extensions/twocaptcha`). The gateway injects both per session; the entrypoint partitions them (CapSolver = everything except Cloudflare; 2Captcha = Turnstile only) so they never race | `Dockerfile` + `entrypoint-capsolver.sh` |
 | **Stealth** | Upstream Steel already ships Apify fingerprint injection + WebRTC/AutomationControlled hardening; enable it by **not** setting `SKIP_FINGERPRINT_INJECTION=true` | `apps/custom/steel/deployment.yaml` env |
 | **Proxy** | Upstream `PROXY_URL` env / per-session `proxyUrl` (authenticated residential supported) | `steel-secrets` → `PROXY_URL` |
 

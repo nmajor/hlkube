@@ -35,16 +35,16 @@ t('keyFromReq: bearer / x-api-key / query', () => {
   assert.strictEqual(G.keyFromReq({ headers: {}, url: '/' }), null);
 });
 
-t('injectSessionBody: adds capsolver, preserves agent fields', () => {
+t('injectSessionBody: adds both solvers, preserves agent fields', () => {
   const out = G.injectSessionBody({ userAgent: 'UA', skipFingerprintInjection: true });
-  assert.deepStrictEqual(out.extensions, ['capsolver']);
+  assert.deepStrictEqual(out.extensions, ['capsolver', 'twocaptcha']);
   assert.strictEqual(out.userAgent, 'UA');
   assert.strictEqual(out.skipFingerprintInjection, true); // agent control preserved
 });
 
 t('injectSessionBody: unions with agent extensions, no dupe', () => {
   const out = G.injectSessionBody({ extensions: ['foo', 'capsolver'] });
-  assert.deepStrictEqual(out.extensions, ['foo', 'capsolver']);
+  assert.deepStrictEqual(out.extensions, ['foo', 'capsolver', 'twocaptcha']);
 });
 
 t('injectSessionBody: noCaptcha opts out and is stripped', () => {

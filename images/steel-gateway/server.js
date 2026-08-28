@@ -70,15 +70,17 @@ function keyFromReq(req) {
 }
 
 // Merge our defaults BENEATH the caller's body — caller values always win.
-// Ensures the CapSolver extension is present unless the caller opts out with
-// `noCaptcha: true` (which we strip so it never reaches Steel).
+// Ensures both captcha-solver extensions are present unless the caller opts out
+// with `noCaptcha: true` (which we strip so it never reaches Steel). CapSolver
+// covers most types; 2Captcha covers Turnstile (partitioned in the image config).
+const CAPTCHA_EXTENSIONS = ['capsolver', 'twocaptcha'];
 function injectSessionBody(body, opts = {}) {
   const b = body && typeof body === 'object' ? { ...body } : {};
   const optOut = b.noCaptcha === true;
   delete b.noCaptcha;
   if (opts.captcha !== false && !optOut) {
     const exts = Array.isArray(b.extensions) ? b.extensions.slice() : [];
-    if (!exts.includes('capsolver')) exts.push('capsolver');
+    for (const e of CAPTCHA_EXTENSIONS) if (!exts.includes(e)) exts.push(e);
     b.extensions = exts;
   }
   return b;

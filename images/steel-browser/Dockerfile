@@ -1,5 +1,8 @@
-# Custom Steel Browser image = upstream Steel + baked-in CapSolver auto-solving
-# extension, loaded on EVERY session so agents never pass a captcha flag.
+# Custom Steel Browser image = upstream Steel + two baked-in auto-solving
+# extensions, loaded on EVERY session so agents never pass a captcha flag:
+#   - CapSolver: reCAPTCHA v2/v3/enterprise, hCaptcha, GeeTest, AWS WAF, image.
+#   - 2Captcha:  Cloudflare Turnstile only (CapSolver's weak spot).
+# They are partitioned by captcha type (see the entrypoint) so they never race.
 #
 # Stealth (Apify fingerprint injection) is built into upstream Steel and toggled
 # at runtime via the SKIP_FINGERPRINT_INJECTION env in the Deployment — not here.
@@ -23,12 +26,24 @@ RUN set -eux; \
     test -f /app/api/extensions/capsolver/manifest.json; \
     test -f /app/api/extensions/capsolver/assets/config.js
 
-# NOTE: We deliberately DO NOT patch Steel's internals to auto-load the extension.
-# The steel-gateway injects `extensions: ["capsolver"]` into every session-create,
-# so this image stays a pure additive layer over upstream — upgrading is just a
-# matter of bumping the FROM digest. The extension only needs to be *present*
-# here (vendored above); the gateway decides when to load it.
+# --- Vendor the 2Captcha browser extension (pinned release) — Turnstile fallback ---
+ARG TWOCAPTCHA_VERSION=3.7.2
+ARG TWOCAPTCHA_ZIP_URL=https://github.com/rucaptcha/2captcha-solver/releases/download/v3.7.2/2captcha-solver-chrome-3.7.2.zip
 
-# --- Runtime: seed the CapSolver API key from env into config.js, then hand off ---
+RUN set -eux; \
+    mkdir -p /app/api/extensions/twocaptcha; \
+    curl -fsSL -o /tmp/twocaptcha.zip "${TWOCAPTCHA_ZIP_URL}"; \
+    unzip -oq /tmp/twocaptcha.zip -d /app/api/extensions/twocaptcha; \
+    rm -f /tmp/twocaptcha.zip; \
+    test -f /app/api/extensions/twocaptcha/manifest.json; \
+    test -f /app/api/extensions/twocaptcha/common/config.js
+
+# NOTE: We deliberately DO NOT patch Steel's internals to auto-load extensions.
+# The steel-gateway injects `extensions: ["capsolver","twocaptcha"]` into every
+# session-create, so this image stays a pure additive layer over upstream —
+# upgrading is just a matter of bumping the FROM digest. The extensions only need
+# to be *present* here (vendored above); the gateway decides when to load them.
+
+# --- Runtime: seed both solvers' API keys + partition config, then hand off ---
 COPY --chmod=755 entrypoint-capsolver.sh /usr/local/bin/entrypoint-capsolver.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint-capsolver.sh"]
