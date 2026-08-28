@@ -20,6 +20,10 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: steel
+      annotations:
+        # Bump to force a rollout onto the latest :latest image (e.g. after an
+        # image rebuild). Value is arbitrary; changing it triggers pod recreation.
+        steel.nmajor.net/image-rev: "2-dual-solver"
     spec:
       automountServiceAccountToken: false
       enableServiceLinks: false

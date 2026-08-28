@@ -18,6 +18,9 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: steel-gateway
+      annotations:
+        # Bump to force a rollout onto the latest :latest image after a rebuild.
+        steel.nmajor.net/image-rev: "2-dual-solver"
     spec:
       automountServiceAccountToken: false
       enableServiceLinks: false
