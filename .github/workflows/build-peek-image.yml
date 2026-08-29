@@ -1,0 +1,48 @@
+name: Build Peek Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-peek-image.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/peek
+  # Pin the upstream source rather than building an unreviewed moving branch.
+  PEEK_COMMIT: 02b3a422eca5c89bf878b87556ad65104e781016
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out pinned Peek source
+        uses: actions/checkout@v4
+        with:
+          repository: puemos/peek
+          ref: ${{ env.PEEK_COMMIT }}
+          path: peek
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: peek
+          push: true
+          platforms: linux/amd64
+          provenance: false
+          build-args: |
+            VERSION=upstream-${{ env.PEEK_COMMIT }}
+            COMMIT=${{ env.PEEK_COMMIT }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:upstream-02b3a422eca5

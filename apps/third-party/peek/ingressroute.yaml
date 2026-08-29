@@ -1,0 +1,20 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: peek
+  namespace: peek
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # Prometheus scrapes /metrics through the internal Service. Do not expose
+    # operational telemetry on the public review hostname.
+    - match: Host(`peek.nmajor.net`) && !PathPrefix(`/metrics`)
+      kind: Rule
+      middlewares:
+        - name: header-transform
+          namespace: traefik
+      services:
+        - name: peek
+          port: 7700
+  tls: {}

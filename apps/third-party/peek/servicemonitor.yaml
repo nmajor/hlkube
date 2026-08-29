@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: peek
+  namespace: peek
+  labels:
+    app.kubernetes.io/name: peek
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: peek
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
