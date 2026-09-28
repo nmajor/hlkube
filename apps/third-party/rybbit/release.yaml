@@ -6,6 +6,8 @@ metadata:
 spec:
   interval: 15m
   timeout: 30m
+  dependsOn:
+    - name: rybbit-valkey
   chart:
     spec:
       chart: rybbit
@@ -46,9 +48,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/rybbit-io/rybbit-backend
-        # Keep the currently deployed build reproducible until the 0.5.x
-        # database migration is planned and backed up.
-        tag: latest@sha256:5cc0bd7b835119c12704b41c43681956c258a682f7fa0b9fb3c80fd66f242f91
+        tag: v2.8.0@sha256:f729f42575bf018ff97e9f36d49200665b99003a14868acbe56a9b32a9ed6ac7
       resources:
         requests:
           cpu: 200m
@@ -62,6 +62,9 @@ spec:
       env:
         BASE_URL: https://rybbit.nmajor.net
         DISABLE_SIGNUP: "true"
+        # Required by Rybbit v2.7+ for session tracking and job queues.
+        REDIS_HOST: rybbit-valkey-primary.rybbit.svc.cluster.local
+        REDIS_PORT: "6379"
 
     # Client (frontend) configuration
     client:
@@ -69,7 +72,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/rybbit-io/rybbit-client
-        tag: latest@sha256:7977a4b7742aebde575c6087490f8c00d8c21499fb0e60fbce88103c4a0f2176
+        tag: v2.8.0@sha256:f384c1f73a0c2fc0794526908a1fdb2ba410a5cdb3f105487af70f067c8f103a
       resources:
         requests:
           cpu: 100m
@@ -141,3 +144,31 @@ spec:
         enabled: false
       client:
         enabled: false
+
+  # The current Rybbit chart does not expose a secret-backed environment
+  # variable interface. Add the Valkey password after Helm renders the
+  # backend Deployment, keeping the credential out of Helm values and Git.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: rybbit-backend
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: rybbit-backend
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: backend
+                        env:
+                          - name: REDIS_PASSWORD
+                            valueFrom:
+                              secretKeyRef:
+                                name: rybbit-valkey-auth
+                                key: password

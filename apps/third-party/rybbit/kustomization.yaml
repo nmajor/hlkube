@@ -4,6 +4,8 @@ resources:
   - namespace.yaml
   - rybbit-secrets.sealed.yaml
   - helm-values.sealed.yaml
+  - valkey-auth.sealed.yaml
+  - valkey-release.yaml
   - release.yaml
   - database-backup-pvc.yaml
   - ingress.yaml

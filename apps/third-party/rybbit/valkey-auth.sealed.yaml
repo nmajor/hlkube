@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: rybbit-valkey-auth
+  namespace: rybbit
+spec:
+  encryptedData:
+    password: AgB4+ZZAN/AUxVJXoDiPzCMYnNrc/pvE8aGDrnoCHObvrGx5LZ22TALTBwmcv9gRyNfyIPefbpHAzX/DCQmeWQd5rrvkn6q1nYJW4W3a6bA2Tn7h6yizEShXCeQTIL5afdUG/0Xz+JrtdcYh0BCT1bejPnZPrZWBEso1CNEb9Pr0/gnNBIpH3z0xKhAhoFcvJReinJxCRrUkeH4OK3UD/p5tcBzWSmKYbFDmR96CLyssWoJ+Icq3XpT32Rl+wdV/ojGntNbWzijIt663Fvxu32SmUx6p2nOxX02JnmDJHk10DNXPWw8bBCOU/j1T8IpWVX44uo31KAg21nygJCJQ9HgdksBc6yQw1RZSsuI3TjEyjibG5Cg5ZjDLtF7J47yCV6u06IZhIboopliXycF7DSe+Ygbk6zh9TJrbwSyPJLAbUb4ZNpPOBelYTNielTPbH09ZbpXeMmcC2zMrx5mai6pozae1v2HyQXYYsJ8Ip2itH4699q5Y9w2m1XA6hq3eUuyU1pnW6qlulQwbHb3JkvKBrk7ZIDIUpUmCL1fo79IU2VVviZ5kg9y+fTIuUq1scnnLiwNqoAGVmBVGKm4kznGnxBxjZVLE7wrq7sj8yr5PgHDL7zmf7/3H0Ogv1rFlmS2wj+Nt5/McpFz1QmmlwCMiPaGlOM8xyHvXtRpNK2gyaIVBPefSFO9i6BRQXbu/mXnphbFNZZ7YeL1GgIyaggjT8tClfaA0dAqVJlTwdR5h6z3UTRYJTuAP3YVbcIHJgfA5i2yN1aPvdQNuzVMBA0Xy
+  template:
+    metadata:
+      creationTimestamp: null
+      name: rybbit-valkey-auth
+      namespace: rybbit
+    type: Opaque
