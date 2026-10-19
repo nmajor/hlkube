@@ -1,0 +1,139 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hlkube-desktopaccountingapi
+  namespace: arc-desktopaccountingapi
+spec:
+  # Activate only after the sealed credential and runner image are available.
+  suspend: true
+  interval: 30m
+  dependsOn:
+    - name: arc-controller
+      namespace: arc-system
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      version: "0.15.0"
+      sourceRef:
+        kind: HelmRepository
+        name: arc-scale-sets
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    githubConfigUrl: https://github.com/DesktopAccountingAPI
+    githubConfigSecret: desktopaccountingapi-github-app
+    runnerScaleSetName: hlkube-desktopaccountingapi
+    minRunners: 0
+    maxRunners: 2
+    controllerServiceAccount:
+      name: arc-controller
+      namespace: arc-system
+    # Explicit upstream DinD pod template so every image and resource is pinned.
+    # Do not also set containerMode: the chart would inject its own DinD template.
+    template:
+      metadata:
+        labels:
+          hlkube.nmajor.net/runner: desktopaccountingapi
+      spec:
+        automountServiceAccountToken: false
+        nodeSelector:
+          kubernetes.io/os: linux
+          kubernetes.io/arch: amd64
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: node-role.kubernetes.io/control-plane
+                      operator: DoesNotExist
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    hlkube.nmajor.net/runner: desktopaccountingapi
+                topologyKey: kubernetes.io/hostname
+        initContainers:
+          - name: init-dind-externals
+            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1
+            command: [cp, -r, /home/runner/externals/., /home/runner/tmpDir/]
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: "1"
+                memory: 256Mi
+            volumeMounts:
+              - name: dind-externals
+                mountPath: /home/runner/tmpDir
+          - name: dind
+            image: docker:29.9.1-dind@sha256:3e5756e2b6dad6a5f1f5deacf0a19f9eaa2581b76ae092b2d4a118162e1d4d4e
+            restartPolicy: Always
+            args: [dockerd, --host=unix:///var/run/docker.sock, --group=123]
+            env:
+              - name: DOCKER_TLS_CERTDIR
+                value: ""
+            securityContext:
+              privileged: true
+            startupProbe:
+              exec:
+                command: [docker, info]
+              periodSeconds: 5
+              failureThreshold: 24
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+                ephemeral-storage: 5Gi
+              limits:
+                cpu: "2"
+                memory: 4Gi
+                ephemeral-storage: 25Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+              - name: dind-externals
+                mountPath: /home/runner/externals
+              - name: docker-data
+                mountPath: /var/lib/docker
+        containers:
+          - name: runner
+            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1
+            command: [/home/runner/run.sh]
+            env:
+              - name: DOCKER_HOST
+                value: unix:///var/run/docker.sock
+              - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+                value: "120"
+            resources:
+              requests:
+                cpu: "2"
+                memory: 8Gi
+                ephemeral-storage: 5Gi
+              limits:
+                cpu: "4"
+                memory: 12Gi
+                ephemeral-storage: 15Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+        volumes:
+          - name: work
+            emptyDir:
+              sizeLimit: 10Gi
+          - name: dind-sock
+            emptyDir: {}
+          - name: dind-externals
+            emptyDir: {}
+          - name: docker-data
+            emptyDir:
+              sizeLimit: 20Gi

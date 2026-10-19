@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: arc-desktopaccountingapi
+  labels:
+    # Docker-in-Docker requires a privileged sidecar. Jobs have no Kubernetes token.
+    pod-security.kubernetes.io/enforce: privileged

@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-controller
+  namespace: arc-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: gha-runner-scale-set-controller
+      version: "0.15.0"
+      sourceRef:
+        kind: HelmRepository
+        name: arc-scale-sets
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    image:
+      tag: "0.15.0@sha256:162dfb5bfbda9e7e49fbed67d428994c9ced55b41a37a18b75b46dab0aa98d37"
+    serviceAccount:
+      name: arc-controller
+    flags:
+      logLevel: info
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi

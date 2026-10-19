@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - release.yaml
+  # Add github-app.sealed.yaml after the owner populates github-app.secret
+  # and ./seal-secrets.sh generates it. Unsuspend the release at the same time.

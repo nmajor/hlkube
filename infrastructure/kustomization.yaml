@@ -13,4 +13,5 @@ resources:
   - monitoring
   - cloudnativepg
   - actions-runner-controller
+  - arc-scale-set-controller
   - docker-registry
