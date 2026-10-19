@@ -59,7 +59,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
         initContainers:
           - name: init-dind-externals
-            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1
+            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1@sha256:b1d804830933279dd9f7e97d8d0b0807e0ae15320f8d347ec2ad3cf79b619b06
             command: [cp, -r, /home/runner/externals/., /home/runner/tmpDir/]
             resources:
               requests:
@@ -105,7 +105,7 @@ spec:
                 mountPath: /var/lib/docker
         containers:
           - name: runner
-            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1
+            image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1@sha256:b1d804830933279dd9f7e97d8d0b0807e0ae15320f8d347ec2ad3cf79b619b06
             command: [/home/runner/run.sh]
             env:
               - name: DOCKER_HOST

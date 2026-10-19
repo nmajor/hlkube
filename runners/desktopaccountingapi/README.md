@@ -1,8 +1,9 @@
 # DesktopAccountingAPI runners
 
-Status: prepared, suspended pending GitHub App credentials, registry checks,
-runner-image publication and end-to-end verification. The legacy runner for
-`nmajor/hlkube` remains separate during this rollout.
+Status: ARC 0.15.0 is deployed and healthy on worker `w3`. The generic runner image
+was built and verified by GitHub Actions and an anonymous registry pull. The pool
+is deployed but suspended pending GitHub App credentials and end-to-end CI
+verification. The legacy runner for `nmajor/hlkube` remains separate.
 
 ## Configuration
 
@@ -53,20 +54,16 @@ SealedSecret or copy an encrypted value between namespaces.
 
 ## Activation sequence
 
-1. Validate both charts from the exact release source and all Kustomizations.
-   Confirm Flux can pull the OCI chart repository. Anonymous registry manifest
-   checks passed for both pinned charts, the controller, the base runner and DinD.
-   Local Helm chart pulls initially returned HTTP 403; direct registry checks
-   confirmed availability. Check Flux's own chart-source status during deployment.
-2. Commit/push the runner image workflow and infrastructure through GitOps.
-   Keep this HelmRelease suspended until its prerequisites pass. The existing
-   local working tree has unrelated changes; stage only runner-related files.
-3. Wait for `Build Actions Runner Image` to build, verify and publish
-   `ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1`. On first publication GitHub
-   Packages defaults to private: make **this generic runner image** public in
-   its package settings and verify an anonymous manifest pull. It contains only
-   the public Dockerfile and upstream tools, never private application sources.
-   Private application images may stay private.
+1. Completed: both charts linted/rendered from the exact release source; runner
+   and infrastructure Kustomizations built successfully. Flux pulled and
+   installed the pinned controller chart, and its pod is healthy.
+2. Completed: image workflow and staged infrastructure committed/pushed through
+   GitOps. Only runner-related changes were staged; unrelated work was preserved.
+3. Completed: [Build Actions Runner Image](https://github.com/nmajor/hlkube/actions/runs/39238316889)
+   built, verified and published `ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1`.
+   Anonymous pull succeeded; both pod-template references pin its digest.
+   It contains only the public Dockerfile and upstream tools, never private
+   application sources. Private application images may stay private.
 4. Verify the GitHub App authentication and default runner group's private-only
    access. Seal and add the credential as described above. Set `suspend: false`
    here and commit/push. Flux waits for `arc-controller` before installing this
