@@ -2,11 +2,10 @@
 
 Status: ARC 0.15.0 is deployed and healthy on worker `w3`. The generic runner image
 was built and verified by GitHub Actions and an anonymous registry pull. The pool
-is deployed but suspended pending GitHub App runner permissions and end-to-end
-CI verification. The App key and installation were authenticated successfully;
-the populated credential was encrypted with the repository's sealing script.
-GitHub currently reports no permissions on the installation, so enable and
-approve **Self-hosted runners: Read and write** before activating the pool.
+is enabled, with end-to-end CI verification pending. The App key and installation
+authenticated successfully, and **Self-hosted runners: Read and write** is approved.
+The default organization runner group excludes public repositories. The populated
+credential was encrypted with the repository's sealing script.
 The legacy runner for `nmajor/hlkube` remains separate.
 
 ## Configuration

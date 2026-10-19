@@ -4,8 +4,7 @@ metadata:
   name: hlkube-desktopaccountingapi
   namespace: arc-desktopaccountingapi
 spec:
-  # Activate only after the sealed credential and runner image are available.
-  suspend: true
+  suspend: false
   interval: 30m
   dependsOn:
     - name: arc-controller
