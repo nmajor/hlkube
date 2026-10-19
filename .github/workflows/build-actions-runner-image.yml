@@ -1,0 +1,55 @@
+name: Build Actions Runner Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - images/actions-runner/**
+      - .github/workflows/build-actions-runner-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: build-actions-runner-image
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image for verification
+        uses: docker/build-push-action@v6
+        with:
+          context: images/actions-runner
+          platforms: linux/amd64
+          load: true
+          tags: hlkube-actions-runner:verify
+      - name: Verify runner prerequisites
+        run: |
+          docker run --rm hlkube-actions-runner:verify bash -euc '
+            test "$(id -u)" = 1001
+            /home/runner/bin/Runner.Listener --version
+            for tool in git curl jq sudo docker flock gcc g++ make tar unzip zip xz rsync; do
+              command -v "$tool"
+            done
+            docker buildx version
+            sudo -n true
+          '
+      - name: Publish verified image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/hlkube-actions-runner"
+          docker tag hlkube-actions-runner:verify "$image:2.338.0-1"
+          docker tag hlkube-actions-runner:verify "$image:sha-$GITHUB_SHA"
+          docker push "$image:2.338.0-1"
+          docker push "$image:sha-$GITHUB_SHA"
