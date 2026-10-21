@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: cloudflared
-          image: cloudflare/cloudflared:2025.8.1
+          image: cloudflare/cloudflared:2026.10.2@sha256:0e56c13c7058fcef9c4f0e7d83372f82330548dbf8f8b366f3d8b506526d93b2
           # Token-based (remotely-managed) connector for Cloudflare Workers VPC.
           # Routing is defined on Cloudflare's side by VPC Services (created with
           # `wrangler vpc service create`), NOT by a local ingress config. This
