@@ -9,3 +9,7 @@ resources:
   - release.yaml
   - database-backup-pvc.yaml
   - ingress.yaml
+
+namespace: rybbit
+components:
+  - ../../../components/public-ca-trust

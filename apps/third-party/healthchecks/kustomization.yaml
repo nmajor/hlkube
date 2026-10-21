@@ -9,3 +9,9 @@ resources:
   - service.yaml
   - public-headers-middleware.yaml
   - ingress.yaml
+
+namespace: healthchecks
+components:
+  - ../../../components/public-ca-trust
+patches:
+  - path: public-ca-trust-patch.yaml

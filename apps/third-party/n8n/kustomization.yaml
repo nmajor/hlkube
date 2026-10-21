@@ -16,3 +16,9 @@ resources:
   - service.yaml
   - webhook-service.yaml
   - ingress.yaml
+
+namespace: n8n
+components:
+  - ../../../components/public-ca-trust
+patches:
+  - path: public-ca-trust-patch.yaml

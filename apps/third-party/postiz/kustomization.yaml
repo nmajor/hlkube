@@ -21,3 +21,9 @@ resources:
   - static-pages.yaml
   - service.yaml
   - ingress.yaml
+
+namespace: postiz
+components:
+  - ../../../components/public-ca-trust
+patches:
+  - path: public-ca-trust-patch.yaml

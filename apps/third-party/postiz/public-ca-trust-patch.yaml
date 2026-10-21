@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postiz
+  namespace: postiz
+spec:
+  template:
+    metadata:
+      annotations:
+        security.hlkube.net/ca-bundle-sha256: 796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
+    spec:
+      volumes:
+      - name: public-ca-trust
+        configMap:
+          name: public-ca-trust
+      containers:
+      - name: postiz
+        env:
+        - name: SSL_CERT_FILE
+          value: "/etc/hlkube-ca/ca-bundle.pem"
+        - name: SSL_CERT_DIR
+          value: "/etc/hlkube-ca/empty"
+        - name: REQUESTS_CA_BUNDLE
+          value: "/etc/hlkube-ca/ca-bundle.pem"
+        - name: CURL_CA_BUNDLE
+          value: "/etc/hlkube-ca/ca-bundle.pem"
+        - name: PIP_CERT
+          value: "/etc/hlkube-ca/ca-bundle.pem"
+        - name: GIT_SSL_CAINFO
+          value: "/etc/hlkube-ca/ca-bundle.pem"
+        - name: NODE_OPTIONS
+          value: "--use-openssl-ca"
+        volumeMounts:
+        - name: public-ca-trust
+          mountPath: "/etc/hlkube-ca"
+          readOnly: true
