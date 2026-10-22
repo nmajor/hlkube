@@ -1,6 +1,6 @@
 # Temporary host TLS probes
 
-These Pods test kubelet/containerd image-fetch TLS on each node, separately from
+This DaemonSet creates a Pod per node to test kubelet/containerd image-fetch TLS on each node, separately from
 Talos's API image resolver. All three image references deliberately do not
 exist. No test container is expected to start.
 
@@ -13,6 +13,9 @@ are inconclusive; inspect each container's detailed waiting message/events.
 Before host remediation, a nonexistent-image error for an eMudhra host means the
 TLS chain was accepted and the node remains affected. After rebooting with the
 committed CA patch, both must change to certificate rejection.
+
+The DaemonSet recreates its probes after node shutdown, so checks use fresh
+containerd processes following each reboot.
 
 The dedicated Flux Kustomization intentionally has `wait: false` because Pending
 Pods are the expected negative-test result. Remove
