@@ -1,0 +1,648 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-cp1",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "cp1",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-cp2",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "cp2",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-cp3",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "cp3",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-w1",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "w1",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-w2",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "w2",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "tls-w3",
+        "namespace": "talos-trust-check",
+        "labels": {
+          "security.hlkube.net/check": "host-public-ca"
+        }
+      },
+      "spec": {
+        "nodeName": "w3",
+        "automountServiceAccountToken": false,
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 1,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "emudhra-direct",
+            "image": "dv-g3b-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "emudhra-cross-sign",
+            "image": "dv-g3b-aaa-emudhra.we-have-a-problem.com/hlkube-ca-probe:never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          },
+          {
+            "name": "valid-registry-control",
+            "image": "registry.k8s.io/pause:hlkube-ca-probe-never-exists-20261022",
+            "imagePullPolicy": "Always",
+            "command": [
+              "/hlkube-ca-probe-must-never-run"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1m",
+                "memory": "8Mi"
+              },
+              "limits": {
+                "cpu": "10m",
+                "memory": "32Mi"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
