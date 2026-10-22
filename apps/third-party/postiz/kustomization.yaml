@@ -27,16 +27,3 @@ components:
   - ../../../components/public-ca-trust
 patches:
   - path: public-ca-trust-patch.yaml
-  # Preserve an explicit null in the rendered manifest so Flux can clear the
-  # API-defaulted RollingUpdate fields when switching the existing Deployment.
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      name: elasticsearch
-    patch: |-
-      - op: add
-        path: /spec/strategy
-        value:
-          type: Recreate
-          rollingUpdate: null
