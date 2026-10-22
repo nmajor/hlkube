@@ -42,6 +42,9 @@ metadata:
   name: elasticsearch
   namespace: postiz
 spec:
+  strategy:
+    type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       annotations:
