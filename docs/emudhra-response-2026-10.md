@@ -24,6 +24,13 @@ are separate checks.
 - ARC's listener has explicit restricted-pod security settings; its namespace
   policy remains enforced. Listener runs in `arc-system`, where the same public
   CA ConfigMap is supplied by infrastructure.
+- The Mac system CA file was filtered with the local administrator helper.
+  Both affected roots are absent; explicit system-bundle curl checks rejected
+  both controlled bad chains and accepted GitHub HTTPS.
+- Coder template `emudhra-61055fe` was imported successfully and promoted active
+  from committed source (`61055fe`). All nine workspaces have automatic updates
+  enabled for future starts. The running `nick/supertools` workspace still uses
+  the previous template until its restart is authorized and completed.
 - Homebrew's public CA bundle was replaced. New zsh sessions source
   `scripts/public-ca-env.sh` for Node, Python, curl, Git, AWS, Hex and Java client
   configuration. Already-running processes need to restart or reload settings.
@@ -58,16 +65,16 @@ with valid HTTPS (GitHub was used here).
 
 ## Outstanding work
 
-1. **Mac system CA file:** `/etc/ssl/cert.pem` still contained both affected roots
-   on the last check. Run `./scripts/fix-macos-ca-trust.sh` locally; it requests
-   the administrator password locally and preserves an original-file backup.
-   Verify the system curl path separately from environment overrides afterward.
-2. **Coder workspaces:** the saved CLI session expired. Run
-   `coder login https://coder.nmajor.net`. Workspace-template changes are
-   prepared in `main.tf` and passed Terraform provider validation, but are not
-   published. All five containers need the namespace-local CA volume and runtime
-   settings. Update the three running workspaces one at a time through Coder;
-   preserve PVCs, then test Node/Python/Erlang/Hex and browser behavior.
+1. **Coder running workspace:** the local login is renewed and the fixed template
+   is published. `nick/supertools` is the only running workspace in the latest
+   authenticated inventory; the user has been asked when it can restart.
+   Preserve its PVCs, update through Coder, then test Node/Python/Erlang/Hex and
+   browser behavior. Stopped workspaces update on their next start.
+2. **CI template publishing:** the GitHub workflow failed because repository
+   secret `CODER_SESSION_TOKEN` is absent. The security template was published
+   using the renewed local session instead. Automatic publishing remains
+   blocked until a suitable CI credential is configured; no local session token
+   was copied into GitHub.
 3. **Talos hosts:** the sampled Talos 1.9.5 host bundle contains both affected
    roots. This is separate from pod trust. The version-specific trusted-roots
    controller appends configured roots to its embedded defaults; adding a CA
