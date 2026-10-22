@@ -95,6 +95,9 @@ spec:
                       -Djavax.net.ssl.trustStoreType=JKS"
                   volumeMounts:
                   - *1
+            strategy:
+              type: Recreate
+              rollingUpdate:
       - target:
           group: apps
           version: v1
