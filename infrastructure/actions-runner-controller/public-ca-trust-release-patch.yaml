@@ -1,0 +1,142 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: actions-runner-controller
+  namespace: actions-runner-system
+spec:
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          group: apps
+          version: v1
+          kind: Deployment
+          name: actions-runner-controller
+        patch: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: actions-runner-controller
+          spec:
+            template:
+              metadata:
+                annotations:
+                  security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+              spec:
+                volumes:
+                - name: public-ca-trust
+                  configMap:
+                    name: public-ca-trust
+                containers:
+                - name: manager
+                  env:
+                  - name: SSL_CERT_FILE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: SSL_CERT_DIR
+                    value: "/etc/hlkube-ca/empty"
+                  - name: REQUESTS_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: CURL_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: PIP_CERT
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: GIT_SSL_CAINFO
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: NODE_OPTIONS
+                    value: "--use-openssl-ca"
+                  - name: JAVA_TOOL_OPTIONS
+                    value: "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit
+                      -Djavax.net.ssl.trustStoreType=JKS"
+                  volumeMounts:
+                  - &1
+                    name: public-ca-trust
+                    mountPath: "/etc/hlkube-ca"
+                    readOnly: true
+                - name: kube-rbac-proxy
+                  env:
+                  - name: SSL_CERT_FILE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: SSL_CERT_DIR
+                    value: "/etc/hlkube-ca/empty"
+                  - name: REQUESTS_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: CURL_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: PIP_CERT
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: GIT_SSL_CAINFO
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: NODE_OPTIONS
+                    value: "--use-openssl-ca"
+                  - name: JAVA_TOOL_OPTIONS
+                    value: "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit
+                      -Djavax.net.ssl.trustStoreType=JKS"
+                  volumeMounts:
+                  - *1
+      - target:
+          group: apps
+          version: v1
+          kind: Deployment
+          name: actions-runner-controller-github-webhook-server
+        patch: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: actions-runner-controller-github-webhook-server
+          spec:
+            template:
+              metadata:
+                annotations:
+                  security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+              spec:
+                volumes:
+                - name: public-ca-trust
+                  configMap:
+                    name: public-ca-trust
+                containers:
+                - name: github-webhook-server
+                  env:
+                  - name: SSL_CERT_FILE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: SSL_CERT_DIR
+                    value: "/etc/hlkube-ca/empty"
+                  - name: REQUESTS_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: CURL_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: PIP_CERT
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: GIT_SSL_CAINFO
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: NODE_OPTIONS
+                    value: "--use-openssl-ca"
+                  - name: JAVA_TOOL_OPTIONS
+                    value: "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit
+                      -Djavax.net.ssl.trustStoreType=JKS"
+                  volumeMounts:
+                  - &1
+                    name: public-ca-trust
+                    mountPath: "/etc/hlkube-ca"
+                    readOnly: true
+                - name: kube-rbac-proxy
+                  env:
+                  - name: SSL_CERT_FILE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: SSL_CERT_DIR
+                    value: "/etc/hlkube-ca/empty"
+                  - name: REQUESTS_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: CURL_CA_BUNDLE
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: PIP_CERT
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: GIT_SSL_CAINFO
+                    value: "/etc/hlkube-ca/ca-bundle.pem"
+                  - name: NODE_OPTIONS
+                    value: "--use-openssl-ca"
+                  - name: JAVA_TOOL_OPTIONS
+                    value: "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit
+                      -Djavax.net.ssl.trustStoreType=JKS"
+                  volumeMounts:
+                  - *1

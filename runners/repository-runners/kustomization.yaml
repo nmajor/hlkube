@@ -3,3 +3,6 @@ kind: Kustomization
 resources:
   - runnerdeployment.yaml
   - autoscaler.yaml
+
+patches:
+  - path: public-ca-trust-patch.yaml

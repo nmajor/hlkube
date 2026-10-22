@@ -1,6 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - public-ca-trust
   - namespace.yaml
   - release.yaml
 
@@ -12,3 +13,6 @@ resources:
 
   - ingress.yaml
   - servicemonitor.yaml
+
+patches:
+  - path: public-ca-trust-release-patch.yaml

@@ -5,6 +5,11 @@ The accompanying https://curl.se/ca/cacert.pem.sha256 was checked before use.
 
 SHA256: `796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe`
 
+`cacerts` is a Java JKS trust store generated with `keytool` from exactly these
+118 public CA certificates. Its conventional integrity password is `changeit`;
+it contains public certificates only, no private keys or credentials. Java
+consumers select it through `JAVA_TOOL_OPTIONS` in their workload patches.
+
 This emergency mitigation excludes the trust paths for the October 2026 eMudhra
 intermediate-key compromise, including the AAA Certificate Services cross-signs.
 All twelve public test chains supplied by the incident researcher were rejected

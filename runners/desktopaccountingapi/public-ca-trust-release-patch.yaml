@@ -1,0 +1,178 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hlkube-desktopaccountingapi
+  namespace: arc-desktopaccountingapi
+spec:
+  values:
+    template:
+      metadata:
+        labels:
+          hlkube.nmajor.net/runner: desktopaccountingapi
+        annotations:
+          security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+      spec:
+        automountServiceAccountToken: false
+        nodeSelector:
+          kubernetes.io/os: linux
+          kubernetes.io/arch: amd64
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  hlkube.nmajor.net/runner: desktopaccountingapi
+              topologyKey: kubernetes.io/hostname
+        initContainers:
+        - name: init-dind-externals
+          image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1@sha256:b1d804830933279dd9f7e97d8d0b0807e0ae15320f8d347ec2ad3cf79b619b06
+          command:
+          - cp
+          - "-r"
+          - "/home/runner/externals/."
+          - "/home/runner/tmpDir/"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: '1'
+              memory: 256Mi
+          volumeMounts:
+          - name: dind-externals
+            mountPath: "/home/runner/tmpDir"
+        - name: dind
+          image: docker:29.9.1-dind@sha256:3e5756e2b6dad6a5f1f5deacf0a19f9eaa2581b76ae092b2d4a118162e1d4d4e
+          restartPolicy: Always
+          args:
+          - dockerd
+          - "--host=unix:///var/run/docker.sock"
+          - "--group=123"
+          env:
+          - name: DOCKER_TLS_CERTDIR
+            value: ''
+          - &1
+            name: SSL_CERT_FILE
+            value: "/etc/hlkube-ca/ca-bundle.pem"
+          - &2
+            name: SSL_CERT_DIR
+            value: "/etc/hlkube-ca/empty"
+          - &3
+            name: REQUESTS_CA_BUNDLE
+            value: "/etc/hlkube-ca/ca-bundle.pem"
+          - &4
+            name: CURL_CA_BUNDLE
+            value: "/etc/hlkube-ca/ca-bundle.pem"
+          - &5
+            name: PIP_CERT
+            value: "/etc/hlkube-ca/ca-bundle.pem"
+          - &6
+            name: GIT_SSL_CAINFO
+            value: "/etc/hlkube-ca/ca-bundle.pem"
+          securityContext:
+            privileged: true
+          startupProbe:
+            exec:
+              command:
+              - docker
+              - info
+            periodSeconds: 5
+            failureThreshold: 24
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+              ephemeral-storage: 5Gi
+            limits:
+              cpu: '2'
+              memory: 4Gi
+              ephemeral-storage: 25Gi
+          volumeMounts:
+          - name: work
+            mountPath: "/home/runner/_work"
+          - name: dind-sock
+            mountPath: "/var/run"
+          - name: dind-externals
+            mountPath: "/home/runner/externals"
+          - name: docker-data
+            mountPath: "/var/lib/docker"
+          - &7
+            name: public-ca-trust
+            mountPath: "/etc/hlkube-ca"
+            readOnly: true
+        containers:
+        - name: runner
+          image: ghcr.io/nmajor/hlkube-actions-runner:2.338.0-1@sha256:b1d804830933279dd9f7e97d8d0b0807e0ae15320f8d347ec2ad3cf79b619b06
+          command:
+          - "/home/runner/run.sh"
+          env:
+          - name: DOCKER_HOST
+            value: unix:///var/run/docker.sock
+          - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+            value: '120'
+          - *1
+          - *2
+          - *3
+          - *4
+          - *5
+          - *6
+          - name: NODE_OPTIONS
+            value: "--use-openssl-ca"
+          - name: JAVA_TOOL_OPTIONS
+            value: "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit
+              -Djavax.net.ssl.trustStoreType=JKS"
+          resources:
+            requests:
+              cpu: '2'
+              memory: 8Gi
+              ephemeral-storage: 5Gi
+            limits:
+              cpu: '4'
+              memory: 12Gi
+              ephemeral-storage: 15Gi
+          volumeMounts:
+          - name: work
+            mountPath: "/home/runner/_work"
+          - name: dind-sock
+            mountPath: "/var/run"
+          - *7
+        volumes:
+        - name: work
+          emptyDir:
+            sizeLimit: 10Gi
+        - name: dind-sock
+          emptyDir: {}
+        - name: dind-externals
+          emptyDir: {}
+        - name: docker-data
+          emptyDir:
+            sizeLimit: 20Gi
+        - &8
+          name: public-ca-trust
+          configMap:
+            name: public-ca-trust
+    listenerTemplate:
+      metadata:
+        annotations:
+          security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+      spec:
+        volumes:
+        - *8
+        containers:
+        - name: listener
+          env:
+          - *1
+          - *2
+          - *3
+          - *4
+          - *5
+          - *6
+          volumeMounts:
+          - *7

@@ -4,6 +4,7 @@ configMapGenerator:
   - name: public-ca-trust
     files:
       - ca-bundle.pem
+      - cacerts
 generatorOptions:
   # Helm post-renderers also reference this name. Pod-template checksums in
   # public-ca-trust patches must change whenever the bundled roots change.
