@@ -23,6 +23,22 @@ data "coder_workspace_owner" "me" {
 # Simplified namespace configuration
 locals {
   namespace = "coder-workspaces"
+
+  # Namespace-local public CA material is maintained by Flux, not workspace state.
+  public_ca_sha256 = "f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237"
+  public_ca_env = {
+    SSL_CERT_FILE      = "/etc/hlkube-ca/ca-bundle.pem"
+    SSL_CERT_DIR       = "/etc/hlkube-ca/empty"
+    REQUESTS_CA_BUNDLE = "/etc/hlkube-ca/ca-bundle.pem"
+    CURL_CA_BUNDLE     = "/etc/hlkube-ca/ca-bundle.pem"
+    PIP_CERT           = "/etc/hlkube-ca/ca-bundle.pem"
+    GIT_SSL_CAINFO     = "/etc/hlkube-ca/ca-bundle.pem"
+    AWS_CA_BUNDLE      = "/etc/hlkube-ca/ca-bundle.pem"
+    HEX_CACERTS_PATH   = "/etc/hlkube-ca/ca-bundle.pem"
+    NODE_OPTIONS       = "--use-openssl-ca"
+    JAVA_TOOL_OPTIONS  = "-Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=JKS"
+    ERL_AFLAGS         = "-public_key cacerts_path '\"/etc/hlkube-ca/ca-bundle.pem\"'"
+  }
 }
 
 # Template parameters
@@ -89,7 +105,7 @@ resource "coder_agent" "main" {
   arch                    = data.coder_provisioner.me.arch
   os                      = "linux"
   startup_script_behavior = "blocking"
-  startup_script = <<-EOT
+  startup_script          = <<-EOT
     set -e
 
     # code-server, postgresql-client, and all dev tooling are pre-baked in the
@@ -310,6 +326,9 @@ resource "kubernetes_pod" "main" {
   metadata {
     name      = "coder-${data.coder_workspace.me.id}"
     namespace = data.kubernetes_namespace.workspace.metadata.0.name
+    annotations = {
+      "security.hlkube.net/ca-bundle-sha256" = local.public_ca_sha256
+    }
     labels = {
       "coder.workspace.id"   = data.coder_workspace.me.id
       "coder.workspace.name" = data.coder_workspace.me.name
@@ -329,6 +348,22 @@ resource "kubernetes_pod" "main" {
 
     # Main development container using Coder enterprise base
     container {
+      # Replace inherited public roots for runtime clients, including sidecars.
+      dynamic "env" {
+        for_each = local.public_ca_env
+        iterator = public_ca
+        content {
+          name  = public_ca.key
+          value = public_ca.value
+        }
+      }
+
+      volume_mount {
+        name       = "public-ca-trust"
+        mount_path = "/etc/hlkube-ca"
+        read_only  = true
+      }
+
       name              = "dev"
       image             = "ghcr.io/nmajor/coder-workspace:latest"
       image_pull_policy = "Always"
@@ -348,13 +383,13 @@ resource "kubernetes_pod" "main" {
       }
 
       dynamic "env" {
-        for_each = data.kubernetes_secret.workspace_secrets.data
+        for_each = { for k, v in data.kubernetes_secret.workspace_secrets.data : k => v if !contains(keys(local.public_ca_env), k) }
         content {
           name = env.key
 
           value_from {
             secret_key_ref {
-              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name # "workspace-secrets"
               key  = env.key
             }
           }
@@ -418,6 +453,22 @@ resource "kubernetes_pod" "main" {
 
     # PostgreSQL with PostGIS sidecar container (using stable v17)
     container {
+      # Replace inherited public roots for runtime clients, including sidecars.
+      dynamic "env" {
+        for_each = local.public_ca_env
+        iterator = public_ca
+        content {
+          name  = public_ca.key
+          value = public_ca.value
+        }
+      }
+
+      volume_mount {
+        name       = "public-ca-trust"
+        mount_path = "/etc/hlkube-ca"
+        read_only  = true
+      }
+
       name              = "postgres"
       image             = "ghcr.io/nmajor/coder-workspace-postgres:17-postgis3.5-pgvector"
       image_pull_policy = "IfNotPresent"
@@ -463,6 +514,22 @@ resource "kubernetes_pod" "main" {
 
     # Crawl4AI sidecar container
     container {
+      # Replace inherited public roots for runtime clients, including sidecars.
+      dynamic "env" {
+        for_each = local.public_ca_env
+        iterator = public_ca
+        content {
+          name  = public_ca.key
+          value = public_ca.value
+        }
+      }
+
+      volume_mount {
+        name       = "public-ca-trust"
+        mount_path = "/etc/hlkube-ca"
+        read_only  = true
+      }
+
       name              = "crawl4ai"
       image             = "unclecode/crawl4ai:latest"
       image_pull_policy = "IfNotPresent"
@@ -480,7 +547,7 @@ resource "kubernetes_pod" "main" {
 
           value_from {
             secret_key_ref {
-              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name # "workspace-secrets"
               key  = env.key
             }
           }
@@ -512,6 +579,22 @@ resource "kubernetes_pod" "main" {
 
     # Playwright MCP sidecar container
     container {
+      # Replace inherited public roots for runtime clients, including sidecars.
+      dynamic "env" {
+        for_each = local.public_ca_env
+        iterator = public_ca
+        content {
+          name  = public_ca.key
+          value = public_ca.value
+        }
+      }
+
+      volume_mount {
+        name       = "public-ca-trust"
+        mount_path = "/etc/hlkube-ca"
+        read_only  = true
+      }
+
       name              = "playwright-mcp"
       image             = "mcp/playwright:latest"
       image_pull_policy = "IfNotPresent"
@@ -530,7 +613,7 @@ resource "kubernetes_pod" "main" {
 
           value_from {
             secret_key_ref {
-              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name # "workspace-secrets"
               key  = env.key
             }
           }
@@ -561,6 +644,22 @@ resource "kubernetes_pod" "main" {
 
     # DataForSEO MCP sidecar container
     container {
+      # Replace inherited public roots for runtime clients, including sidecars.
+      dynamic "env" {
+        for_each = local.public_ca_env
+        iterator = public_ca
+        content {
+          name  = public_ca.key
+          value = public_ca.value
+        }
+      }
+
+      volume_mount {
+        name       = "public-ca-trust"
+        mount_path = "/etc/hlkube-ca"
+        read_only  = true
+      }
+
       name              = "dataforseo-mcp"
       image             = "dataforseo/mcp:latest"
       image_pull_policy = "IfNotPresent"
@@ -577,7 +676,7 @@ resource "kubernetes_pod" "main" {
 
           value_from {
             secret_key_ref {
-              name = data.kubernetes_secret.workspace_secrets.metadata[0].name  # "workspace-secrets"
+              name = data.kubernetes_secret.workspace_secrets.metadata[0].name # "workspace-secrets"
               key  = env.key
             }
           }
@@ -603,6 +702,13 @@ resource "kubernetes_pod" "main" {
           cpu    = "500m"
           memory = "512Mi"
         }
+      }
+    }
+
+    volume {
+      name = "public-ca-trust"
+      config_map {
+        name = "public-ca-trust"
       }
     }
 

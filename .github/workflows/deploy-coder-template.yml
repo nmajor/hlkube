@@ -8,13 +8,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      CODER_URL: https://coder.nmajor.net
+      CODER_SESSION_TOKEN: ${{ secrets.CODER_SESSION_TOKEN }}
+      CODER_TEMPLATE_NAME: elixirphoenixpostgres
+      CODER_TEMPLATE_MESSAGE: Sync elixirphoenixpostgres from ${{ github.sha }}
+      CODER_TEMPLATE_VERSION_NAME: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Coder CLI
+        run: curl -L https://coder.com/install.sh | sh
+
       - name: Deploy Coder Template
-        uses: matifali/update-coder-template@v3
-        with:
-          id: elixir-phoenix-postgres
-          dir: apps/third-party/coder/templates/elixir-phoenix-postgres
-          url: https://coder.nmajor.net
-          coder_session_token: ${{ secrets.CODER_SESSION_TOKEN }}
+        run: ./scripts/sync-coder-template.sh
