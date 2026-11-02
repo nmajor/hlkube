@@ -241,7 +241,6 @@ spec:
           metadata:
             name: kube-prometheus-stack-prometheus
           spec:
-            replicas: 0
             volumes:
             - name: public-ca-trust
               configMap:
