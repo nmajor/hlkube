@@ -65,10 +65,16 @@ with valid HTTPS (GitHub was used here).
 
 ## Outstanding work
 
-1. **Coder runtime checks:** Supertools is restored on the fixed template.
-   Node/Python/Erlang/Hex and browser runtime checks remain outstanding. Kingpin
-   recovery encountered a Kubernetes provider null-identity bug; an original
-   private state backup is retained while that recovery is completed. Sellersearchmap's
+1. **Coder runtime checks:** Supertools and Kingpin are Started and healthy on
+   the fixed template. Supertools's default Python HTTPS client rejects both
+   incident chains and accepts GitHub HTTPS (200). Node/Erlang/Hex and browser
+   runtime checks remain outstanding. Kingpin's provider null-identity bug was
+   repaired through Coder's state interface after saving a private original:
+   only the Pod's four identity fields were populated from its existing ID and
+   metadata. Coder then replaced the Pod successfully; PVCs were retained.
+   The template's Kubernetes provider remains 2.38.0; upgrading to a tested
+   version >=3.2.1 is a separate durable fix for the upstream identity bug.
+   Sellersearchmap's
    previously failed stop completed; its disks were preserved and it stays stopped.
 2. **CI template publishing:** the GitHub workflow failed because repository
    secret `CODER_SESSION_TOKEN` is absent. The security template was published
