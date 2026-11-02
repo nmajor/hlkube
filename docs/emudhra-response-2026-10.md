@@ -29,8 +29,8 @@ are separate checks.
   both controlled bad chains and accepted GitHub HTTPS.
 - Coder template `emudhra-61055fe` was imported successfully and promoted active
   from committed source (`61055fe`). All nine workspaces have automatic updates
-  enabled for future starts. The running `nick/supertools` workspace still uses
-  the previous template until its restart is authorized and completed.
+  enabled for future starts. `nick/supertools` was restored after maintenance
+  and Coder reports it Started, healthy, on `emudhra-61055fe`.
 - Homebrew's public CA bundle was replaced. New zsh sessions source
   `scripts/public-ca-env.sh` for Node, Python, curl, Git, AWS, Hex and Java client
   configuration. Already-running processes need to restart or reload settings.
@@ -65,28 +65,59 @@ with valid HTTPS (GitHub was used here).
 
 ## Outstanding work
 
-1. **Coder running workspace:** the local login is renewed and the fixed template
-   is published. `nick/supertools` is the only running workspace in the latest
-   authenticated inventory; the user has been asked when it can restart.
-   Preserve its PVCs, update through Coder, then test Node/Python/Erlang/Hex and
-   browser behavior. Stopped workspaces update on their next start.
+1. **Coder runtime checks:** Supertools is restored on the fixed template.
+   Node/Python/Erlang/Hex and browser runtime checks remain outstanding. Kingpin
+   recovery encountered a Kubernetes provider null-identity bug; an original
+   private state backup is retained while that recovery is completed. Sellersearchmap's
+   previously failed stop completed; its disks were preserved and it stays stopped.
 2. **CI template publishing:** the GitHub workflow failed because repository
    secret `CODER_SESSION_TOKEN` is absent. The security template was published
    using the renewed local session instead. Automatic publishing remains
    blocked until a suitable CI credential is configured; no local session token
    was copied into GitHub.
-3. **Talos hosts:** the sampled Talos 1.9.5 host bundle contains both affected
-   roots. This is separate from pod trust. The version-specific trusted-roots
-   controller appends configured roots to its embedded defaults; adding a CA
-   does not remove the compromised trust paths. Host replacement/restart or
-   upgrade needs a validated, repository-managed maintenance plan and tests of
-   the actual host image-pull/client path. No host modification or reboot has
-   been performed as part of these mitigations.
+3. **Talos host rollout completed:** public patch `814d4bf` removes the two
+   affected roots from the original 151-certificate bundle, retaining the other
+   149. All six server-side dry-runs passed and private recovery configs were
+   saved locally (ignored, mode 0600). All six nodes rebooted successfully;
+   per-node receipts confirm the replacement checksum, rejection of both incident
+   chains and uncached valid-registry HTTPS. Direct CRI probes separately
+   confirmed cp1/cp2/cp3/w1; final w2/w3 CRI results could not be collected
+   after local access to the private cluster API became unavailable.
+   All twelve published incident chains validate against the original host
+   bundle and fail for untrusted issuers against its replacement. Temporary
+   GitOps-managed probes in namespace `talos-trust-check` are being removed through
+   Git; confirm Flux pruned them once private API access returns. Prometheus
+   restoration was committed and pushed in `9aba9e2`; its live replicas/readiness
+   also need confirmation. See `config/talos/README.md` for the host
+   procedure and the pinned-bundle maintenance requirement.
 4. **Coverage audit:** Steel's running browser pool/gateway, browser engines in
    workspace sidecars, database/backup clients, additional service images and
    operator-created storage/CSI pods have not received a complete runtime trust
    audit. Steel source deletion is already pending in the user's working tree;
    it has not been committed or restored by the security changes.
+
+## Subsequent kernel assessment (2026-11-02)
+
+CISA's October 28 alert identifies actively exploited CVE-2026-46300
+(Fragnesia). This is separate from the CA incident. A read-only Coder SSH check
+of the restored Supertools workspace returned the host kernel `6.12.18-talos`.
+The Linux CNA record gives `6.12.91` as the fixed version for the 6.12 branch;
+the inspected kernel is not patched. No exploit was run.
+
+The same live host's `/proc/config.gz` shows `CONFIG_INET_ESPINTCP` and
+`CONFIG_INET6_ESPINTCP` disabled. It has USER_NS/NET_NS/XFRM/ESP enabled, but the
+workspace sees `/proc/sys/user/max_user_namespaces = 0`, no effective
+capabilities, and seccomp mode 2. These restrict the documented ESP-in-TCP and
+unprivileged user-namespace exploit path. This is a conditional mitigation,
+not proof of a patched kernel or coverage for every privileged pod. Direct
+Talos/private Kubernetes API access is currently timing out; verify all six
+nodes, workload capabilities and host sysctls when access returns, then plan a
+supported Talos upgrade containing the kernel fix. A reboot alone does not
+install it. No Talos version upgrade was performed during CA maintenance.
+
+Sources: [CISA alert](https://content.govdelivery.com/accounts/USDHSCISA/bulletins/430d404),
+[Linux CNA record](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/46xxx/CVE-2026-46300.json),
+[vendor analysis](https://access.redhat.com/security/vulnerabilities/RHSB-2026-003).
 
 ## Verification commands
 

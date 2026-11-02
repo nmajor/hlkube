@@ -28,7 +28,9 @@ nodes until it is retired; never commit a complete machine config or credentials
 ## Apply and verify
 
 The user authorized cluster reboots on 2026-10-22. Reboot **one node at a time**:
-workers first, then control-plane members, always retaining etcd quorum. Before
+start with one worker, then select subsequent nodes based on recovery, always
+retaining etcd quorum. Control-plane nodes hold no storage replicas here, so they
+can be updated while worker storage replicas rebuild. Before
 continuing, check host services, Kubernetes readiness, Longhorn volume health,
 and database replica health. Single-instance applications may be interrupted.
 Save each original machine configuration to a mode-0600 ignored local backup.
@@ -53,11 +55,16 @@ talosctl --talosconfig talos-cluster/talosconfig -e 192.168.10.11 -n 192.168.10.
 ```
 
 After boot, read the live host bundle and verify its checksum and root
-fingerprints. Check the actual containerd image-fetch TLS path for both
-controlled incident test hosts, plus a valid public registry. A bad-chain test
+fingerprints. Check Talos's host image resolver against both controlled incident test hosts,
+plus a valid public registry. A bad-chain test
 only passes on a certificate-validation failure; HTTP 404, DNS errors, and
-timeouts are inconclusive. Check both CRI and system image namespaces on the
-first worker before rolling further. Do not use TLS-verification bypasses.
+timeouts are inconclusive. Talos 1.9 image-pull commands retry TLS failures for up to 20 minutes. The
+certificate errors appear in `talosctl dmesg`; verify a fresh, uniquely named
+probe there and cancel the test CLI afterward. Its `image pull` uses Talos's
+host resolver and skips images already cached: use a nonexistent tag on a valid
+registry as an uncached HTTPS control (a genuine registry NotFound response
+proves TLS succeeded). CRI/system are image metadata namespaces for this API,
+not separate TLS implementations; this does not test arbitrary pod trust. Do not use TLS-verification bypasses.
 
 Existing node addresses: cp1 `.11`, cp2 `.12`, cp3 `.13`, w1 `.51`, w2 `.52`,
 w3 `.53` on `192.168.10.0/24`. Use another healthy control-plane endpoint when
