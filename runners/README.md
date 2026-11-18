@@ -15,10 +15,15 @@ controller per application or build another queue/runner supervisor.
 | `nmajor/cloudlessvideo` | `hlkube-cloudlessvideo-android` | Android local builds | 1 |
 | `DesktopAccountingAPI` organization | `hlkube-desktopaccountingapi` | Docker enabled | 2 |
 
-**Initial status:** the four new personal-repository releases are suspended until
-their owner supplies the credential, the image is published and digest pinned,
-and activation is committed. They are not usable until activation and smoke tests
-succeed. The existing organization and legacy `nmajor/hlkube` runners are preserved.
+**Status (2026-11-18):** Flux has staged the namespace and four suspended releases.
+[Configuration CI](https://github.com/nmajor/hlkube/actions/runs/44312706391) and
+[image build/runtime verification](https://github.com/nmajor/hlkube/actions/runs/44312707273)
+passed. Anonymous image metadata access was verified and the profile pins its
+published digest. Claude Code **Opus 5.5** collaborated on the architecture and
+reviewed the implementation; its drain, publishing and resource findings were
+addressed. The owner-supplied GitHub credential is still pending. Registration,
+Linux smoke jobs and real Android builds remain unverified until activation.
+The existing organization and legacy `nmajor/hlkube` runners are preserved.
 
 Personal GitHub accounts cannot share an account-wide runner pool. They need a
 scale set per repository and profile. Organizations can share pools and restrict

@@ -52,7 +52,7 @@ spec:
         containers:
           - name: runner
             # Published/verified by the GitHub-hosted image workflow before activation.
-            image: ghcr.io/nmajor/hlkube-actions-runner:build-pending
+            image: ghcr.io/nmajor/hlkube-actions-runner:sha-f08bfc4303a6cbeff27de9f57723116f7390009d-44312707273-1@sha256:a1b8a7c4982572dedde8fec8644f6d2717254fc3c59efed08e1a1ed235e8239e
             command: [/home/runner/run.sh]
             securityContext:
               allowPrivilegeEscalation: false

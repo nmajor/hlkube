@@ -1,5 +1,5 @@
 # Install in nmajor/nook-measure-poc as .github/workflows/android-local.yml.
-# Replace main with the reviewed hlkube commit SHA before use.
+# Reusable build logic is pinned to the reviewed hlkube commit.
 name: Android preview on hlkube
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   android:
-    uses: nmajor/hlkube/.github/workflows/expo-android-local.yml@main
+    uses: nmajor/hlkube/.github/workflows/expo-android-local.yml@f08bfc4303a6cbeff27de9f57723116f7390009d
     with:
       runner: hlkube-nook-android
       node-version: '24.8.0'
