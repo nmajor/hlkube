@@ -21,15 +21,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image for verification
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: images/actions-runner
           platforms: linux/amd64
@@ -40,16 +40,29 @@ jobs:
           docker run --rm hlkube-actions-runner:verify bash -euc '
             test "$(id -u)" = 1001
             /home/runner/bin/Runner.Listener --version
-            for tool in git curl jq sudo docker flock gcc g++ make tar unzip zip xz rsync; do
+            for tool in git curl jq sudo docker flock gcc g++ make tar unzip zip xz rsync python3; do
               command -v "$tool"
             done
             docker buildx version
             sudo -n true
           '
+      - name: Verify unprivileged runner prerequisites
+        run: |
+          docker run --rm --security-opt no-new-privileges --cap-drop ALL \
+            hlkube-actions-runner:verify bash -euc '
+              test "$(id -u)" = 1001
+              /home/runner/bin/Runner.Listener --version
+              python3 -m venv /tmp/probe-venv
+              mkdir -p /home/runner/_work/_tool
+              test -w /home/runner/_work/_tool
+              git --version
+              gcc --version
+              unzip -v >/dev/null
+            '
       - name: Publish verified image
         run: |
           image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/hlkube-actions-runner"
-          docker tag hlkube-actions-runner:verify "$image:2.338.0-1"
-          docker tag hlkube-actions-runner:verify "$image:sha-$GITHUB_SHA"
-          docker push "$image:2.338.0-1"
-          docker push "$image:sha-$GITHUB_SHA"
+          tag="sha-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker tag hlkube-actions-runner:verify "$image:$tag"
+          docker push "$image:$tag"
+          echo "Published $image:$tag" >> "$GITHUB_STEP_SUMMARY"

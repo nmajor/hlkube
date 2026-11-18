@@ -1,0 +1,123 @@
+name: Expo Android local build
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      app-directory:
+        default: '.'
+        type: string
+      dependency-directory:
+        default: '.'
+        type: string
+      node-version:
+        required: true
+        type: string
+      package-manager:
+        default: npm
+        type: string
+      package-manager-version:
+        required: true
+        type: string
+      eas-version:
+        required: true
+        type: string
+    secrets:
+      EXPO_TOKEN:
+        required: true
+      EXPO_PUBLIC_CV_APP_KEY:
+        required: false
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 120
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+      GRADLE_USER_HOME: /home/runner/_work/_gradle
+      ANDROID_HOME: /home/runner/_work/_android
+      ANDROID_SDK_ROOT: /home/runner/_work/_android
+      npm_config_cache: /home/runner/_work/_npm
+      EAS_LOCAL_BUILD_WORKINGDIR: /home/runner/_work/_eas-build
+      TMPDIR: /home/runner/_work/_tmp
+      npm_config_store_dir: /home/runner/_work/_pnpm-store
+      NODE_OPTIONS: --use-openssl-ca --max-old-space-size=3072
+      ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
+    steps:
+      - name: Prepare writable directories
+        run: mkdir -p "$TMPDIR" "$RUNNER_TOOL_CACHE"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Check build inputs
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          PACKAGE_MANAGER: ${{ inputs.package-manager }}
+        run: |
+          : "${EXPO_TOKEN:?Set the EXPO_TOKEN repository secret}"
+          case "$PACKAGE_MANAGER" in npm|pnpm) ;; *) exit 1 ;; esac
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          cmdline-tools-version: '12266719'
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install pinned package manager and EAS
+        env:
+          PACKAGE_MANAGER: ${{ inputs.package-manager }}
+          PACKAGE_MANAGER_VERSION: ${{ inputs.package-manager-version }}
+          EAS_VERSION: ${{ inputs.eas-version }}
+        run: |
+          npm install --global --prefix "$RUNNER_TEMP/build-tools" \
+            "$PACKAGE_MANAGER@$PACKAGE_MANAGER_VERSION" "eas-cli@$EAS_VERSION"
+          echo "$RUNNER_TEMP/build-tools/bin" >> "$GITHUB_PATH"
+      - name: Cache Gradle dependencies
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5
+      - name: Bound Gradle memory and workers
+        run: |
+          mkdir -p "$GRADLE_USER_HOME"
+          cat > "$GRADLE_USER_HOME/gradle.properties" <<'PROPERTIES'
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:ActiveProcessorCount=4
+          org.gradle.workers.max=2
+          org.gradle.parallel=false
+          org.gradle.daemon=false
+          kotlin.compiler.execution.strategy=in-process
+          reactNativeArchitectures=arm64-v8a
+          PROPERTIES
+      - name: Install repository dependencies
+        working-directory: ${{ inputs.dependency-directory }}
+        env:
+          PACKAGE_MANAGER: ${{ inputs.package-manager }}
+        run: |
+          if [ "$PACKAGE_MANAGER" = pnpm ]; then
+            pnpm install --frozen-lockfile
+          else
+            npm ci
+          fi
+      - name: Build signed preview APK
+        working-directory: ${{ inputs.app-directory }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_PUBLIC_CV_APP_KEY: ${{ secrets.EXPO_PUBLIC_CV_APP_KEY }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/artifacts"
+          eas build --platform android --profile preview --local --non-interactive \
+            --output "$RUNNER_TEMP/artifacts/app.apk"
+          test -s "$RUNNER_TEMP/artifacts/app.apk"
+          sha256sum "$RUNNER_TEMP/artifacts/app.apk" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve APK before the runner is deleted
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: android-preview-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/artifacts/app.apk
+          if-no-files-found: error
+          retention-days: 3

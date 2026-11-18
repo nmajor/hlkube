@@ -1,0 +1,140 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: profile-defaults
+spec:
+  interval: 30m
+  dependsOn:
+    - name: arc-controller
+      namespace: arc-system
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      # Match the running controller; upgrade all ARC charts together.
+      version: "0.15.0"
+      sourceRef:
+        kind: HelmRepository
+        name: arc-scale-sets
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    minRunners: 0
+    maxRunners: 1
+    controllerServiceAccount:
+      name: arc-controller
+      namespace: arc-system
+    # Plain process jobs: no Docker or runner-container-hooks/RBAC.
+    template:
+      metadata:
+        labels:
+          hlkube.nmajor.net/runner-profile: linux
+        annotations:
+          security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+      spec:
+        automountServiceAccountToken: false
+        priorityClassName: hlkube-ci
+        nodeSelector:
+          kubernetes.io/os: linux
+          kubernetes.io/arch: amd64
+          node-type: worker
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          fsGroup: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: runner
+            # Published/verified by the GitHub-hosted image workflow before activation.
+            image: ghcr.io/nmajor/hlkube-actions-runner:build-pending
+            command: [/home/runner/run.sh]
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: [ALL]
+            env:
+              - name: RUNNER_TOOL_CACHE
+                value: /home/runner/_work/_tool
+              - name: AGENT_TOOLSDIRECTORY
+                value: /home/runner/_work/_tool
+              - name: SSL_CERT_FILE
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: SSL_CERT_DIR
+                value: /etc/hlkube-ca/empty
+              - name: REQUESTS_CA_BUNDLE
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: CURL_CA_BUNDLE
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: PIP_CERT
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: GIT_SSL_CAINFO
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: NODE_OPTIONS
+                value: --use-openssl-ca
+              - name: JAVA_TOOL_OPTIONS
+                value: -Djavax.net.ssl.trustStore=/etc/hlkube-ca/cacerts -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=JKS
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+                ephemeral-storage: 10Gi
+              limits:
+                cpu: "2"
+                memory: 4Gi
+                ephemeral-storage: 15Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: public-ca-trust
+                mountPath: /etc/hlkube-ca
+                readOnly: true
+        volumes:
+          - name: work
+            emptyDir:
+              sizeLimit: 10Gi
+          - name: public-ca-trust
+            configMap:
+              name: public-ca-trust
+    # ARC creates listeners in arc-system; its namespace already has the bundle.
+    listenerTemplate:
+      metadata:
+        annotations:
+          security.hlkube.net/ca-bundle-sha256: f4808ea05337410284d6f1fcf7fe7cca9abb9c31312189963796955a02d02237
+      spec:
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: listener
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: [ALL]
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi
+            env:
+              - name: SSL_CERT_FILE
+                value: /etc/hlkube-ca/ca-bundle.pem
+              - name: SSL_CERT_DIR
+                value: /etc/hlkube-ca/empty
+            volumeMounts:
+              - name: public-ca-trust
+                mountPath: /etc/hlkube-ca
+                readOnly: true
+        volumes:
+          - name: public-ca-trust
+            configMap:
+              name: public-ca-trust

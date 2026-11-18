@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: arc-nmajor
+resources:
+  - namespace.yaml
+  - priorityclass.yaml
+  - public-ca-trust
+  - linux
+  - android
+# Add github-auth.sealed.yaml only after the owner populates github-auth.secret
+# and ./seal-secrets.sh generates it. Keep all releases suspended until then.

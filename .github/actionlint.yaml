@@ -1,0 +1,6 @@
+self-hosted-runner:
+  labels:
+    - hlkube-nook-linux
+    - hlkube-nook-android
+    - hlkube-cloudlessvideo-linux
+    - hlkube-cloudlessvideo-android

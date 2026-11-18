@@ -1,0 +1,8 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: hlkube-ci
+value: -10
+globalDefault: false
+preemptionPolicy: Never
+description: CI waits for capacity and can be preempted by application workloads.

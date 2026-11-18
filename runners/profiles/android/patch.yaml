@@ -1,0 +1,26 @@
+- op: replace
+  path: /spec/values/template/metadata/labels/hlkube.nmajor.net~1runner-profile
+  value: android
+- op: add
+  path: /spec/values/template/spec/affinity
+  value:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              hlkube.nmajor.net/runner-profile: android
+          topologyKey: kubernetes.io/hostname
+- op: replace
+  path: /spec/values/template/spec/containers/0/resources
+  value:
+    requests:
+      cpu: "2"
+      memory: 12Gi
+      ephemeral-storage: 45Gi
+    limits:
+      cpu: "4"
+      memory: 12Gi
+      ephemeral-storage: 50Gi
+- op: replace
+  path: /spec/values/template/spec/volumes/0/emptyDir/sizeLimit
+  value: 40Gi

@@ -1,0 +1,10 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hlkube-cloudlessvideo-android
+spec:
+  suspend: true
+  values:
+    githubConfigUrl: https://github.com/nmajor/cloudlessvideo
+    githubConfigSecret: nmajor-runner-auth
+    runnerScaleSetName: hlkube-cloudlessvideo-android
