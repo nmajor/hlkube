@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - repository-runners
   - desktopaccountingapi
-  - nmajor
+  - nmajorstudios

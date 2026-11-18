@@ -1,4 +1,4 @@
-# Install in nmajor/cloudlessvideo as .github/workflows/android-local.yml.
+# Install after transfer to nmajorstudios/cloudlessvideo.
 # Reusable build logic is pinned to the reviewed hlkube commit.
 name: Android preview on hlkube
 on:
@@ -9,7 +9,7 @@ jobs:
   android:
     uses: nmajor/hlkube/.github/workflows/expo-android-local.yml@f08bfc4303a6cbeff27de9f57723116f7390009d
     with:
-      runner: hlkube-cloudlessvideo-android
+      runner: hlkube-android
       app-directory: apps/mobile
       node-version: '24.8.0'
       package-manager: pnpm

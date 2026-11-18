@@ -23,9 +23,13 @@ Dir.chdir(File.expand_path('..', __dir__))
 helm = ENV.fetch('HELM_BIN', 'helm')
 resources = documents(run!('flux', 'build', 'kustomization', 'runners', '--dry-run',
                           '--path', './runners', '--kustomization-file', 'clusters/hlkube/runners.yaml'))
-releases = resources.select { |r| r['kind'] == 'HelmRelease' && r.dig('metadata', 'namespace') == 'arc-nmajor' }
-expected = %w[hlkube-nook-linux hlkube-nook-android hlkube-cloudlessvideo-linux hlkube-cloudlessvideo-android]
-check((expected - releases.map { |r| r.dig('metadata', 'name') }).empty?, 'Missing initial repository/profile pool')
+namespace = 'arc-nmajorstudios'
+releases = resources.select { |r| r['kind'] == 'HelmRelease' && r.dig('metadata', 'namespace') == namespace }
+expected = { 'hlkube-linux' => 2, 'hlkube-android' => 1 }
+check(releases.map { |r| r.dig('metadata', 'name') }.sort == expected.keys.sort, 'Expected two shared organization pools')
+check(resources.none? { |r| r.dig('metadata', 'namespace') == 'arc-nmajor' }, 'Obsolete personal-account pool remains')
+names = resources.select { |r| r['kind'] == 'HelmRelease' }.filter_map { |r| r.dig('spec', 'values', 'runnerScaleSetName') }
+check(names.uniq.size == names.size, 'Runner scale-set names must be unique')
 controller = YAML.load_file('infrastructure/arc-scale-set-controller/release.yaml')
 version = controller.dig('spec', 'chart', 'spec', 'version')
 secrets = resources.select { |r| r['kind'] == 'SealedSecret' }.map { |r| [r.dig('metadata', 'namespace'), r.dig('metadata', 'name')] }
@@ -43,7 +47,9 @@ Dir.mktmpdir('hlkube-runner-check-') do |tmp|
     values = spec.fetch('values')
     check(spec.dig('chart', 'spec', 'version') == version, "#{name}: controller/chart version mismatch")
     check(values['runnerScaleSetName'] == name, "#{name}: ambiguous workflow selector")
-    check(values['minRunners'] == 0 && [0, 1].include?(values['maxRunners']), "#{name}: unexpected scaling bounds")
+    check(values['minRunners'] == 0 && [0, expected.fetch(name)].include?(values['maxRunners']), "#{name}: unexpected scaling bounds")
+    check(values['githubConfigUrl'] == 'https://github.com/nmajorstudios', "#{name}: must register at organization scope")
+    check(values['githubConfigSecret'] == 'nmajorstudios-runner-app', "#{name}: must reference the dedicated App secret")
     check(!values.key?('containerMode'), "#{name}: plain profiles must not grant Docker/Kubernetes access")
     pod = values.dig('template', 'spec')
     check(pod['automountServiceAccountToken'] == false, "#{name}: job must not receive a Kubernetes token")
@@ -64,13 +70,13 @@ Dir.mktmpdir('hlkube-runner-check-') do |tmp|
       check(runner.dig('resources', 'requests', 'memory') == runner.dig('resources', 'limits', 'memory'), "#{name}: Android memory must be reserved")
     end
     unless spec['suspend']
-      check(secrets.include?(['arc-nmajor', values['githubConfigSecret']]), "#{name}: active release has no Git-managed credential")
+      check(secrets.include?([namespace, values['githubConfigSecret']]), "#{name}: active release has no Git-managed credential")
       check(runner['image'].match?(/@sha256:[a-f0-9]{64}\z/), "#{name}: active runner image must be digest pinned")
     end
     file = File.join(tmp, "#{name}.json")
     File.write(file, JSON.generate(values))
     rendered = documents(run!(helm, 'template', name, chart,
-                              '--namespace', 'arc-nmajor', '--kube-version', '1.32.3', '--values', file))
+                              '--namespace', namespace, '--kube-version', '1.32.3', '--values', file))
     set = rendered.find { |r| r['kind'] == 'AutoscalingRunnerSet' }
     check(set && set.dig('spec', 'template', 'spec', 'containers', 0, 'image') == runner['image'], "#{name}: chart changed the runner template")
     check(rendered.none? { |r| r['kind'] == 'Secret' }, "#{name}: chart must reference the sealed credential")

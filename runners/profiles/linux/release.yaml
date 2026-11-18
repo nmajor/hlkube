@@ -24,7 +24,8 @@ spec:
       retries: 3
   values:
     minRunners: 0
-    maxRunners: 1
+    # Set maxRunners in each pool's leaf release; this component must not
+    # overwrite that pool-specific limit during Kustomize transformation.
     controllerServiceAccount:
       name: arc-controller
       namespace: arc-system

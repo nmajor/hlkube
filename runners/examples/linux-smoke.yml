@@ -1,4 +1,4 @@
-# Install in either authorized repository, choosing its corresponding Linux pool.
+# Install in any private nmajorstudios repository.
 name: hlkube Linux smoke
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   smoke:
-    runs-on: hlkube-nook-linux
+    runs-on: hlkube-linux
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
