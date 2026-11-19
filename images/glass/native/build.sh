@@ -7,6 +7,32 @@ mkdir -p "$work" "$output"
 export CARGO_HOME="$work/cargo-home"
 export CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=2
 export PKG_CONFIG_LIBDIR=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig:/usr/lib/pkgconfig
+# Conda enables relocatable prefixes; Ubuntu's multiarch .pc files already have
+# correct /usr prefixes. Preserve them instead of deriving /usr/lib as a prefix.
+export PKG_CONFIG_REAL
+PKG_CONFIG_REAL=$(command -v pkg-config)
+export PKG_CONFIG="$work/pkg-config"
+cat > "$PKG_CONFIG" <<'SH'
+#!/usr/bin/env bash
+exec "$PKG_CONFIG_REAL" --dont-define-prefix "$@"
+SH
+chmod 0755 "$PKG_CONFIG"
+"$PKG_CONFIG" --print-errors --exists libpipewire-0.3 libspa-0.2 gstreamer-app-1.0 gstreamer-video-1.0
+python -I - "$PKG_CONFIG" <<'PY'
+import pathlib, shlex, subprocess, sys
+tool = sys.argv[1]
+includes = []
+for module in ['libpipewire-0.3', 'libspa-0.2', 'gstreamer-app-1.0', 'gstreamer-video-1.0']:
+    for option, prefix in [('--cflags-only-I', '-I'), ('--libs-only-L', '-L')]:
+        flags = shlex.split(subprocess.check_output([tool, option, module], text=True))
+        for flag in flags:
+            assert flag.startswith(prefix), f'Unexpected pkg-config flag: {flag}'
+            directory = pathlib.Path(flag[len(prefix):])
+            assert directory.is_dir(), f'Nonexistent {module} dependency path: {directory}'
+            if prefix == '-I': includes.append(directory)
+assert any((directory / 'pipewire/version.h').is_file() for directory in includes)
+print('PASS system dependency paths and PipeWire header are valid')
+PY
 export SSL_CERT_FILE="$GITHUB_WORKSPACE/components/public-ca-trust/ca-bundle.pem"
 export SSL_CERT_DIR="$work/empty-ca-directory"
 export CARGO_HTTP_CAINFO="$SSL_CERT_FILE"
