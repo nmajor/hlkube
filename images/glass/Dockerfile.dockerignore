@@ -1,0 +1,10 @@
+**
+!images/
+!images/glass/
+!images/glass/**
+!components/
+!components/public-ca-trust/
+!components/public-ca-trust/ca-bundle.pem
+images/glass/node_modules
+images/glass/*.secret
+images/glass/.dev.vars

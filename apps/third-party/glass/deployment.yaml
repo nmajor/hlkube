@@ -1,0 +1,170 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glass
+  namespace: glass
+spec:
+  # Local Durable Object state cannot be shared between concurrent instances.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: glass
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: glass
+      annotations:
+        # Fill with the SHA256 of configmap.yaml on activation and every config change.
+        checksum/config: REPLACE_WITH_CONFIG_CHECKSUM
+        security.hlkube.net/ca-bundle-sha256: 796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: glass
+          # Keep this app out of the Flux resource list until the built digest is set.
+          image: ghcr.io/nmajor/glass-direct@sha256:REPLACE_WITH_BUILT_IMAGE_DIGEST
+          env:
+            - name: PUBLIC_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: glass-config
+                  key: PUBLIC_ORIGIN
+            - name: STARPORT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: glass-config
+                  key: STARPORT_ID
+            - name: SSL_CERT_FILE
+              value: /etc/hlkube-ca/ca-bundle.pem
+            - name: SSL_CERT_DIR
+              value: /etc/hlkube-ca/empty
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            exec:
+              command: [/usr/local/bin/mise, exec, --, node, /opt/glass/health.mjs]
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command: [/usr/local/bin/mise, exec, --, node, /opt/glass/health.mjs, --tunnel]
+            periodSeconds: 15
+            timeoutSeconds: 6
+          livenessProbe:
+            exec:
+              command: [/usr/local/bin/mise, exec, --, node, /opt/glass/health.mjs]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: state
+              mountPath: /data
+            - name: home
+              mountPath: /home/glass
+            - name: temporary
+              mountPath: /tmp
+            - name: wrangler-work
+              mountPath: /glass/site/.wrangler
+            - name: public-ca-trust
+              mountPath: /etc/hlkube-ca
+              readOnly: true
+        - name: cloudflared
+          image: cloudflare/cloudflared:2026.11.1@sha256:e613aadbc2d9511785d2e67a86b0c8ac18dd63a3f9af0d06faf04cbfdcb35f2d
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --config
+            - /etc/cloudflared/config.yaml
+            - --credentials-file
+            - /etc/cloudflared/tunnel.json
+            - run
+          env:
+            - name: SSL_CERT_FILE
+              value: /etc/hlkube-ca/ca-bundle.pem
+            - name: SSL_CERT_DIR
+              value: /etc/hlkube-ca/empty
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          startupProbe:
+            exec:
+              command: [cloudflared, tunnel, --metrics, "127.0.0.1:2000", ready]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            exec:
+              command: [cloudflared, tunnel, --metrics, "127.0.0.1:2000", ready]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          volumeMounts:
+            - name: connector-config
+              mountPath: /etc/cloudflared/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: connector-credentials
+              mountPath: /etc/cloudflared/tunnel.json
+              subPath: tunnel.json
+              readOnly: true
+            - name: public-ca-trust
+              mountPath: /etc/hlkube-ca
+              readOnly: true
+      # No Service, Ingress, pod-IP listener, or NetworkPolicy isolation assumption.
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: glass-state
+        - name: home
+          emptyDir:
+            sizeLimit: 64Mi
+        - name: temporary
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: wrangler-work
+          emptyDir:
+            sizeLimit: 128Mi
+        - name: connector-config
+          configMap:
+            name: glass-config
+        - name: connector-credentials
+          secret:
+            secretName: glass-tunnel
+            defaultMode: 0440
+        - name: public-ca-trust
+          configMap:
+            name: public-ca-trust
