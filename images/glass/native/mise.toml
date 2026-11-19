@@ -1,0 +1,6 @@
+[tools]
+rust = "1.100.0"
+python = "3.14.7"
+cmake = "4.5.0"
+"conda:nasm" = "2.16.03"
+"conda:pkg-config" = "0.29.2"
