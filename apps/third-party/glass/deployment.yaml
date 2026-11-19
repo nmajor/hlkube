@@ -34,7 +34,7 @@ spec:
       containers:
         - name: glass
           # Keep this app out of the Flux resource list until the built digest is set.
-          image: ghcr.io/nmajor/glass-direct@sha256:REPLACE_WITH_BUILT_IMAGE_DIGEST
+          image: ghcr.io/nmajor/glass-direct@sha256:8699b2e4b30fbec70e55d3a7d5a51b4667120be2a8be7fea6b3db21fc8c01ac3
           env:
             - name: PUBLIC_ORIGIN
               valueFrom:

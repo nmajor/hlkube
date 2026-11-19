@@ -4,7 +4,7 @@ This app is staged and is not included in the parent kustomization. Do not activ
 
 The pinned Glass 0.15.3 viewer and signaling server run in one pod with a dedicated Cloudflare Tunnel connector. All TCP listeners bind to loopback. There is no Service or Ingress, and isolation does not depend on the cluster's unenforced NetworkPolicies. One replica and a Recreate rollout keep local Durable Object state on one Longhorn volume.
 
-Cloudflare carries the website and signaling. Desktop video, input and file transfers use a direct encrypted WebRTC connection between the viewer and Starport. TURN provisioning is removed from the image and the signaling test requires an empty `iceServers` list. Cloudflare STUN is still used to discover addresses; it does not carry the desktop stream. Connections that cannot establish a direct path fail. Do not enable a relay fallback without a new user decision.
+Cloudflare carries the website and signaling. Desktop video and input use a direct encrypted WebRTC connection between the viewer and Starport. TURN provisioning is removed from the image and the signaling test requires an empty `iceServers` list. Cloudflare STUN is still used to discover addresses; it does not carry the desktop stream. Connections that cannot establish a direct path fail. Do not enable a relay fallback without a new user decision.
 
 ## Activation checklist
 
