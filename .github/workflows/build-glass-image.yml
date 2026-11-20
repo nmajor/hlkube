@@ -1,0 +1,98 @@
+name: Build Glass direct-only image
+
+on:
+  push:
+    branches: [main]
+    paths: ['images/glass/**', 'components/public-ca-trust/ca-bundle.pem', '.github/workflows/build-glass-image.yml']
+  pull_request:
+    paths: ['images/glass/**', 'components/public-ca-trust/ca-bundle.pem', '.github/workflows/build-glass-image.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glass-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build pinned image for verification
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: images/glass/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: glass-direct:verify
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Test the image with the production filesystem restrictions
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'docker rm -f glass-verify >/dev/null 2>&1 || true' EXIT
+          fixture_id=$(docker run --rm glass-direct:verify /usr/local/bin/mise exec -- node /opt/glass/smoke.mjs --fixture-id)
+          docker run -d --name glass-verify --read-only --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --tmpfs /tmp:rw,nosuid,nodev,uid=1000,gid=1000,size=256m \
+            --tmpfs /home/glass:rw,nosuid,nodev,uid=1000,gid=1000,size=64m \
+            --tmpfs /glass/site/.wrangler:rw,nosuid,nodev,uid=1000,gid=1000,size=128m \
+            --tmpfs /data:rw,nosuid,nodev,uid=1000,gid=1000,size=64m \
+            -e PUBLIC_ORIGIN=https://glass.nmajor.net \
+            -e STARPORT_ID="$fixture_id" \
+            glass-direct:verify
+          if ! docker exec glass-verify /usr/local/bin/mise exec -- node /opt/glass/smoke.mjs; then
+            docker logs glass-verify
+            exit 1
+          fi
+          docker exec glass-verify /usr/local/bin/mise exec -- node /opt/glass/isolation.mjs
+      - name: Save the tested image
+        if: github.event_name != 'pull_request'
+        run: docker save glass-direct:verify -o glass-direct.tar
+      - name: Transfer the tested image to the publishing job
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: glass-tested-image
+          path: glass-direct.tar
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: glass-tested-image
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish only a verified image
+        shell: bash
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/glass-direct:sha-${{ github.sha }}
+        run: |
+          set -euo pipefail
+          docker load -i glass-direct.tar
+          docker tag glass-direct:verify "$IMAGE"
+          docker push "$IMAGE"
+          reference=$(docker inspect "$IMAGE" --format '{{index .RepoDigests 0}}')
+          echo "Verified image: $reference" >> "$GITHUB_STEP_SUMMARY"
+          rm glass-direct.tar

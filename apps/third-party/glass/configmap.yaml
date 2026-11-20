@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glass-config
+  namespace: glass
+data:
+  PUBLIC_ORIGIN: https://glass.nmajor.net
+  STARPORT_ID: TOIuCX4GZ1sVXfL0j0FvzA
+  # Account metadata is public; the tunnel credential lives in the SealedSecret.
+  config.yaml: |
+    tunnel: 2556d576-a6ed-4315-a769-cf89f77e274e
+    metrics: 127.0.0.1:2000
+    ingress:
+      # Only this machine-registration path uses native Glass key authentication.
+      - hostname: glass.nmajor.net
+        path: ^/signal/host/TOIuCX4GZ1sVXfL0j0FvzA$
+        service: http://127.0.0.1:8787
+      # Every other request requires Cloudflare Access at both edge and connector.
+      - hostname: glass.nmajor.net
+        service: http://127.0.0.1:8787
+        originRequest:
+          access:
+            required: true
+            teamName: nmajor
+            audTag:
+              - 6154223bf97675945e3a01f3b14d53fc85d534e9bfb07691ba447160cdfcb9d1
+      - service: http_status:404

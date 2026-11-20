@@ -1,0 +1,41 @@
+name: Build Glass native with corrected certificate roots
+
+on:
+  pull_request:
+    paths: ['images/glass/native/**', '.github/workflows/build-glass-native.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glass-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install OS development libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libpipewire-0.3-dev libclang-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3
+        with:
+          version: 2026.11.10
+          working_directory: images/glass/native
+          cache: false
+      - name: Build, verify the lockfile change, and run upstream tests
+        run: mise exec -C images/glass/native -- bash "$GITHUB_WORKSPACE/images/glass/native/build.sh" "$RUNNER_TEMP/glass-native" "$GITHUB_WORKSPACE/dist-native"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: glass-starport-linux-x86_64
+          path: dist-native/
+          retention-days: 3
+      - name: Remove disposable build state
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/glass-native"
