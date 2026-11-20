@@ -4,7 +4,7 @@ metadata:
   name: glass
   namespace: glass
 spec:
-  # Local Durable Object state cannot be shared between concurrent instances.
+  # Host and viewer connections must reach the same in-memory introducer.
   replicas: 1
   strategy:
     type: Recreate
@@ -29,7 +29,6 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -148,8 +147,9 @@ spec:
       # No Service, Ingress, pod-IP listener, or NetworkPolicy isolation assumption.
       volumes:
         - name: state
-          persistentVolumeClaim:
-            claimName: glass-state
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
         - name: home
           emptyDir:
             sizeLimit: 64Mi

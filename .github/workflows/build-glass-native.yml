@@ -1,9 +1,6 @@
 name: Build Glass native with corrected certificate roots
 
 on:
-  push:
-    branches: [codex/glass-starport-direct]
-    paths: ['images/glass/native/**', '.github/workflows/build-glass-native.yml']
   pull_request:
     paths: ['images/glass/native/**', '.github/workflows/build-glass-native.yml']
   workflow_dispatch:

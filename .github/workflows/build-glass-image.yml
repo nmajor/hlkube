@@ -2,7 +2,7 @@ name: Build Glass direct-only image
 
 on:
   push:
-    branches: [main, codex/glass-starport-direct]
+    branches: [main]
     paths: ['images/glass/**', 'components/public-ca-trust/ca-bundle.pem', '.github/workflows/build-glass-image.yml']
   pull_request:
     paths: ['images/glass/**', 'components/public-ca-trust/ca-bundle.pem', '.github/workflows/build-glass-image.yml']

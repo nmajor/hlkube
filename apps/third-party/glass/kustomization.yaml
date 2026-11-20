@@ -5,7 +5,6 @@ components:
   - ../../../components/public-ca-trust
 resources:
   - namespace.yaml
-  - pvc.yaml
   - configmap.yaml
   - deployment.yaml
   - tunnel.sealed.yaml
