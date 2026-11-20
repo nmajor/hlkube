@@ -7,7 +7,9 @@ const fixture = { kty: 'EC', crv: 'P-256', x: 'l37oKuvj3jEEobmBMpHlbIIjRRJu4Chih
   y: 'Hrs4Xic_S8RaQT9HV_CEQZTopEJnYI20eFU_Av72BZc', d: 'n64GpTyuFHR1RSXkwYSt6uIkv3FPhTXmPyToCOXcK9M' };
 const publicBytes = (jwk) => Buffer.concat([Buffer.from([4]), Buffer.from(jwk.x, 'base64url'), Buffer.from(jwk.y, 'base64url')]);
 const fixtureId = createHash('sha256').update(publicBytes(fixture)).digest().subarray(0, 16).toString('base64url');
+const fixturePublicKey = publicBytes(fixture).toString('base64url');
 if (process.argv.includes('--fixture-id')) { console.log(fixtureId); process.exit(0); }
+if (process.argv.includes('--fixture-public-key')) { console.log(fixturePublicKey); process.exit(0); }
 
 const port = Number(process.env.GLASS_TEST_PORT ?? 8787);
 const id = process.env.STARPORT_ID;
@@ -19,8 +21,8 @@ for (let i = 0; i < 60; i++) {
   if (i === 59) throw new Error('Glass did not become ready');
   await new Promise((done) => setTimeout(done, 500));
 }
-for (const [path, expected] of [['/', 302], ['/app', 302], ['/app/', 200], ['/app/main.js', 200],
-  ['/api/account', 404], ['/computers', 404], ['/releases/x', 404], ['/signal/online', 404],
+for (const [path, expected] of [['/', 200], ['/computers', 200], ['/app', 302], ['/app/', 200], ['/app/main.js', 200],
+  ['/api/account', 404], ['/releases/x', 404], ['/signal/online', 404],
   ['/signal/connect/BBBBBBBBBBBBBBBBBBBBBB', 404], ['/healthz', 200],
   [`/signal/host/${id}/`, 404], [`/signal/host/${id}/extra`, 404],
   [`/signal/host/%${id.charCodeAt(0).toString(16)}${id.slice(1)}`, 404],
@@ -29,6 +31,12 @@ for (const [path, expected] of [['/', 302], ['/app', 302], ['/app/', 200], ['/ap
   const response = await fetch(base + path, { redirect: 'manual', signal: AbortSignal.timeout(2000) });
   assert.equal(response.status, expected, path);
   if (expected === 302) assert.equal(response.headers.get('location'), '/app/');
+  if (path === '/' || path === '/computers') {
+    assert.equal(response.headers.get('content-type'), 'text/html; charset=utf-8');
+    const page = await response.text();
+    assert.ok(page.includes(`href="/app/#r=${fixturePublicKey}"`), path);
+    assert.ok(page.includes('one-time Glass passkey setup link'), path);
+  }
   console.log('PASS HTTP', path, expected);
 }
 

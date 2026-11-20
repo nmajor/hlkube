@@ -40,6 +40,7 @@ jobs:
           set -euo pipefail
           trap 'docker rm -f glass-verify >/dev/null 2>&1 || true' EXIT
           fixture_id=$(docker run --rm glass-direct:verify /usr/local/bin/mise exec -- node /opt/glass/smoke.mjs --fixture-id)
+          fixture_public_key=$(docker run --rm glass-direct:verify /usr/local/bin/mise exec -- node /opt/glass/smoke.mjs --fixture-public-key)
           docker run -d --name glass-verify --read-only --cap-drop ALL \
             --security-opt no-new-privileges \
             --tmpfs /tmp:rw,nosuid,nodev,uid=1000,gid=1000,size=256m \
@@ -48,6 +49,7 @@ jobs:
             --tmpfs /data:rw,nosuid,nodev,uid=1000,gid=1000,size=64m \
             -e PUBLIC_ORIGIN=https://glass.nmajor.net \
             -e STARPORT_ID="$fixture_id" \
+            -e STARPORT_PUBLIC_KEY="$fixture_public_key" \
             glass-direct:verify
           if ! docker exec glass-verify /usr/local/bin/mise exec -- node /opt/glass/smoke.mjs; then
             docker logs glass-verify

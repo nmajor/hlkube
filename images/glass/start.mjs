@@ -1,13 +1,21 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const origin = new URL(process.env.PUBLIC_ORIGIN ?? '');
 if (origin.protocol !== 'https:' || origin.pathname !== '/' || origin.search || origin.hash || origin.username || origin.password) {
   throw new Error('PUBLIC_ORIGIN must be an HTTPS origin');
 }
-if (!/^[A-Za-z0-9_-]{22}$/.test(process.env.STARPORT_ID ?? '')) throw new Error('STARPORT_ID is required');
+const starportId = process.env.STARPORT_ID;
+const starportPublicKey = process.env.STARPORT_PUBLIC_KEY ?? '';
+const publicKey = Buffer.from(starportPublicKey, 'base64url');
+if (publicKey.length !== 65 || publicKey[0] !== 4 || publicKey.toString('base64url') !== starportPublicKey) {
+  throw new Error('STARPORT_PUBLIC_KEY must be a raw P-256 public key encoded as base64url');
+}
+const publicKeyId = createHash('sha256').update(publicKey).digest().subarray(0, 16).toString('base64url');
+if (publicKeyId !== starportId) throw new Error('STARPORT_PUBLIC_KEY does not match STARPORT_ID');
 const base = JSON.parse(readFileSync('/glass/site/wrangler.base.json'));
-base.vars = { PUBLIC_ORIGIN: origin.origin, STARPORT_ID: process.env.STARPORT_ID };
+base.vars = { PUBLIC_ORIGIN: origin.origin, STARPORT_ID: starportId, STARPORT_PUBLIC_KEY: starportPublicKey };
 mkdirSync('/tmp/glass', { recursive: true, mode: 0o700 });
 writeFileSync('/tmp/glass/wrangler.json', JSON.stringify(base), { mode: 0o600 });
 

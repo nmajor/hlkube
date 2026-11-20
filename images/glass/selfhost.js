@@ -2,6 +2,27 @@
 import upstream from './src/index.js';
 export { Introducer } from './src/introducer.js';
 
+function starportEntry(publicKey) {
+  const html = `<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starport | Glass</title>
+<main>
+  <h1>Starport</h1>
+  <p><a href="/app/#r=${publicKey}">Open Starport desktop</a></p>
+  <p>On a new browser, open your one-time Glass passkey setup link first.</p>
+</main>
+</html>`;
+  return new Response(html, {
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    },
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     let origin;
@@ -15,7 +36,8 @@ export default {
 
     const path = new URL(request.url).pathname;
     if (path === '/healthz') return Response.json({ ok: true, version: '0.15.3', media: 'direct-only' });
-    if (path === '/' || path === '/app') {
+    if (path === '/' || path === '/computers') return starportEntry(env.STARPORT_PUBLIC_KEY);
+    if (path === '/app') {
       return new Response(null, { status: 302, headers: { Location: '/app/', 'Cache-Control': 'no-store' } });
     }
     const host = `/signal/host/${env.STARPORT_ID}`;

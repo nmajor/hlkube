@@ -18,6 +18,8 @@ Cloudflare carries the website and signaling. Desktop video and input use a dire
 
 The host ID is a public fingerprint of Starport's P-256 key. The introducer checks a signature against that fingerprint, so a different key cannot claim it. Tests also confirm that an unsigned host socket cannot replace an authenticated host. The exception permits signaling registration only, and does not authorize desktop access.
 
+After Cloudflare Access sign-in, the site's home page links to Starport using its public key. The link opens the desktop for browsers already enrolled with Glass. For a new browser, create a one-time passkey link on Starport with `mise exec -- glass link --anywhere --passkey --for 30d`. The same entry page handles `/computers`, where Glass redirects when opened without a host in the link.
+
 ## Verification and recovery
 
 Check the published image's listener test, Access denial without authentication, native host registration, and a browser session from outside the home network with Tailscale disabled. Inspect the browser's selected ICE candidate pair: neither side may be a `relay` candidate. Confirm screen capture, keyboard input, lock/unlock, process restart, pod restart, and an unattended Starport reboot.

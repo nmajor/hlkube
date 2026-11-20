@@ -17,7 +17,7 @@ spec:
         app.kubernetes.io/name: glass
       annotations:
         # Refresh these checksums whenever config or tunnel credentials change.
-        checksum/config: 61ea2feced7554c0c54ff4e7290a683ecb4127f20e91908a27a09e0a452dd4df
+        checksum/config: 57e6f29801fba7e8f22956fae521fe80d49bb722549283d85ad7b8a4432e0236
         checksum/tunnel: 78b7468b2b4e268661e8702fac8744de90689c9e9fe11e97578aadf94ec21f75
         security.hlkube.net/ca-bundle-sha256: 796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
     spec:
@@ -46,6 +46,11 @@ spec:
                 configMapKeyRef:
                   name: glass-config
                   key: STARPORT_ID
+            - name: STARPORT_PUBLIC_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: glass-config
+                  key: STARPORT_PUBLIC_KEY
             - name: SSL_CERT_FILE
               value: /etc/hlkube-ca/ca-bundle.pem
             - name: SSL_CERT_DIR
