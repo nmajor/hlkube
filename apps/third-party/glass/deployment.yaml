@@ -34,7 +34,7 @@ spec:
       containers:
         - name: glass
           # Exact image tested in CI with a read-only filesystem and loopback isolation.
-          image: ghcr.io/nmajor/glass-direct@sha256:8699b2e4b30fbec70e55d3a7d5a51b4667120be2a8be7fea6b3db21fc8c01ac3
+          image: ghcr.io/nmajor/glass-direct@sha256:ab5c369868c27002577acee5c812e745b6212035442cf13cef895287c802abd0
           env:
             - name: PUBLIC_ORIGIN
               valueFrom:
