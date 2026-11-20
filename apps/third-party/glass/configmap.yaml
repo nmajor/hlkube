@@ -6,6 +6,7 @@ metadata:
 data:
   PUBLIC_ORIGIN: https://glass.nmajor.net
   STARPORT_ID: TOIuCX4GZ1sVXfL0j0FvzA
+  STARPORT_PUBLIC_KEY: BJL7sFbLxyW5Vrf1OufUTekbbVgctqwk9y9NCOIiy-IvMs6kQAMyPgmA6Xqa6vWymjaLsN33VUqpG_urQV1GAto
   # Account metadata is public; the tunnel credential lives in the SealedSecret.
   config.yaml: |
     tunnel: 2556d576-a6ed-4315-a769-cf89f77e274e
