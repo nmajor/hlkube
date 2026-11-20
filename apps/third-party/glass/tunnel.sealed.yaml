@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: glass-tunnel
+  namespace: glass
+spec:
+  encryptedData:
+    tunnel.json: AgAOu0eTn36+s/uZBhM1+iyvLpsHVkf4Dird5QVPpayGs5KCECXcvP+Wx6zH4RiY99UF9wolgr+NR4vl+wuEAw5xLpEgOnlJemcJb0QtNxjr0nCZgyfw3Ye60RM2CKdLqsc6dLABrN/vIWX9cFiKbpI83xxLBQzqhkxkuz5DqEnWTeGeOou84Pxk92nR07QReBpWC9hu2Djk+WKmey4daxd92xtmdcWOoxugdaJCoUwj2nz2JIpuYdyquwAX54lCvFoHqMkq0hAFbmooeXZGjCvLbh6PqHLv82Myt2WPtglIL5zg/jYbRptWCdhVgs70j5xJL521RvJMkf/fjSQg3exAYgGkZiMZgK/knUuPWvhvnxXeoooLfAWygz2M+Sp5LuARwRNoOzCpy8bzqc3qLq3NeKHOWVr38KwdoGphqQYdKGo6xYtgYl7P/ndMDJPFs4yZen1S5dgbj2/JSqXPpg3eClccdT+4M/v9R9vbTn7N4ksSnPoC81W0yKk1hkhLnKwzx+Qad0l7srq+GAf1gtRbbiZbNs7wi0/FKfg9mJ7ppU2SwUOWdBc+h/vP+9bZp6fNDTqOAQZlhf7ee6Mcg3NhioK8uQCv6gLPZaBl/hKWv+UmevNwUNHRJnPeuchZlFJZZjEsLqQxUqwn4AdRhmlkM0PcvKDTfPXecxcUMtJr4ykq7Fg2KyNmVB968yiLWZtwS8ibS0/JdqEDM/szK3Nm1F5OGVKK1QEUqvOriU097LRKlFrUnNgs0irtNpRahAJ5z6YjwPbE5djs4Td28JR8RZZbPdq1lOpNjn8SCsSkyuTYFeMnUYoY9asiV0D2dihV+p4qUM5TxpC3o8xetKhTTGBGj21IvO0M0Vth6mFdJROtFn1MDKLkZzfFH94xEK/+iEHsP4AEzpZJsRYVzOa3kDrAoALOqQtb8n+ZCUCm
+  template:
+    metadata:
+      name: glass-tunnel
+      namespace: glass
+    type: Opaque

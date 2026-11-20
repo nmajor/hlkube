@@ -1,6 +1,6 @@
 # Starport browser desktop
 
-This app is staged and is not included in the parent kustomization. Do not activate it with placeholders.
+This app is managed through Flux by the parent kustomization. Merge activation only after the pinned image is pullable, the Access policies are verified and the tunnel credential is sealed. DNS must point to the dedicated tunnel only after its connector is healthy.
 
 The pinned Glass 0.15.3 viewer and signaling server run in one pod with a dedicated Cloudflare Tunnel connector. All TCP listeners bind to loopback. There is no Service or Ingress, and isolation does not depend on the cluster's unenforced NetworkPolicies. One replica and a Recreate rollout keep local Durable Object state on one Longhorn volume.
 
@@ -12,7 +12,7 @@ Cloudflare carries the website and signaling. Desktop video and input use a dire
 2. Create a dedicated tunnel and an Access application for `glass.nmajor.net` restricted to the owner's identity. Create a more specific Bypass application for `/signal/host/TOIuCX4GZ1sVXfL0j0FvzA` only. The connector requires an Access JWT for every other path. Never widen the exception to `/signal/*`.
 3. Fill the tunnel UUID, Access team and application AUD in `configmap.yaml`. Edge path matching can be broader than the connector's anchored regex. Percent-encoded aliases that match the connector's decoded path are rejected by the application's allowlist.
 4. Follow the root SealedSecrets workflow for a `glass-tunnel` Secret in namespace `glass`, with its `tunnel.json` key. Add the generated `.sealed.yaml` to this kustomization. Never commit tunnel credentials or an API token.
-5. Fill the image digest and config checksum in `deployment.yaml`, render the kustomization, and review the complete diff before adding this directory to the parent resource list. Deployment goes through Flux only.
+5. Pin the verified image digest and config/SealedSecret checksums in `deployment.yaml`, render the kustomization, and review the complete activation diff. Deployment goes through Flux only. Once the dedicated connector is healthy, create the exact proxied CNAME to its tunnel UUID; preserve the existing wildcard and shared tunnel.
 6. Install the verified native build from `build-glass-native.yml` on Starport through mise before enabling remote access. It updates only the upstream Cargo.lock dependency `webpki-roots` from 1.0.10 to 1.0.11, removing the same two excluded eMudhra trust anchors as the cluster's policy. The stock binary embeds the old roots and ignores the OS CA bundle for host signaling. Retain the build's checksum, lockfile diff and source commit. Do not install an unverified artifact or run the compiler on Starport.
 7. On Starport, set `glass config relay https://glass.nmajor.net`, then enable remote access. Complete the initial Ubuntu screen-sharing consent locally. Create a passkey-bound guest link with user verification required. Keep the owner token off the website.
 

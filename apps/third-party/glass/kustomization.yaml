@@ -8,5 +8,5 @@ resources:
   - pvc.yaml
   - configmap.yaml
   - deployment.yaml
-# Add the generated tunnel.sealed.yaml only after following AGENTS.md's secret workflow.
-# This directory is intentionally not listed in ../kustomization.yaml during preparation.
+  - tunnel.sealed.yaml
+# Credentials were generated through the repository sealing workflow.

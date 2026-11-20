@@ -16,8 +16,9 @@ spec:
       labels:
         app.kubernetes.io/name: glass
       annotations:
-        # Fill with the SHA256 of configmap.yaml on activation and every config change.
-        checksum/config: REPLACE_WITH_CONFIG_CHECKSUM
+        # Refresh these checksums whenever config or tunnel credentials change.
+        checksum/config: 61ea2feced7554c0c54ff4e7290a683ecb4127f20e91908a27a09e0a452dd4df
+        checksum/tunnel: 78b7468b2b4e268661e8702fac8744de90689c9e9fe11e97578aadf94ec21f75
         security.hlkube.net/ca-bundle-sha256: 796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
     spec:
       automountServiceAccountToken: false
@@ -33,7 +34,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: glass
-          # Keep this app out of the Flux resource list until the built digest is set.
+          # Exact image tested in CI with a read-only filesystem and loopback isolation.
           image: ghcr.io/nmajor/glass-direct@sha256:8699b2e4b30fbec70e55d3a7d5a51b4667120be2a8be7fea6b3db21fc8c01ac3
           env:
             - name: PUBLIC_ORIGIN

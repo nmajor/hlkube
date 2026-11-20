@@ -6,9 +6,9 @@ metadata:
 data:
   PUBLIC_ORIGIN: https://glass.nmajor.net
   STARPORT_ID: TOIuCX4GZ1sVXfL0j0FvzA
-  # Replace account metadata before activating this app. These are not secrets.
+  # Account metadata is public; the tunnel credential lives in the SealedSecret.
   config.yaml: |
-    tunnel: REPLACE_WITH_DEDICATED_TUNNEL_UUID
+    tunnel: 2556d576-a6ed-4315-a769-cf89f77e274e
     metrics: 127.0.0.1:2000
     ingress:
       # Only this machine-registration path uses native Glass key authentication.
@@ -21,7 +21,7 @@ data:
         originRequest:
           access:
             required: true
-            teamName: REPLACE_WITH_ACCESS_TEAM
+            teamName: nmajor
             audTag:
-              - REPLACE_WITH_ACCESS_APP_AUDIENCE
+              - 6154223bf97675945e3a01f3b14d53fc85d534e9bfb07691ba447160cdfcb9d1
       - service: http_status:404
